@@ -11,11 +11,13 @@ namespace Keede.DAL
     {
         IDbConnection _connection;
 
+        [Obsolete("务必在应用启动时调用ConnectionContainer.AddDbConnections进行数据库配置初始化")]
         public IDbConnection GetDbConnection(bool isReadDb = true)
         {
             return CreateConnction(null, isReadDb);
         }
 
+        [Obsolete("务必在应用启动时调用ConnectionContainer.AddDbConnections进行数据库配置初始化")]
         public IDbConnection GetDbConnection(string dbName, bool isReadDb = true)
         {
             return CreateConnction(dbName, isReadDb);
@@ -40,7 +42,7 @@ namespace Keede.DAL
 
         ~Databases()
         {
-            Dispose(false);
+            Dispose(true);
         }
 
         /// <summary>

@@ -9,22 +9,41 @@ namespace Keede.DAL.Conntion
     public static class ConnectionContainer
     {
 
-        static IList<ConnectionWrapper> _lists;
-        const string DAL_Connection_Strings = "DAL_Connection_Strings";
+        static IList<ConnectionWrapper> _lists= new List<ConnectionWrapper>();
 
-        static ConnectionContainer()
+        public static void AddDbConnections(string dbName, string writeConnction, string[] readConnctions=null, EnumStrategyType strategyType= EnumStrategyType.Loop)
         {
-            ConfManager.ValueChanged += ConfManager_ValueChanged;
+            //if (_lists.First(f => f.DbName == dbName) != null)
+            //    throw new Exception("数据库已存在");
 
-            //todo  list read from conf manager
+            if (readConnctions==null)
+            {
+                _lists.Add(new ConnectionWrapper(dbName, writeConnction));
+            }
+            else
+            {
+                BaseStrategy strategy=null;
+
+                switch (strategyType)
+                {
+                    case EnumStrategyType.Loop:
+                        strategy = new LoopStrategy();
+                        break;
+                    case EnumStrategyType.Random:
+                        strategy = new RondomStrategy();
+                        break;
+                    default:
+                        strategy= new LoopStrategy();
+                        break;
+                }
+                _lists.Add(new ConnectionWrapper(dbName, writeConnction,readConnctions, strategy));
+            }
         }
 
-        private static void ConfManager_ValueChanged(object sender, Config.Keede.Common.Event.ConfigValueChangedEventArgs args)
+        [Obsolete("仅供单元测试调用")]
+        public static void ClearConnections()
         {
-            if (args.Name == DAL_Connection_Strings)
-            {
-
-            }
+            if(_lists!=null) _lists.Clear();
         }
 
         internal static string GetConnction(string dbName, bool isReadDb = true)
