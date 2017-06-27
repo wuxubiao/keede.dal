@@ -34,7 +34,6 @@ namespace Keede.DAL.Test
 
         private void Init()
         {
-            ConnectionContainer.ClearConnections();
             string[] readConnctions = { "Data Source=tcp:192.168.152.52,1433;Initial Catalog=DB01;User ID=sa;Password=!QAZ2wsx;", "Data Source=tcp:192.168.152.53,1433;Initial Catalog=DB01;User ID=sa;Password=!QAZ2wsx;" };
             ConnectionContainer.AddDbConnections("DB01", "Data Source=tcp:192.168.152.52,1433;Initial Catalog=DB01;User ID=sa;Password=!QAZ2wsx;", readConnctions, EnumStrategyType.Random);
         }

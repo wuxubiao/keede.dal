@@ -1,5 +1,4 @@
-﻿using Config.Keede.Library;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,12 +37,6 @@ namespace Keede.DAL.Conntion
                 }
                 _lists.Add(new ConnectionWrapper(dbName, writeConnction,readConnctions, strategy));
             }
-        }
-
-        [Obsolete("仅供单元测试调用")]
-        public static void ClearConnections()
-        {
-            if(_lists!=null) _lists.Clear();
         }
 
         internal static string GetConnction(string dbName, bool isReadDb = true)

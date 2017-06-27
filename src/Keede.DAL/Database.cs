@@ -2,7 +2,6 @@
 using System.Data;
 using System.Data.SqlClient;
 using Dapper;
-using Config.Keede.Library;
 using Keede.DAL.Conntion;
 
 namespace Keede.DAL
