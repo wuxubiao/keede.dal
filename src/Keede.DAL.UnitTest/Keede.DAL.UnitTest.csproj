@@ -51,8 +51,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conntion\ConnectionContainerTests.cs" />
     <Compile Include="News.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="DatabasesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

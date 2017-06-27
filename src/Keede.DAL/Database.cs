@@ -2,22 +2,19 @@
 using System.Data;
 using System.Data.SqlClient;
 using Dapper;
-using Keede.DAL.Conntion;
+using Keede.DAL;
 
 namespace Keede.DAL
 {
     public class Databases : IDisposable
     {
         IDbConnection _connection;
-        SqlConnectionWrapper _rapper;
 
-        [Obsolete("务必在应用启动时调用ConnectionContainer.AddDbConnections进行数据库配置初始化")]
         public IDbConnection GetDbConnection(bool isReadDb = true)
         {
             return CreateConnction(null, isReadDb);
         }
 
-        [Obsolete("务必在应用启动时调用ConnectionContainer.AddDbConnections进行数据库配置初始化")]
         public IDbConnection GetDbConnection(string dbName, bool isReadDb = true)
         {
             return CreateConnction(dbName, isReadDb);

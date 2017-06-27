@@ -52,7 +52,6 @@
     <Compile Include="Conntion\ConnectionContainer.cs" />
     <Compile Include="Conntion\ConnectionWrapper.cs" />
     <Compile Include="Conntion\EnumStrategyType.cs" />
-    <Compile Include="Conntion\SqlConnectionWrapper.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Strategy\BaseStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

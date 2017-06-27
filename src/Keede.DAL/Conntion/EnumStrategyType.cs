@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Keede.DAL.Conntion
+namespace Keede.DAL
 {
     public enum EnumStrategyType
     {
