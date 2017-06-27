@@ -12,20 +12,21 @@ namespace Keede.DAL.UnitTest
         public void TestRead()
         {
             Init();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
 
                 Databases db = new Databases();
 
                 using (var connection = db.GetDbConnection())
                 {
-
+                    connection.Open();
                     var result = connection.Query<News>("select top 10 * from news order by id");
                     var b = connection;
                 }
 
                 using (var connection = new Databases().GetDbConnection())
                 {
+                    connection.Open();
                     var result = connection.Query<News>("select top 10 * from news order by id");
                     int ii = 0;
                 }
