@@ -10,6 +10,7 @@ namespace Keede.DAL
     public class Databases : IDisposable
     {
         IDbConnection _connection;
+        SqlConnectionWrapper _rapper;
 
         [Obsolete("务必在应用启动时调用ConnectionContainer.AddDbConnections进行数据库配置初始化")]
         public IDbConnection GetDbConnection(bool isReadDb = true)
@@ -42,7 +43,7 @@ namespace Keede.DAL
 
         ~Databases()
         {
-            Dispose(true);
+            Dispose(false);
         }
 
         /// <summary>

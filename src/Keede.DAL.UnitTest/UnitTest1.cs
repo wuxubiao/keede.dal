@@ -9,17 +9,38 @@ namespace Keede.DAL.UnitTest
     public class UnitTest1
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestRead()
         {
             Init();
             for (int i = 0; i < 10; i++)
             {
-                using (var connection = new Databases().GetDbConnection())
+
+                Databases db = new Databases();
+
+                using (var connection = db.GetDbConnection())
                 {
 
-
                     var result = connection.Query<News>("select top 10 * from news order by id");
-                    //connection.Execute("update news set title='中文扥扥扥的扥扥扥是' where id=1");
+                    var b = connection;
+                }
+
+                using (var connection = new Databases().GetDbConnection())
+                {
+                    var result = connection.Query<News>("select top 10 * from news order by id");
+                    int ii = 0;
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestWrite()
+        {
+            Init();
+            for (int i = 0; i < 10; i++)
+            {
+                using (var connection = new Databases().GetDbConnection(false))
+                {
+                    connection.Execute("update news set title='中文1'");
                 }
             }
         }

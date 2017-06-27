@@ -24,11 +24,11 @@ namespace Keede.DAL.Test
             using (var connection = new Databases().GetDbConnection())
             {
                 
-                using (var tran = connection.BeginTransaction())
-                {
+                //using (var tran = connection.Connection.BeginTransaction())
+                //{
 
-                    tran.Commit();
-                }
+                //    tran.Commit();
+                //}
             }
         }
 
