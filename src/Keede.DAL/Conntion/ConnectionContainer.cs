@@ -12,20 +12,12 @@ namespace Keede.DAL.Conntion
         static IList<ConnectionWrapper> _lists;
         const string DAL_Connection_Strings = "DAL_Connection_Strings";
 
-        static ConnectionContainer()
+        public static void AddDbConnections(string dbName, string writeConnction, string[] readConnctions, EnumStrategyType strategyType)
         {
-            ConfManager.ValueChanged += ConfManager_ValueChanged;
-            ConfManager.GetAppsetting("DAL_Connection_Strings");
-            //todo  list read from conf manager
+
         }
 
-        private static void ConfManager_ValueChanged(object sender, Config.Keede.Common.Event.ConfigValueChangedEventArgs args)
-        {
-            if (args.Name == DAL_Connection_Strings)
-            {
-                //重新加载数据库连接字符串
-            }
-        }
+       
 
         internal static string GetConnction(string dbName, bool isReadDb = true)
         {
