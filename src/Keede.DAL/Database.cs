@@ -23,7 +23,7 @@ namespace Keede.DAL
 
         private IDbConnection CreateConnction(string dbName = null, bool isReadDb = true)
         {
-            var connectionStr = ConnectionContainer.GetConnction(dbName, isReadDb);
+            var connectionStr = dbName == null ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
             _connection = new SqlConnection(connectionStr);
             return _connection;
         }

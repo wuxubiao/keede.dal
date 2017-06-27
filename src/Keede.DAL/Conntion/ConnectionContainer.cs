@@ -15,7 +15,7 @@ namespace Keede.DAL.Conntion
         static ConnectionContainer()
         {
             ConfManager.ValueChanged += ConfManager_ValueChanged;
-            ConfManager.GetAppsetting("DAL_Connection_Strings");
+
             //todo  list read from conf manager
         }
 
@@ -23,19 +23,22 @@ namespace Keede.DAL.Conntion
         {
             if (args.Name == DAL_Connection_Strings)
             {
-                //重新加载数据库连接字符串
+
             }
         }
 
         internal static string GetConnction(string dbName, bool isReadDb = true)
         {
             var wapper = _lists.First(f => f.DbName == dbName);
+
+            if(wapper==null) throw new Exception("数据库不存在，请检查配置");
+
             return isReadDb ? wapper.ReadConnction : wapper.WriteConnction;
         }
 
         internal static string GetConnction(bool isRead = true)
         {
-            if (_lists.Count != 1) throw new Exception("");
+            if (_lists.Count != 1) throw new Exception("配置了多个数据库，请指定数据库");
 
             var wapper = _lists.First();
             return isRead ? wapper.ReadConnction : wapper.WriteConnction;
