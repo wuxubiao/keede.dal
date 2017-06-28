@@ -17,7 +17,7 @@ namespace Keede.DAL.Tests
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver2;User Id = sa;Password = !QAZ2wsx;" };
             ConnectionContainer.AddDbConnections("DB01", "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;", readConnctions, EnumStrategyType.Loop);
 
-            ConnectionContainer.AddDbConnections("DB01", "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;", readConnctions, EnumStrategyType.Loop);
+            ConnectionContainer.AddDbConnections("DB02", "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;", readConnctions, EnumStrategyType.Loop);
         }
     }
 }

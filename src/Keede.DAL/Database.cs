@@ -17,7 +17,7 @@ namespace Keede.DAL
 
         public IDbConnection GetDbConnection(string dbName, bool isReadDb = true)
         {
-            return CreateConnction(dbName, isReadDb);
+            return CreateConnction(dbName.ToLower(), isReadDb);
         }
 
         private IDbConnection CreateConnction(string dbName = null, bool isReadDb = true)

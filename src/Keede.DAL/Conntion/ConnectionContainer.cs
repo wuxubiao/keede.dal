@@ -12,12 +12,12 @@ namespace Keede.DAL
 
         public static void AddDbConnections(string dbName, string writeConnction, string[] readConnctions = null, EnumStrategyType strategyType = EnumStrategyType.Loop)
         {
-            //if (_lists.First(f => f.DbName == dbName) != null)
-            //    throw new Exception("数据库已存在");
+            var ss = _lists.FirstOrDefault(f => f.DbName == dbName);
+            if (_lists.Count > 0 && _lists.FirstOrDefault(f => f.DbName == dbName) != null) throw new Exception("dbName重复");
 
             if (readConnctions == null)
             {
-                _lists.Add(new ConnectionWrapper(dbName, writeConnction));
+                _lists.Add(new ConnectionWrapper(dbName.ToLower(), writeConnction));
             }
             else
             {
@@ -35,13 +35,13 @@ namespace Keede.DAL
                         strategy = new LoopStrategy();
                         break;
                 }
-                _lists.Add(new ConnectionWrapper(dbName, writeConnction, readConnctions, strategy));
+                _lists.Add(new ConnectionWrapper(dbName.ToLower(), writeConnction, readConnctions, strategy));
             }
         }
 
         internal static string GetConnction(string dbName, bool isReadDb = true)
         {
-            var wapper = _lists.First(f => f.DbName == dbName);
+            var wapper = _lists.FirstOrDefault(f => f.DbName == dbName);
 
             if (wapper == null)
             {
