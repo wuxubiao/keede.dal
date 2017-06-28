@@ -10,6 +10,13 @@ namespace Keede.DAL
 
         static IList<ConnectionWrapper> _lists = new List<ConnectionWrapper>();
 
+        /// <summary>
+        /// 初始化数据库配置
+        /// </summary>
+        /// <param name="dbName"></param>
+        /// <param name="writeConnction"></param>
+        /// <param name="readConnctions"></param>
+        /// <param name="strategyType"></param>
         public static void AddDbConnections(string dbName, string writeConnction, string[] readConnctions = null, EnumStrategyType strategyType = EnumStrategyType.Loop)
         {
             var ss = _lists.FirstOrDefault(f => f.DbName == dbName);
