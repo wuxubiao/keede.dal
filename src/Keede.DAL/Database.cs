@@ -1,49 +1,65 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using Dapper;
-using Keede.DAL;
 
 namespace Keede.DAL
 {
-    public class Databases
+    public static class Databases
     {
-        #region SqlConnection对象
-        public IDbConnection GetDbConnection(bool isReadDb = true)
+        #region IDbConnection对象
+        public static IDbConnection GetDbConnection(bool isReadDb = true)
         {
             return CreateConnction(null, isReadDb);
         }
 
-        public IDbConnection GetDbConnection(string dbName, bool isReadDb = true)
+        public static IDbConnection GetDbConnection(string dbName, bool isReadDb = true)
         {
             return CreateConnction(dbName.ToLower(), isReadDb);
         }
         
-        private IDbConnection CreateConnction(string dbName = null, bool isReadDb = true)
+        private static IDbConnection CreateConnction(string dbName = null, bool isReadDb = true)
         {
             var connectionStr = dbName == null ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
             return new SqlConnection(connectionStr);
         }
-        #endregion Connection
+        #endregion IDbConnection对象
+
+        #region SqlConnection对象
+        public static SqlConnection GetSqlConnection(bool isReadDb = true)
+        {
+            return CreateSqlConnection(null, isReadDb);
+        }
+
+        public static SqlConnection GetSqlConnection(string dbName, bool isReadDb = true)
+        {
+            return CreateSqlConnection(dbName.ToLower(), isReadDb);
+        }
+
+        private static SqlConnection CreateSqlConnection(string dbName = null, bool isReadDb = true)
+        {
+            var connectionStr = dbName == null ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
+            return new SqlConnection(connectionStr);
+        }
+        #endregion SqlConnection对象
 
         #region SqlConnection连接字符串
-        public string GetDbConnectionStr(bool isReadDb = true)
+        public static string GetDbConnectionStr(bool isReadDb = true)
         {
             return CreateConnctionStr(null, isReadDb);
         }
 
-        public string GetDbConnectionStr(string dbName, bool isReadDb = true)
+        public static string GetDbConnectionStr(string dbName, bool isReadDb = true)
         {
             return CreateConnctionStr(dbName.ToLower(), isReadDb);
         }
 
-        private string CreateConnctionStr(string dbName = null, bool isReadDb = true)
+        private static string CreateConnctionStr(string dbName = null, bool isReadDb = true)
         {
             return dbName == null ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
         }
         #endregion SqlConnection连接字符串
 
-        //#region IDisposable Members
+        #region IDisposable Members
 
         //private bool _isDispose;
 
@@ -70,6 +86,6 @@ namespace Keede.DAL
         //        _connection.Close();
         //}
 
-        //#endregion
+        #endregion
     }
 }
