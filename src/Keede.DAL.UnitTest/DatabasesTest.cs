@@ -21,12 +21,10 @@ namespace Keede.DAL.UnitTest
             for (int i = 0; i < 1; i++)
             {
 
-                Databases db = new Databases();
-
-                using (var connection = db.GetDbConnection())
+                using (var connection = Databases.GetDbConnection())
                 {
                     connection.Open();
-                    var result = connection.Query<News>("SELECT TOP 1000 [Id],[Level],[Content],[CreateDate]FROM[Test_Master].[dbo].[Logs]");
+                    var result = connection.Query<News>("SELECT TOP 1000 * FROM Logs");
                 }
             }
         }
@@ -36,7 +34,7 @@ namespace Keede.DAL.UnitTest
         {
             for (int i = 0; i < 10; i++)
             {
-                using (var connection = new Databases().GetDbConnection(false))
+                using (var connection =  Databases.GetDbConnection(false))
                 {
                     connection.Execute("update news set title='中文1'");
                 }
@@ -50,11 +48,18 @@ namespace Keede.DAL.UnitTest
             string writeConnction = "Data Source=192.168.152.52;Initial Catalog=news;User Id=sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB2", writeConnction, readConnctions, EnumStrategyType.Loop);
 
-            using (var connection = new Databases().GetDbConnection("db2"))
+            using (var connection = Databases.GetDbConnection("db2"))
             {
                 connection.Open();
                 var result = connection.Query<News>("select top 10 * from news order by id");
             }
+        }
+
+        [TestMethod()]
+        public void GetDbConnectionStrTest()
+        {
+            var connstr =  Databases.GetDbConnectionStr();
+            var connstr2 =  Databases.GetDbConnectionStr(false);
         }
     }
 }
