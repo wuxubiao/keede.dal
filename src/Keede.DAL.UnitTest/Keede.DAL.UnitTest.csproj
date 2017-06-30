@@ -52,9 +52,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conntion\ConnectionContainerTests.cs" />
+    <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\PersonDetail.cs" />
+    <Compile Include="Models\PersonScore.cs" />
     <Compile Include="News.cs" />
     <Compile Include="DatabasesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitTest_DomainBase\PersonRepository.cs" />
+    <Compile Include="UnitTest_DomainBase\UnitTest_Repository.cs" />
+    <Compile Include="UnitTest_DomainBase\UnitTest_UnitWork.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -67,6 +73,10 @@
     <ProjectReference Include="..\Keede.DAL\Keede.DAL.csproj">
       <Project>{ffdeb36e-a2c6-4fb4-a88e-0bdd49d83699}</Project>
       <Name>Keede.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Repositories\Repositories.csproj">
+      <Project>{73c19c15-5933-489a-ae5d-275425709354}</Project>
+      <Name>Repositories</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
