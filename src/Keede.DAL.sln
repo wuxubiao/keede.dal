@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.UnitTest", "Keede
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper", "Dapper\Dapper.csproj", "{C872A7D5-567A-4320-B805-FC32DB20B8E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Repositories\Repositories.csproj", "{73C19C15-5933-489A-AE5D-275425709354}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73C19C15-5933-489A-AE5D-275425709354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73C19C15-5933-489A-AE5D-275425709354}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73C19C15-5933-489A-AE5D-275425709354}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73C19C15-5933-489A-AE5D-275425709354}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

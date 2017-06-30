@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using Dapper;
 
-namespace Framework.Core.DB.DapperExtension
+namespace Dapper.Extension
 {
 
     /// <summary>

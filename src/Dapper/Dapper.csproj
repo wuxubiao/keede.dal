@@ -45,9 +45,9 @@
     <Compile Include="CommandDefinition.cs" />
     <Compile Include="CommandFlags.cs" />
     <Compile Include="CustomPropertyTypeMap.cs" />
-    <Compile Include="DapperExtension\SqlMapperExtensions.Async.cs" />
-    <Compile Include="DapperExtension\SqlMapperExtensions.cs" />
-    <Compile Include="DapperExtension\SqlMapperExtensions.Paged.cs" />
+    <Compile Include="Extension\SqlMapperExtensions.Async.cs" />
+    <Compile Include="Extension\SqlMapperExtensions.cs" />
+    <Compile Include="Extension\SqlMapperExtensions.Paged.cs" />
     <Compile Include="DataTableHandler.cs" />
     <Compile Include="DbString.cs" />
     <Compile Include="DefaultTypeMap.cs" />

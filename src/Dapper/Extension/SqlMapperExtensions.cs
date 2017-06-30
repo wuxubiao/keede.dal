@@ -13,7 +13,7 @@ using DataException = System.InvalidOperationException;
 using System.Threading;
 #endif
 
-namespace Framework.Core.DB.DapperExtension
+namespace Dapper.Extension
 {
     /// <summary>
     /// 

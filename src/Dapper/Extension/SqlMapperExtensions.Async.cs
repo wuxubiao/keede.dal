@@ -6,10 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Framework.Core.DB.Dapper;
+using Dapper;
 
-
-namespace Framework.Core.DB.DapperExtension
+namespace Dapper.Extension
 {
     public static partial class SqlMapperExtensions
     {
