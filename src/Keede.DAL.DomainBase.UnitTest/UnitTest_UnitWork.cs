@@ -24,7 +24,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
-        public void TestUnitWrokNews()
+        public void TestUnitWrokSelectAndUpdateNews()
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
@@ -55,6 +55,48 @@ namespace Keede.DAL.DomainBase.UnitTest
                 unitOfWork.RegisterModified(news2);
 
                 unitOfWork.Commit();
+            }
+        }
+
+        [TestMethod]
+        public void TestUnitWrokAdd()
+        {
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
+            {
+                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
+
+                var news1 = new News();
+                news1.Id = 6;
+                news1.Title = "UnitWrokTitle6";
+                unitOfWork.RegisterAdded(news1);
+
+                var news2 = new News();
+                news2.Id = 7;
+                news2.Title = "UnitWrokTitle7";
+                unitOfWork.RegisterAdded(news2);
+
+                var result=unitOfWork.Commit();
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
+        public void TestUnitWrokRemove()
+        {
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
+            {
+                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
+
+                var news1 = new News();
+                news1.Id = 6;
+                unitOfWork.RegisterRemoved(news1);
+
+                var news2 = new News();
+                news2.Id = 7;
+                unitOfWork.RegisterRemoved(news2);
+
+                var result = unitOfWork.Commit();
+                Assert.IsTrue(result);
             }
         }
 

@@ -8,6 +8,8 @@ using System.Threading;
 using Keede.DAL.DomainBase.Unitwork;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
+using Keede.DAL.DomainBase.UnitTest.Models;
+using Dapper;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
@@ -25,7 +27,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
-        public void TestRepoNews()
+        public void TestRepoSelectAndUpdate()
         {
             using (var repository = new NewsRepository().SetDbConnection(false))
             {
@@ -38,6 +40,70 @@ namespace Keede.DAL.DomainBase.UnitTest
                 if (news2 == null) return;
                 Assert.IsNotNull(news1);
                 Assert.IsNotNull(news2);
+            }
+        }
+
+        [TestMethod]
+        public void TestRepoSelect()
+        {
+            using (var repository = new NewsRepository().SetDbConnection(false))
+            {
+                var news1 = repository.GetById(1);
+                if (news1 == null) return;
+
+                var dynParms1 = new DynamicParameters();
+                dynParms1.Add("@id", 2);
+                var news2 = repository.Get("select * from news where id=@id", dynParms1);
+                var news3 = repository.Get("select * from news where id=2");
+
+                var list1 = repository.GetAll();
+
+                var dynParms2 = new DynamicParameters();
+                dynParms2.Add("@num", 5);
+                var list2=repository.GetList("select * from news where id>@num", dynParms2);
+                var list3= repository.GetList("select * from news where id>5");
+
+                var list4 = repository.GetPagedList("where id<=6"," order by id desc ",null,2,3);
+                var dynParms3 = new DynamicParameters();
+                dynParms3.Add("@num", 6);
+                var list5 = repository.GetPagedList("where id<=@num", " id desc ", dynParms3, 2, 3);
+
+                Assert.IsNotNull(news1);
+                Assert.IsNotNull(news2);
+                Assert.IsNotNull(news3);
+                Assert.IsTrue(list1.Count > 0);
+                Assert.IsTrue(list2.Count > 0);
+                Assert.IsTrue(list3.Count > 0);
+                Assert.IsTrue(list4.Items.Count > 0);
+                Assert.IsTrue(list5.Items.Count > 0);
+            }
+        }
+
+        [TestMethod]
+        public void TestRepoAdd()
+        {
+            using (var repository = new NewsRepository().SetDbConnection(false))
+            {
+                var news1 = new News();
+                news1.Id = 8;
+                news1.Title = "title5";
+                var result=repository.Add(news1);
+
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
+        public void TestRepoRemove()
+        {
+            using (var repository = new NewsRepository().SetDbConnection(false))
+            {
+                var news1 = new News();
+                news1.Id = 4;
+                news1.Title = "title5";
+                var result = repository.Remove(news1);
+
+                Assert.IsTrue(result);
             }
         }
 
