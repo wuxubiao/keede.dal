@@ -92,5 +92,8 @@
     <Compile Include="WrappedReader.cs" />
     <Compile Include="XmlHandlers.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

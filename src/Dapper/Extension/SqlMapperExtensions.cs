@@ -417,6 +417,11 @@ namespace Dapper.Extension
             var computedProperties = ComputedPropertiesCache(type);
             var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
 
+            var isAutoKey = allProperties.Where(p =>
+            {
+                return p.GetCustomAttributes(true).Any(a => a is AutoKeyAttribute);
+            }).Count() > 0;
+
             var adapter = GetFormatter(connection);
 
             for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
@@ -440,12 +445,12 @@ namespace Dapper.Extension
             var wasClosed = connection.State == ConnectionState.Closed;
             if (wasClosed) connection.Open();
 
-            if (!isList)    //single entity
+            if (!isList && isAutoKey)    //主键为自增列
             {
                 returnVal = adapter.Insert(connection, transaction, commandTimeout, name, sbColumnList.ToString(),
                     sbParameterList.ToString(), keyProperties, entityToInsert);
             }
-            else
+            else                        //非自增列和列表
             {
                 //insert list of entities
                 var cmd = $"insert into {name} ({sbColumnList}) values ({sbParameterList})";
