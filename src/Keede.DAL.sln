@@ -11,9 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.RWSplitting.UnitT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.DomainBase", "Keede.DAL.DomainBase\Keede.DAL.DomainBase.csproj", "{73C19C15-5933-489A-AE5D-275425709354}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.DomainBaseTests", "Keede.DAL.DomainBaseTests\Keede.DAL.DomainBaseTests.csproj", "{9B765F2D-63DE-4714-A4D5-0C8890604665}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTest", "UnitTest", "{09E18B60-E5D9-4B34-BA5D-45658B8DE7DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.DomainBase.UnitTest", "Keede.DAL.DomainBase.UnitTest\Keede.DAL.DomainBase.UnitTest.csproj", "{9B765F2D-63DE-4714-A4D5-0C8890604665}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper.Extension;
 
-namespace Keede.DAL.DomainBaseTests.Models
+namespace Keede.DAL.DomainBase.UnitTest.Models
 {
     [Table("PersonScore")]
     public class PersonScore

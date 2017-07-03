@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Keede.DAL.DomainBaseTests.Models
+namespace Keede.DAL.DomainBase.UnitTest.Models
 {
     [Table("News")]
     public class News : Entity<int>

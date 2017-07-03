@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
 using Keede.DAL.DomainBase.Unitwork;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
-using Keede.DAL.DomainBaseTests.Models;
 
-namespace Keede.DAL.DomainBaseTests
+namespace Keede.DAL.DomainBase.UnitTest
 {
     /// <summary>
     /// UnitTest_UnitWork 的摘要说明
     /// </summary>
     [TestClass]
-    public class UnitTest_UnitWork
+    public class UnitTest_Repository
     {
-        public UnitTest_UnitWork()
+        public UnitTest_Repository()
         {
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
@@ -24,74 +25,38 @@ namespace Keede.DAL.DomainBaseTests
         }
 
         [TestMethod]
-        public void TestUnitWrokNews()
+        public void TestRepoNews()
         {
-            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
+            using (var repository = new NewsRepository().SetDbConnection(false))
             {
-                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
-                if (!unitOfWork.TryLockEntityObject<News>(3, 1))
-                {
-                    return;
-                }
-
-#if DEBUG
-                Trace.WriteLine($"Connection > {unitOfWork.DbConnection.GetHashCode()}");
-#endif
-
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;
 
+                news1.Title = "RepoTitle1";
+                repository.Save(news1);
                 var news2 = repository.GetById(2);
                 if (news2 == null) return;
-                //unitOfWork.BeginTransaction();//开启事务
-
-
-                news1.Title= "UnitWrokTitle1";
-                unitOfWork.RegisterModified(news1);
-                /////////////////////////////////////////////////////////////////////////////
-
-
-                news2.Title = "cba";
-                unitOfWork.RegisterModified(news2);
-
-                unitOfWork.Commit();
+                Assert.IsNotNull(news1);
+                Assert.IsNotNull(news2);
             }
         }
 
         [TestMethod]
-        public void TestUnitWrokPerson()
+        public void TestRepoPerson()
         {
             var id1 = Guid.Parse("9E8D004F-21F6-432C-B1D5-DA5C01CA60DE");
             var id2 = Guid.Parse("848D4D32-6962-404D-BDFC-E61F2094D76C");
-            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
+            using (var repository = new PersonRepository().SetDbConnection(false))
             {
-                var repository = new PersonRepository().SetDbTransaction(unitOfWork.DbTransaction);
-                if (!unitOfWork.TryLockEntityObject<Person>(3, id1, id2))
-                {
-                    return;
-                }
-
-#if DEBUG
-                Trace.WriteLine($"Connection > {unitOfWork.DbConnection.GetHashCode()}");
-#endif
-
                 var person1 = repository.GetById(id1);
                 if (person1 == null) return;
 
+                person1.Name = "RepoName1";
+                repository.Save(person1);
                 var person2 = repository.GetById(id2);
                 if (person2 == null) return;
-
-                //////unitOfWork.BeginTransaction();//开启事务
-
-
-                person1.Name = "UnitWrokName1";
-                unitOfWork.RegisterModified(person1);
-
-
-                person2.Name = "UnitWrokName2";
-                unitOfWork.RegisterModified(person2);
-
-                unitOfWork.Commit();
+                Assert.IsNotNull(person1);
+                Assert.IsNotNull(person2);
             }
         }
 

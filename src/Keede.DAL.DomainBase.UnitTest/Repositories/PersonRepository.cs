@@ -1,7 +1,7 @@
 ﻿using Keede.DAL.DomainBase.Repositories;
-using Keede.DAL.DomainBaseTests.Models;
+using Keede.DAL.DomainBase.UnitTest.Models;
 
-namespace Keede.DAL.DomainBaseTests
+namespace Keede.DAL.DomainBase.UnitTest
 {
     public class PersonRepository:SqlServerRepository<Person>
     {
