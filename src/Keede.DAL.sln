@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL", "Keede.DAL\Keede.DAL.csproj", "{FFDEB36E-A2C6-4FB4-A88E-0BDD49D83699}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.UnitTest", "Keede.DAL.UnitTest\Keede.DAL.UnitTest.csproj", "{C7221799-C2DE-469A-AD8B-EAA0F06B4711}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper", "Dapper\Dapper.csproj", "{C872A7D5-567A-4320-B805-FC32DB20B8E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Repositories\Repositories.csproj", "{73C19C15-5933-489A-AE5D-275425709354}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.RWSplitting", "Keede.DAL.RWSplitting\Keede.DAL.RWSplitting.csproj", "{FFDEB36E-A2C6-4FB4-A88E-0BDD49D83699}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoriesTests", "RepositoriesTests\RepositoriesTests.csproj", "{9B765F2D-63DE-4714-A4D5-0C8890604665}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.RWSplitting.UnitTest", "Keede.DAL.RWSplitting.UnitTest\Keede.DAL.RWSplitting.UnitTest.csproj", "{C7221799-C2DE-469A-AD8B-EAA0F06B4711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.DomainBase", "Keede.DAL.DomainBase\Keede.DAL.DomainBase.csproj", "{73C19C15-5933-489A-AE5D-275425709354}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keede.DAL.DomainBaseTests", "Keede.DAL.DomainBaseTests\Keede.DAL.DomainBaseTests.csproj", "{9B765F2D-63DE-4714-A4D5-0C8890604665}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTest", "UnitTest", "{09E18B60-E5D9-4B34-BA5D-45658B8DE7DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FFDEB36E-A2C6-4FB4-A88E-0BDD49D83699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FFDEB36E-A2C6-4FB4-A88E-0BDD49D83699}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFDEB36E-A2C6-4FB4-A88E-0BDD49D83699}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,10 +33,6 @@ Global
 		{C7221799-C2DE-469A-AD8B-EAA0F06B4711}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7221799-C2DE-469A-AD8B-EAA0F06B4711}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7221799-C2DE-469A-AD8B-EAA0F06B4711}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C872A7D5-567A-4320-B805-FC32DB20B8E1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{73C19C15-5933-489A-AE5D-275425709354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{73C19C15-5933-489A-AE5D-275425709354}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73C19C15-5933-489A-AE5D-275425709354}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,5 +44,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C7221799-C2DE-469A-AD8B-EAA0F06B4711} = {09E18B60-E5D9-4B34-BA5D-45658B8DE7DD}
+		{9B765F2D-63DE-4714-A4D5-0C8890604665} = {09E18B60-E5D9-4B34-BA5D-45658B8DE7DD}
 	EndGlobalSection
 EndGlobal
