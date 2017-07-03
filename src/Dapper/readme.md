@@ -1,0 +1,1 @@
+Dapper.Extension由于用到了原生dapper中internal类型的扩展方法TypeExtensions，只能挪进来，后续升级Dapper版本注意
