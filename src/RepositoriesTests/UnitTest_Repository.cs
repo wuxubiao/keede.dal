@@ -32,13 +32,15 @@ namespace Framework.Core.UnitTest.UnitTest_DomainBase
             var connectionString = "";
             using (var repository = new NewsRepository().SetDbConnection(false))
             {
-                var person1 = repository.GetById(1);
-                if (person1 == null) return;
+                var news1 = repository.GetById(1);
+                if (news1 == null) return;
 
-                var person2 = repository.GetById(10);
-                if (person2 == null) return;
-                Assert.IsNotNull(person1);
-                Assert.IsNotNull(person2);
+                news1.title = "中文1";
+                repository.Save(news1);
+                var news2 = repository.GetById(10);
+                if (news2 == null) return;
+                Assert.IsNotNull(news1);
+                Assert.IsNotNull(news2);
             }
         }
 

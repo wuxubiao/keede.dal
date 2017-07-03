@@ -30,13 +30,13 @@ namespace Framework.Core.UnitTest.UnitTest_DomainBase
             var id1 = Guid.Parse("9E8D004F-21F6-432C-B1D5-DA5C01CA60DE");
             var id2 = Guid.Parse("848D4D32-6962-404D-BDFC-E61F2094D76C");
             var connectionString = "";
-            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
                 var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
-                //if (!unitOfWork.TryLockEntityObject<News>(3, 1, 2))
-                //{
-                //    return;
-                //}
+                if (!unitOfWork.TryLockEntityObject<News>(3, 1, 2))
+                {
+                    return;
+                }
 
 #if DEBUG
                 Trace.WriteLine($"Connection > {unitOfWork.DbConnection.GetHashCode()}");
