@@ -53,7 +53,7 @@ namespace Dapper.Extension
         {
             PageIndex = pageIndex;
             PageSize = pageSize;
-            WhereSql = whereSql.Trim().StartsWith("WHERE", StringComparison.CurrentCultureIgnoreCase) ? " " + whereSql + " " : " WHERE " + WhereSql + " ";
+            WhereSql = whereSql.Trim().StartsWith("WHERE", StringComparison.CurrentCultureIgnoreCase) ? " " + whereSql + " " : " WHERE " + whereSql + " ";
             OrderBy = orderBy.Trim().StartsWith("ORDER BY",StringComparison.CurrentCultureIgnoreCase)?" "+orderBy+" ":" ORDER BY "+orderBy+" ";
         }
 
