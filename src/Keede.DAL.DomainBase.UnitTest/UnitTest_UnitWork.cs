@@ -7,6 +7,7 @@ using Keede.DAL.DomainBase.Unitwork;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
 using Keede.DAL.DomainBase.UnitTest.Models;
+using Dapper;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
@@ -45,7 +46,6 @@ namespace Keede.DAL.DomainBase.UnitTest
                 if (news2 == null) return;
                 //unitOfWork.BeginTransaction();//开启事务
 
-
                 news1.Title= "UnitWrokTitle1";
                 unitOfWork.RegisterModified(news1);
                 /////////////////////////////////////////////////////////////////////////////
@@ -77,6 +77,28 @@ namespace Keede.DAL.DomainBase.UnitTest
 
                 var result=unitOfWork.Commit();
                 Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
+        public void TestUnitWrokSelect()
+        {
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
+            {
+                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
+
+                var dynParms1 = new DynamicParameters();
+                dynParms1.Add("@id", 2);
+                var news2 = repository.Get("select * from news where id=@id", dynParms1);
+
+                //var list1 = repository.GetAll();//GetAll不允许使用
+
+                var list3 = repository.GetList("select * from news where id>5");
+                var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
+
+                Assert.IsNotNull(news2);
+                Assert.IsTrue(list3.Count > 0);
+                Assert.IsTrue(list4.Items.Count > 0);
             }
         }
 
