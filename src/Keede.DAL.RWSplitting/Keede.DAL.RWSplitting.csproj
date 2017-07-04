@@ -7,8 +7,8 @@
     <ProjectGuid>{FFDEB36E-A2C6-4FB4-A88E-0BDD49D83699}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Keede.DAL</RootNamespace>
-    <AssemblyName>Keede.DAL</AssemblyName>
+    <RootNamespace>Keede.DAL.RWSplitting</RootNamespace>
+    <AssemblyName>Keede.DAL.RWSplitting</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

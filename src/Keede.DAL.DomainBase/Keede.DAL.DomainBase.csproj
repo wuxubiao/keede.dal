@@ -7,8 +7,8 @@
     <ProjectGuid>{73C19C15-5933-489A-AE5D-275425709354}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Repositories</RootNamespace>
-    <AssemblyName>Repositories</AssemblyName>
+    <RootNamespace>Keede.DAL.DomainBase</RootNamespace>
+    <AssemblyName>Keede.DAL.DomainBase</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
