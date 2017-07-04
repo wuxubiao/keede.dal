@@ -45,6 +45,12 @@
     <Compile Include="CommandDefinition.cs" />
     <Compile Include="CommandFlags.cs" />
     <Compile Include="CustomPropertyTypeMap.cs" />
+    <Compile Include="Extension\Attribute\AutoKeyAttribute.cs" />
+    <Compile Include="Extension\Attribute\ComputedAttribute.cs" />
+    <Compile Include="Extension\Attribute\ExplicitKeyAttribute.cs" />
+    <Compile Include="Extension\Attribute\IgnoreReadAttribute.cs" />
+    <Compile Include="Extension\Attribute\TableAttribute.cs" />
+    <Compile Include="Extension\Attribute\WriteAttribute.cs" />
     <Compile Include="Extension\SqlMapperExtensions.Async.cs" />
     <Compile Include="Extension\SqlMapperExtensions.cs" />
     <Compile Include="Extension\SqlMapperExtensions.Paged.cs" />
