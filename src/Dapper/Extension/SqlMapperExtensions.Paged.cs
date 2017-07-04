@@ -34,6 +34,29 @@ namespace Dapper.Extension
             var total = connection.QueryFirstOrDefault<int>(countSql, paramterObjects, transaction);
             pagedList.FillQueryData(total, datas);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="table"></param>
+        /// <param name="columns"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="where"></param>
+        /// <param name="PageIndex"></param>
+        /// <param name="PageSize"></param>
+        /// <param name="paramterObjects"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static List<T> QueryPaged<T>(this IDbConnection connection, string table ,string columns, string orderBy,string where, int PageIndex, int PageSize,object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, where, (PageIndex - 1) * PageSize + 1, PageIndex * PageSize);
+
+            return connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+        }
+
     }
 
     /// <summary>
