@@ -45,7 +45,7 @@ namespace Dapper.Extension
 
         public static List<T> QueryPaged<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            var commandText = ProcessCommand(sql,pageIndex,pageSize);
+            var commandText = ProcessCommand(sql.Trim(),pageIndex,pageSize);
 
             return connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
         }

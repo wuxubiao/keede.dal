@@ -176,7 +176,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
+        /// <param name="sql">sql语句须确保没有多余的空格</param>
         /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
