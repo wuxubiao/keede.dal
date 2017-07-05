@@ -28,20 +28,5 @@ namespace Keede.DAL.DomainBase.Repositories
             _isEnableTransaction = true;
             return this;
         }
-
-        /// <summary>
-        /// 验证是否是有效连接
-        /// </summary>
-        protected override void ValidateConnection()
-        {
-            if (_isEnableTransaction)
-            {
-                if (DbTransaction == null) throw new ArgumentNullException("DbTransaction is empty");
-            }
-            else
-            {
-                base.ValidateConnection();
-            }
-        }
     }
 }

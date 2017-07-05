@@ -11,5 +11,11 @@ namespace Dapper.Extension
     [AttributeUsage(AttributeTargets.Property)]
     public class AutoKeyAttribute : Attribute
     {
+        public AutoKeyAttribute(string keyName)
+        {
+            this.Value = keyName;
+        }
+
+        public string Value { get; protected set; }
     }
 }

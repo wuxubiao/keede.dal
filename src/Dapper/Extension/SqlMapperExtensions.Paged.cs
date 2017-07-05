@@ -36,33 +36,22 @@ namespace Dapper.Extension
             pagedList.FillQueryData(total, datas);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="table"></param>
-        /// <param name="columns"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="where"></param>
-        /// <param name="PageIndex"></param>
-        /// <param name="PageSize"></param>
-        /// <param name="paramterObjects"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <returns></returns>
-        public static List<T> QueryPaged<T>(this IDbConnection connection, string table ,string columns, string orderBy,string where, int PageIndex, int PageSize,object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, where, (PageIndex - 1) * PageSize + 1, PageIndex * PageSize);
+        //public static List<T> QueryPaged<T>(this IDbConnection connection, string table ,string columns, string orderBy,string where, int PageIndex, int PageSize,object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        //{
+        //    var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, where, (PageIndex - 1) * PageSize + 1, PageIndex * PageSize);
 
-            return connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+        //    return connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+        //}
+
+        public static List<T> QueryPaged<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var commandText = ProcessCommand(sql,pageIndex,pageSize);
+
+            return connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
         }
 
-        private static  string PageFormat
-        {
-            get { return @"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},* FROM ({0}) ____t1____) ____t2____ WHERE {1}>{2} AND {1}<={3}"; }
-        }
         private static readonly Regex OrderByRegex = new Regex(@"\s*order\s+by\s+[^\s,\)\(]+(?:\s+(?:asc|desc))?(?:\s*,\s*[^\s,\)\(]+(?:\s+(?:asc|desc))?)*", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        //private static string PageFormat = @"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},* FROM ({0}) ____t1____) ____t2____ WHERE {1}>{2} AND {1}<={3}";
 
         /// <summary>
         /// 获取最后一个匹配的 Order By 结果。
@@ -83,28 +72,35 @@ namespace Dapper.Extension
         /// <summary>
         /// 创建指定查询字符串的统计总行数查询字符串。
         /// </summary>
-        /// <param name="PageIndex">从 1 开始的页码。</param>
+        /// <param name="pageIndex">从 1 开始的页码。</param>
         /// <param name="pageSize">页的大小。</param>
         /// <param name="commandText">数据源查询命令。</param>
-        //public static string ProcessCommand(int PageIndex, int pageSize, string commandText)
-        //{
-        //    var start = (PageIndex - 1) * pageSize;
-        //    var end = PageIndex * pageSize;
-        //    var match = GetOrderByMatch(commandText);
-        //    var orderBy = "ORDER BY getdate()";
-        //    if (match.Success)
-        //    {
-        //        commandText = commandText.Remove(match.Index);
-        //        orderBy = match.Value.Trim();
-        //    }
+        public static string ProcessCommand(string commandText,int pageIndex, int pageSize)
+        {
+            var start = (pageIndex - 1) * pageSize;
+            var end = pageIndex * pageSize;
+            var match = GetOrderByMatch(commandText);
+            var orderBy = "ORDER BY getdate()";
+            if (match.Success)
+            {
+                commandText = commandText.Remove(match.Index);
+                orderBy = match.Value.Trim();
+            }
 
-        //    return PageFormat.Fmt(
-        //         commandText
-        //        , this.RowNumberName
-        //        , start
-        //        , end
-        //        , orderBy);
-        //}
+            return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},* FROM ({0}) ____t1____) ____t2____ WHERE {1}>{2} AND {1}<={3}", 
+                commandText
+                , "RowNumber"
+                , start
+                , end
+                , orderBy);
+
+            //return PageFormat.Format(
+            //     commandText
+            //    , "RowNumber"
+            //    , start
+            //    , end
+            //    , orderBy);
+        }
     }
 
     /// <summary>

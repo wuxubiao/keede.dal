@@ -30,15 +30,15 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestRepoSelectAndUpdate()
         {
-            using (var repository = new NewsRepository().SetDbConnection(false))
+            using (var repository = new NewsRepository())
             {
-                var repository1 = new NewsRepository().SetDbConnection(false);
+                var repository1 = new NewsRepository();
                 var news3 = repository1.GetById(1);
 
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;
 
-                news1.Title = "RepoTitle1";
+                news1.Title = "RepoTitle11";
                 repository.Save(news1);
                 var news2 = repository.GetById(2);
                 if (news2 == null) return;
@@ -60,7 +60,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestRepoSelect()
         {
-            using (var repository = new NewsRepository().SetDbConnection(false))
+            using (var repository = new NewsRepository())
             {
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;
@@ -74,13 +74,16 @@ namespace Keede.DAL.DomainBase.UnitTest
 
                 var dynParms2 = new DynamicParameters();
                 dynParms2.Add("@num", 5);
-                var list2=repository.GetList("select * from news where id>@num", dynParms2);
-                var list3= repository.GetList("select * from news where id>5");
+                var list2=repository.GetList<News>("select * from news where id>@num", dynParms2);
+                var list3= repository.GetList<News>("select * from news where id>5");
 
                 var list4 = repository.GetPagedList("where id<=6"," order by id desc ",null,2,3);
                 var dynParms3 = new DynamicParameters();
                 dynParms3.Add("@num", 6);
                 var list5 = repository.GetPagedList("where id<=@num", " id desc ", dynParms3, 2, 3);
+
+                var sql = "select * from News where id>2 order by id desc ";
+                var list6= repository.GetPagedList<News>(sql, null, 1, 2);
 
                 Assert.IsNotNull(news1);
                 Assert.IsNotNull(news2);
@@ -90,13 +93,14 @@ namespace Keede.DAL.DomainBase.UnitTest
                 Assert.IsTrue(list3.Count > 0);
                 Assert.IsTrue(list4.Items.Count > 0);
                 Assert.IsTrue(list5.Items.Count > 0);
+                Assert.IsTrue(list6.Count > 0);
             }
         }
 
         [TestMethod]
         public void TestRepoAdd()
         {
-            using (var repository = new NewsRepository().SetDbConnection(false))
+            using (var repository = new NewsRepository())
             {
                 var news1 = new News();
                 news1.Id = 8;
@@ -110,7 +114,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestRepoRemove()
         {
-            using (var repository = new NewsRepository().SetDbConnection(false))
+            using (var repository = new NewsRepository())
             {
                 var news1 = new News();
                 news1.Id = 4;
@@ -126,7 +130,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             var id1 = Guid.Parse("9E8D004F-21F6-432C-B1D5-DA5C01CA60DE");
             var id2 = Guid.Parse("848D4D32-6962-404D-BDFC-E61F2094D76C");
-            using (var repository = new PersonRepository().SetDbConnection(false))
+            using (var repository = new PersonRepository())
             {
                 var person1 = repository.GetById(id1);
                 if (person1 == null) return;

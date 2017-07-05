@@ -15,25 +15,6 @@ namespace Keede.DAL.DomainBase.Repositories
         where TEntity : IEntity
     {
         /// <summary>
-        /// DB事务对象
-        /// </summary>
-        IDbConnection DbConnection { get; }
-
-        ///// <summary>
-        ///// 数据库连接字符串
-        ///// </summary>
-        //string ConnectionString { get; }
-
-        /// <summary>
-        /// 设置DB事务对象，设置后ConnectionString会为空
-        /// </summary>
-        /// <param name="dbConnection"></param>
-        IRepository<TEntity> SetDbConnection(IDbConnection dbConnection);
-
-        IRepository<TEntity> SetDbConnection(bool isReadDb = true);
-        IRepository<TEntity> SetDbConnection(string dbName, bool isReadDb = true);
-
-        /// <summary>
         /// Add a new item into the repository
         /// </summary>
         /// <param name="data"></param>
@@ -60,14 +41,16 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        TEntity Get(string sql,object parameterObject = null);
+        TEntity Get(string sql,object parameterObject = null, bool isReadDb = true);
+
+         T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        TEntity GetById(dynamic id);
+        TEntity GetById(dynamic id, bool isReadDb = true);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果要求附带UPDLOCK更新锁，就能防止脏读数据
@@ -75,21 +58,23 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="id"></param>
         /// <param name="isUpdateLock"></param>
         /// <returns></returns>
-        TEntity GetById(dynamic id,bool isUpdateLock);
+        TEntity GetById(dynamic id,bool isUpdateLock, bool isReadDb = true);
 
-        /// <summary>
-        /// Get multi items from the repository by custom condition
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameterObject"></param>
-        /// <returns></returns>
-        IList<TEntity> GetList(string sql, object parameterObject = null);
+        ///// <summary>
+        ///// Get multi items from the repository by custom condition
+        ///// </summary>
+        ///// <param name="sql"></param>
+        ///// <param name="parameterObject"></param>
+        ///// <returns></returns>
+        //IList<TEntity> GetList(string sql, object parameterObject = null);
+
+        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
 
         /// <summary>
         /// Get all items from the repository by custom condition
         /// </summary>
         /// <returns></returns>
-        IList<TEntity> GetAll();
+        IList<TEntity> GetAll(bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -100,6 +85,18 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        PagedList<TEntity> GetPagedList(string whereSql, string orderBy,object parameterObjects, int pageIndex, int pageSize);
+        PagedList<TEntity> GetPagedList(string whereSql, string orderBy,object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObjects"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
     }
 }

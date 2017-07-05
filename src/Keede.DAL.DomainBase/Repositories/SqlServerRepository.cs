@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Dapper;
 using Dapper.Extension;
+using Keede.DAL.RWSplitting;
 
 namespace Keede.DAL.DomainBase.Repositories
 {
@@ -14,21 +15,19 @@ namespace Keede.DAL.DomainBase.Repositories
     public class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
-        private IDbConnection OpenDbConnection()
+        private IDbConnection OpenDbConnection(bool isReadDb = true)
         {
-            var conn = DbTransaction != null ? DbTransaction.Connection : DbConnection;
+            var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(isReadDb);
             if (conn.State == ConnectionState.Broken || conn.State == ConnectionState.Closed) conn.Open();
             return conn;
         }
 
         private void CloseConnection(IDbConnection conn)
         {
-            if (DbTransaction == null)
+            if (DbTransaction != null) return;
+            if (conn.State == ConnectionState.Open)
             {
-                if (DbConnection.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
+                conn.Close();
             }
         }
 
@@ -40,8 +39,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Add(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(false);
             var value = conn.Insert(data, DbTransaction) > 0;
             CloseConnection(conn);
             return value;
@@ -55,8 +53,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Save(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(false);
             var value = conn.Update(data, DbTransaction);
             CloseConnection(conn);
             return value;
@@ -70,8 +67,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Remove(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(false);
             var value = conn.Delete(data, DbTransaction);
             CloseConnection(conn);
             return value;
@@ -83,12 +79,21 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public override TEntity Get(string sql, object parameterObject = null)
+        public override TEntity Get(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(isReadDb);
             var value = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
+            CloseConnection(conn);
+            return value;
+        }
+
+
+        public override T Get<T>(string sql, object parameterObject = null, bool isReadDb = true)
+        {
+            if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
+            var conn = OpenDbConnection(isReadDb);
+            var value = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
             CloseConnection(conn);
             return value;
         }
@@ -98,11 +103,10 @@ namespace Keede.DAL.DomainBase.Repositories
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override TEntity GetById(dynamic id)
+        public override TEntity GetById(dynamic id, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(isReadDb);
             var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
             CloseConnection(conn);
             return value;
@@ -114,11 +118,10 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="id"></param>
         /// <param name="isUpdateLock"></param>
         /// <returns></returns>
-        public override TEntity GetById(dynamic id, bool isUpdateLock)
+        public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(isReadDb);
             var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
             CloseConnection(conn);
             return value;
@@ -130,12 +133,11 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public override IList<T> GetList<T>(string sql, object parameterObject = null)
+        public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            ValidateConnection();
-            var conn = OpenDbConnection();
-            var values = conn.Query<TEntity>(sql, parameterObject, DbTransaction).ToList();
+            var conn = OpenDbConnection(isReadDb);
+            var values = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
             CloseConnection(conn);
             return values;
         }
@@ -144,10 +146,9 @@ namespace Keede.DAL.DomainBase.Repositories
         /// 
         /// </summary>
         /// <returns></returns>
-        public override IList<TEntity> GetAll()
+        public override IList<TEntity> GetAll( bool isReadDb = true)
         {
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(isReadDb);
             var list = conn.GetAll<TEntity>().ToList();
             CloseConnection(conn);
             return list;
@@ -162,14 +163,32 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public override PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize)
+        public override PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {
-            ValidateConnection();
-            var conn = OpenDbConnection();
+            var conn = OpenDbConnection(isReadDb);
             PagedList<TEntity> pagedList = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
             conn.QueryPaged(ref pagedList, parameterObjects, DbTransaction);
             CloseConnection(conn);
             return pagedList;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObjects"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
+        {
+            var conn = OpenDbConnection(isReadDb);
+            var pagedList = conn.QueryPaged<T>(sql,pageIndex,pageSize, parameterObjects, DbTransaction);
+            CloseConnection(conn);
+            return pagedList;
+        }
+
     }
 }

@@ -18,10 +18,10 @@ namespace Keede.DAL.DomainBase.UnitTest
         /// </summary>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public NewsRepository(bool isReadDb = true)
-        {
-            base.SetDbConnection(isReadDb);
-        }
+        //public NewsRepository(bool isReadDb = true)
+        //{
+        //    base.SetDbConnection(isReadDb);
+        //}
 
         /// <summary>
         /// 
@@ -29,14 +29,14 @@ namespace Keede.DAL.DomainBase.UnitTest
         /// <param name="dbName"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public NewsRepository(string dbName, bool isReadDb = true)
-        {
-            base.SetDbConnection(dbName, isReadDb);
-        }
+        //public NewsRepository(string dbName, bool isReadDb = true)
+        //{
+        //    base.SetDbConnection(dbName, isReadDb);
+        //}
 
         public bool TestAdd(int id)
         {
-            var news=DbConnection.Query<News>("select * from news where id=1");
+            //var news=DbConnection.Query<News>("select * from news where id=1");
             return false;
         }
     }

@@ -14,59 +14,6 @@ namespace Keede.DAL.DomainBase.Repositories
     public abstract class Repository<TEntity> : IRepository<TEntity>
         where TEntity : IEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public IDbConnection DbConnection { get; protected set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dbConnection"></param>
-        /// <returns></returns>
-        public IRepository<TEntity> SetDbConnection(IDbConnection dbConnection)
-        {
-            DbConnection = dbConnection;
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public IRepository<TEntity> SetDbConnection(bool isReadDb = true)
-        {
-            DbConnection=Databases.GetDbConnection(isReadDb);
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dbName"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public IRepository<TEntity> SetDbConnection(string dbName, bool isReadDb = true)
-        {
-            DbConnection = Databases.GetDbConnection(dbName, isReadDb);
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected virtual void ValidateConnection()
-        {
-            if (DbConnection == null)
-            {
-                throw new ArgumentNullException($"DbConnection is empty");
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         public abstract bool Add(TEntity data);
@@ -91,14 +38,14 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract TEntity Get(string where, object parameterObject = null);
+        public abstract TEntity Get(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public abstract TEntity GetById(dynamic id);
+        public abstract TEntity GetById(dynamic id, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -106,7 +53,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="id"></param>
         /// <param name="isUpdateLock"></param>
         /// <returns></returns>
-        public abstract TEntity GetById(dynamic id, bool isUpdateLock);
+        public abstract TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -114,17 +61,25 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract IList<T> GetList<T>(string where, object parameterObject = null);
+        public abstract IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
 
-        public abstract IList<TEntity> GetList(string where, object parameterObject = null);
+        //public abstract IList<TEntity> GetList(string where, object parameterObject = null);
 
-        public abstract T Get<T>(string where, object parameterObject = null);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public abstract IList<TEntity> GetAll();
+        public abstract IList<TEntity> GetAll( bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -135,13 +90,23 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public abstract PagedList<TEntity> GetPagedList(string where, string orderBy, object parameterObjects, int pageIndex, int pageSize);
+        public abstract PagedList<TEntity> GetPagedList(string where, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObjects"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
         #region IDisposable Members
 
         public void Dispose()
         {
-            if (DbConnection !=null && DbConnection.State == ConnectionState.Open) DbConnection.Close();
             GC.SuppressFinalize(this);
         }
 

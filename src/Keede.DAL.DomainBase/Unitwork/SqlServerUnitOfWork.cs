@@ -68,7 +68,7 @@ namespace Keede.DAL.DomainBase.Unitwork
         /// 
         /// </summary>
         /// <param name="isReadDb"></param>
-        public SqlServerUnitOfWork(bool isReadDb = true)
+        public SqlServerUnitOfWork(bool isReadDb = false)
         {
             _dbConnectString=Databases.GetDbConnectionStr(isReadDb);
             Init();

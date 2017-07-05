@@ -17,7 +17,6 @@ namespace Keede.DAL.DomainBase.UnitTest
     [TestClass]
     public class UnitTest_UnitWork
     {
-        private NewsRepository repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
         public UnitTest_UnitWork()
         {
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
@@ -28,8 +27,11 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestUnitWrokSelectAndUpdateNews()
         {
-            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
-            {                
+
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
+            {
+                NewsRepository repository = new NewsRepository();//.SetDbTransaction(unitOfWork.DbTransaction);
+                
                 if (!unitOfWork.TryLockEntityObject<News>(3, 1))
                 {
                     return;
@@ -93,7 +95,7 @@ namespace Keede.DAL.DomainBase.UnitTest
 
                 //var list1 = repository.GetAll();//GetAll不允许使用
 
-                var list3 = repository.GetList("select * from news where id>5");
+                var list3 = repository.GetList<News>("select * from news where id>5");
                 var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
 
                 Assert.IsNotNull(news2);
