@@ -43,6 +43,14 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         TEntity Get(string sql,object parameterObject = null, bool isReadDb = true);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
          T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
 
         /// <summary>
@@ -60,14 +68,23 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         TEntity GetById(dynamic id,bool isUpdateLock, bool isReadDb = true);
 
-        ///// <summary>
-        ///// Get multi items from the repository by custom condition
-        ///// </summary>
-        ///// <param name="sql"></param>
-        ///// <param name="parameterObject"></param>
-        ///// <returns></returns>
-        //IList<TEntity> GetList(string sql, object parameterObject = null);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
         IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
 
         /// <summary>

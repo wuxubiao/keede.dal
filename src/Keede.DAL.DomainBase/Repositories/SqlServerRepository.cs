@@ -127,6 +127,15 @@ namespace Keede.DAL.DomainBase.Repositories
             return value;
         }
 
+        public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true)
+        {
+            if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
+            var conn = OpenDbConnection(isReadDb);
+            var values = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
+            CloseConnection(conn);
+            return values;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -189,6 +198,8 @@ namespace Keede.DAL.DomainBase.Repositories
             CloseConnection(conn);
             return pagedList;
         }
+
+
 
     }
 }

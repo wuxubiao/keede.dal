@@ -25,6 +25,33 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
+        public void TestUnitWrokSelectAndUpdate()
+        {
+            NewsRepository repository = new NewsRepository();
+
+            var news = new News();
+            news.Id = 998;
+            news.Title = "UnitWrokTitle998";
+
+            IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
+            unitOfWork.RegisterAdded(news);
+            unitOfWork.RegisterRemoved(news);
+
+            var person = new Person();
+            person.Name = "name";
+            person.Id = new Guid("9E8D004F-21F6-432C-B1D5-DA5C01CA60DE");
+
+            unitOfWork.Commit();
+
+            //var news1 = repository.GetById(1);
+            //if (news1 == null) return;
+            //news1.Title = "UnitWrokTitle1";
+            //unitOfWork.RegisterModified(news1);
+
+        }
+
+
+        [TestMethod]
         public void TestUnitWrokSelectAndUpdateNews()
         {
 

@@ -14,6 +14,7 @@ namespace Dapper.Extension
     public static partial class SqlMapperExtensions
     {
         /// <summary>Query paged data from a single table.
+        /// 目前只有针对sql server的实现
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="pagedList"></param>
@@ -36,22 +37,26 @@ namespace Dapper.Extension
             pagedList.FillQueryData(total, datas);
         }
 
-        //public static List<T> QueryPaged<T>(this IDbConnection connection, string table ,string columns, string orderBy,string where, int PageIndex, int PageSize,object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
-        //{
-        //    var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, where, (PageIndex - 1) * PageSize + 1, PageIndex * PageSize);
-
-        //    return connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
-        //}
-
+        /// <summary>
+        /// 目前只有针对sql server的实现
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="sql"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="paramterObjects"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
         public static List<T> QueryPaged<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            var commandText = ProcessCommand(sql.Trim(),pageIndex,pageSize);
+            var commandText = ProcessCommandSqlServer(sql.Trim(),pageIndex,pageSize);
 
             return connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
         }
 
-        private static readonly Regex OrderByRegex = new Regex(@"\s*order\s+by\s+[^\s,\)\(]+(?:\s+(?:asc|desc))?(?:\s*,\s*[^\s,\)\(]+(?:\s+(?:asc|desc))?)*", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        //private static string PageFormat = @"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},* FROM ({0}) ____t1____) ____t2____ WHERE {1}>{2} AND {1}<={3}";
+        private static readonly Regex OrderByRegexSqlServer = new Regex(@"\s*order\s+by\s+[^\s,\)\(]+(?:\s+(?:asc|desc))?(?:\s*,\s*[^\s,\)\(]+(?:\s+(?:asc|desc))?)*", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// 获取最后一个匹配的 Order By 结果。
@@ -60,7 +65,7 @@ namespace Dapper.Extension
         /// <returns>返回 Order By 结果。</returns>
         private static Match GetOrderByMatch(string commandText)
         {
-            var match = OrderByRegex.Match(commandText);
+            var match = OrderByRegexSqlServer.Match(commandText);
             while (match.Success)
             {
                 if ((match.Index + match.Length) == commandText.Length) return match;
@@ -75,7 +80,7 @@ namespace Dapper.Extension
         /// <param name="pageIndex">从 1 开始的页码。</param>
         /// <param name="pageSize">页的大小。</param>
         /// <param name="commandText">数据源查询命令。</param>
-        public static string ProcessCommand(string commandText,int pageIndex, int pageSize)
+        private static string ProcessCommandSqlServer(string commandText,int pageIndex, int pageSize)
         {
             var start = (pageIndex - 1) * pageSize;
             var end = pageIndex * pageSize;
@@ -93,13 +98,6 @@ namespace Dapper.Extension
                 , start
                 , end
                 , orderBy);
-
-            //return PageFormat.Format(
-            //     commandText
-            //    , "RowNumber"
-            //    , start
-            //    , end
-            //    , orderBy);
         }
     }
 

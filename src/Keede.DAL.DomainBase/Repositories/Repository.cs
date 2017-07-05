@@ -78,6 +78,14 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public abstract IList<TEntity> GetAll( bool isReadDb = true);
 

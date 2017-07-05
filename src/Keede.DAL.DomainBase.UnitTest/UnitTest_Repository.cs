@@ -58,6 +58,14 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
+        public void TestGetCount()
+        {
+            var repository = new NewsRepository();
+            var num = repository.GetCount("select * from news where id>5");
+            Assert.IsTrue(num > 0);
+        }
+
+        [TestMethod]
         public void TestRepoSelect()
         {
             using (var repository = new NewsRepository())
