@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Dapper;
 using Dapper.Extension;
+using Keede.DAL.RWSplitting;
 
 namespace Keede.DAL.DomainBase.Repositories
 {
@@ -14,21 +15,19 @@ namespace Keede.DAL.DomainBase.Repositories
     public class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
-        private IDbConnection OpenDbConnection()
+        private IDbConnection OpenDbConnection(bool isReadDb = true)
         {
-            var conn = DbTransaction != null ? DbTransaction.Connection : DbConnection;
+            var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(isReadDb);
             if (conn.State == ConnectionState.Broken || conn.State == ConnectionState.Closed) conn.Open();
             return conn;
         }
 
         private void CloseConnection(IDbConnection conn)
         {
-            if (DbTransaction == null)
+            if (DbTransaction != null) return;
+            if (conn.State == ConnectionState.Open)
             {
-                if (DbConnection.State == ConnectionState.Open)
-                {
-                    conn.Close();
-                }
+                conn.Close();
             }
         }
 
@@ -40,7 +39,6 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Add(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            ValidateConnection();
             var conn = OpenDbConnection();
             var value = conn.Insert(data, DbTransaction) > 0;
             CloseConnection(conn);
@@ -55,7 +53,6 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Save(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            ValidateConnection();
             var conn = OpenDbConnection();
             var value = conn.Update(data, DbTransaction);
             CloseConnection(conn);
@@ -70,7 +67,6 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Remove(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            ValidateConnection();
             var conn = OpenDbConnection();
             var value = conn.Delete(data, DbTransaction);
             CloseConnection(conn);
@@ -86,11 +82,18 @@ namespace Keede.DAL.DomainBase.Repositories
         public override TEntity Get(string sql, object parameterObject = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            ValidateConnection();
             var conn = OpenDbConnection();
             var value = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
             CloseConnection(conn);
             return value;
+        }
+
+
+        public T Get<T>(string sql, object parameterObject = null)
+            where T : class
+        {
+            //todo
+            return default(T);
         }
 
         /// <summary>
@@ -101,7 +104,6 @@ namespace Keede.DAL.DomainBase.Repositories
         public override TEntity GetById(dynamic id)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            ValidateConnection();
             var conn = OpenDbConnection();
             var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
             CloseConnection(conn);
@@ -117,7 +119,6 @@ namespace Keede.DAL.DomainBase.Repositories
         public override TEntity GetById(dynamic id, bool isUpdateLock)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            ValidateConnection();
             var conn = OpenDbConnection();
             var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
             CloseConnection(conn);
@@ -133,7 +134,6 @@ namespace Keede.DAL.DomainBase.Repositories
         public override IList<TEntity> GetList(string sql, object parameterObject = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            ValidateConnection();
             var conn = OpenDbConnection();
             var values = conn.Query<TEntity>(sql, parameterObject, DbTransaction).ToList();
             CloseConnection(conn);
@@ -146,7 +146,6 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         public override IList<TEntity> GetAll()
         {
-            ValidateConnection();
             var conn = OpenDbConnection();
             var list = conn.GetAll<TEntity>().ToList();
             CloseConnection(conn);
@@ -164,7 +163,6 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         public override PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize)
         {
-            ValidateConnection();
             var conn = OpenDbConnection();
             PagedList<TEntity> pagedList = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
             conn.QueryPaged(ref pagedList, parameterObjects, DbTransaction);

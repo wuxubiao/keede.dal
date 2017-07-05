@@ -15,25 +15,6 @@ namespace Keede.DAL.DomainBase.Repositories
         where TEntity : IEntity
     {
         /// <summary>
-        /// DB事务对象
-        /// </summary>
-        IDbConnection DbConnection { get; }
-
-        ///// <summary>
-        ///// 数据库连接字符串
-        ///// </summary>
-        //string ConnectionString { get; }
-
-        /// <summary>
-        /// 设置DB事务对象，设置后ConnectionString会为空
-        /// </summary>
-        /// <param name="dbConnection"></param>
-        IRepository<TEntity> SetDbConnection(IDbConnection dbConnection);
-
-        IRepository<TEntity> SetDbConnection(bool isReadDb = true);
-        IRepository<TEntity> SetDbConnection(string dbName, bool isReadDb = true);
-
-        /// <summary>
         /// Add a new item into the repository
         /// </summary>
         /// <param name="data"></param>

@@ -17,56 +17,6 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <summary>
         /// 
         /// </summary>
-        public IDbConnection DbConnection { get; private set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dbConnection"></param>
-        /// <returns></returns>
-        public IRepository<TEntity> SetDbConnection(IDbConnection dbConnection)
-        {
-            DbConnection = dbConnection;
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public IRepository<TEntity> SetDbConnection(bool isReadDb = true)
-        {
-            DbConnection=Databases.GetDbConnection(isReadDb);
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dbName"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public IRepository<TEntity> SetDbConnection(string dbName, bool isReadDb = true)
-        {
-            DbConnection = Databases.GetDbConnection(dbName, isReadDb);
-            return this;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected virtual void ValidateConnection()
-        {
-            if (DbConnection == null)
-            {
-                throw new ArgumentNullException($"DbConnection is empty");
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         public abstract bool Add(TEntity data);
@@ -137,7 +87,6 @@ namespace Keede.DAL.DomainBase.Repositories
 
         public void Dispose()
         {
-            if (DbConnection !=null && DbConnection.State == ConnectionState.Open) DbConnection.Close();
             GC.SuppressFinalize(this);
         }
 
