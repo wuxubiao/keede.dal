@@ -12,6 +12,9 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
     public class News : Entity<int>
     {
         [ExplicitKey]
+        public int Idd { get; set; }
+
+        [IgnoreRead]
         public override int Id { get; set; }
 
         public string Title { get; set; }

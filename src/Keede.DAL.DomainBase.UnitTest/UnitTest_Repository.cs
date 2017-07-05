@@ -33,7 +33,7 @@ namespace Keede.DAL.DomainBase.UnitTest
             using (var repository = new NewsRepository())
             {
                 var repository1 = new NewsRepository();
-                var news3 = repository1.GetById(1);
+                var news3 = repository1.GetById(1,false);
 
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;
