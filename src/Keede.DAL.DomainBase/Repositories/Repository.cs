@@ -17,7 +17,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <summary>
         /// 
         /// </summary>
-        public IDbConnection DbConnection { get; private set; }
+        public IDbConnection DbConnection { get; protected set; }
 
         /// <summary>
         /// 
@@ -91,7 +91,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract TEntity Get(string sql, object parameterObject = null);
+        public abstract TEntity Get(string where, object parameterObject = null);
 
         /// <summary>
         /// 
@@ -114,7 +114,11 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract IList<TEntity> GetList(string sql, object parameterObject = null);
+        public abstract IList<T> GetList<T>(string where, object parameterObject = null);
+
+        public abstract IList<TEntity> GetList(string where, object parameterObject = null);
+
+        public abstract T Get<T>(string where, object parameterObject = null);
 
         /// <summary>
         /// 
@@ -131,7 +135,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public abstract PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize);
+        public abstract PagedList<TEntity> GetPagedList(string where, string orderBy, object parameterObjects, int pageIndex, int pageSize);
 
         #region IDisposable Members
 

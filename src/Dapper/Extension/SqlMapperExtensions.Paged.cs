@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Dapper;
+using System.Text.RegularExpressions;
 
 namespace Dapper.Extension
 {
@@ -57,6 +58,53 @@ namespace Dapper.Extension
             return connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
         }
 
+        private static  string PageFormat
+        {
+            get { return @"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},* FROM ({0}) ____t1____) ____t2____ WHERE {1}>{2} AND {1}<={3}"; }
+        }
+        private static readonly Regex OrderByRegex = new Regex(@"\s*order\s+by\s+[^\s,\)\(]+(?:\s+(?:asc|desc))?(?:\s*,\s*[^\s,\)\(]+(?:\s+(?:asc|desc))?)*", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        /// <summary>
+        /// 获取最后一个匹配的 Order By 结果。
+        /// </summary>
+        /// <param name="commandText">原查询字符串。</param>
+        /// <returns>返回 Order By 结果。</returns>
+        private static Match GetOrderByMatch(string commandText)
+        {
+            var match = OrderByRegex.Match(commandText);
+            while (match.Success)
+            {
+                if ((match.Index + match.Length) == commandText.Length) return match;
+                match = match.NextMatch();
+            }
+            return match;
+        }
+
+        /// <summary>
+        /// 创建指定查询字符串的统计总行数查询字符串。
+        /// </summary>
+        /// <param name="PageIndex">从 1 开始的页码。</param>
+        /// <param name="pageSize">页的大小。</param>
+        /// <param name="commandText">数据源查询命令。</param>
+        //public static string ProcessCommand(int PageIndex, int pageSize, string commandText)
+        //{
+        //    var start = (PageIndex - 1) * pageSize;
+        //    var end = PageIndex * pageSize;
+        //    var match = GetOrderByMatch(commandText);
+        //    var orderBy = "ORDER BY getdate()";
+        //    if (match.Success)
+        //    {
+        //        commandText = commandText.Remove(match.Index);
+        //        orderBy = match.Value.Trim();
+        //    }
+
+        //    return PageFormat.Fmt(
+        //         commandText
+        //        , this.RowNumberName
+        //        , start
+        //        , end
+        //        , orderBy);
+        //}
     }
 
     /// <summary>

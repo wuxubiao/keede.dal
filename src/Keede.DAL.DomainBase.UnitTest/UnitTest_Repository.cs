@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
 using Keede.DAL.DomainBase.UnitTest.Models;
 using Dapper;
+using Keede.DAL.DomainBase.Repositories;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
@@ -31,6 +32,9 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (var repository = new NewsRepository().SetDbConnection(false))
             {
+                var repository1 = new NewsRepository().SetDbConnection(false);
+                var news3 = repository1.GetById(1);
+
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;
 
@@ -41,6 +45,16 @@ namespace Keede.DAL.DomainBase.UnitTest
                 Assert.IsNotNull(news1);
                 Assert.IsNotNull(news2);
             }
+        }
+
+        [TestMethod]
+        public void TestRepoINewsRepository()
+        {
+            //Keede.DAL.DomainBase.UnitTest.Models
+            INewsRepository<News> news = new NewsRepository();
+            news.TestAdd(1);
+            IRepository<News> news2 = new NewsRepository();
+            //news2.
         }
 
         [TestMethod]

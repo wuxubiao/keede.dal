@@ -130,7 +130,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public override IList<TEntity> GetList(string sql, object parameterObject = null)
+        public override IList<T> GetList<T>(string sql, object parameterObject = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             ValidateConnection();

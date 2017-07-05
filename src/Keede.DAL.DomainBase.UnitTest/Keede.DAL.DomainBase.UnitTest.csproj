@@ -62,6 +62,7 @@
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\PersonDetail.cs" />
     <Compile Include="Models\PersonScore.cs" />
+    <Compile Include="Repositories\INewsRepository.cs" />
     <Compile Include="Repositories\NewsRepository.cs" />
     <Compile Include="Repositories\PersonRepository.cs" />
     <Compile Include="UnitTest_Repository.cs" />

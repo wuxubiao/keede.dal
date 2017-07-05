@@ -17,6 +17,7 @@ namespace Keede.DAL.DomainBase.UnitTest
     [TestClass]
     public class UnitTest_UnitWork
     {
+        private NewsRepository repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
         public UnitTest_UnitWork()
         {
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
@@ -28,8 +29,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         public void TestUnitWrokSelectAndUpdateNews()
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
-            {
-                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
+            {                
                 if (!unitOfWork.TryLockEntityObject<News>(3, 1))
                 {
                     return;
