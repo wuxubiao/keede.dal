@@ -134,6 +134,17 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
+        public void TestRepoRemoveWhereSql()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var result = repository.Remove("  id=999");
+
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
         public void TestRepoPerson()
         {
             var id1 = Guid.Parse("9E8D004F-21F6-432C-B1D5-DA5C01CA60DE");

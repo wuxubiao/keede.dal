@@ -36,6 +36,14 @@ namespace Keede.DAL.DomainBase.Repositories
         bool Remove(TEntity condition);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="where"></param>
+        /// <param name="parameterObject"></param>
+        /// <returns></returns>
+        bool Remove(string whereSql, object parameterObject = null);
+
+        /// <summary>
         /// Get single item from the repository by custom condition
         /// </summary>
         /// <param name="sql"></param>

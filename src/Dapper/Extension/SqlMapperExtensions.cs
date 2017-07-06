@@ -633,6 +633,30 @@ namespace Dapper.Extension
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereSql"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static bool Delete<T>(this IDbConnection connection, string whereSql, object parameterObject = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+
+            whereSql = whereSql.Trim();
+            if (string.IsNullOrEmpty(whereSql)) throw new ArgumentNullException("where is null");
+
+            whereSql = whereSql.StartsWith("WHERE", StringComparison.CurrentCultureIgnoreCase) ? " " + whereSql + " " : " WHERE " + whereSql + " ";
+            var type = typeof(T);
+            var name = GetTableName(type);
+            var statement = $"delete from {name}" + whereSql;
+
+            var deleted = connection.Execute(statement, parameterObject, transaction, commandTimeout);
+            return deleted > 0;
+        }
+
+        /// <summary>
         /// Specifies a custom callback that detects the database type instead of relying on the default strategy (the name of the connection type object).
         /// Please note that this callback is global and will be used by all the calls that require a database specific adapter.
         /// </summary>

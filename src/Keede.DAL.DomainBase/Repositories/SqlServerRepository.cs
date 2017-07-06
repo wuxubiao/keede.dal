@@ -76,6 +76,20 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="where"></param>
+        /// <param name="parameterObject"></param>
+        /// <returns></returns>
+        public override bool Remove(string whereSql, object parameterObject = null)
+        {
+            var conn = OpenDbConnection(false);
+            var value = conn.Delete<TEntity>(whereSql, parameterObject, DbTransaction);
+            CloseConnection(conn);
+            return value;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>

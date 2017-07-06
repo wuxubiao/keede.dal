@@ -35,6 +35,14 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="where"></param>
+        /// <param name="parameterObject"></param>
+        /// <returns></returns>
+        public abstract bool Remove(string whereSql, object parameterObject = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
