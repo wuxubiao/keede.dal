@@ -17,6 +17,9 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         //[IgnoreRead]
         //public override int Id { get; set; }
 
+        [ExplicitKey]
         public string Title { get; set; }
+
+        public string Content { get; set; }
     }
 }

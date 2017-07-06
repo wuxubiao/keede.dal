@@ -28,6 +28,67 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
+        public void TestRepoAdd()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var news1 = new News();
+                news1.Id = 4;
+                news1.Title = "title4";
+                var result = repository.Add(news1);
+
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
+        public void TestSave()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var news1 = new News();
+
+                news1.Id = 4;
+                news1.Title = "title4";
+                news1.Content = "aaa";
+                var result = repository.Save(news1);
+
+                Assert.IsNotNull(result);
+            }
+        }
+
+        [TestMethod]
+        public void TestRepoRemove()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var news1 = new News();
+                news1.Id = 4;
+                news1.Title = "title4";
+                var result = repository.Remove(news1);
+
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
+        public void TestGet()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var dynParms1 = new DynamicParameters();
+                dynParms1.Add("@id", 2);
+                var news2 = repository.Get("select * from news where id=@id", dynParms1);
+
+                var news1 = repository.Get<News>("select * from news where id=@id", dynParms1);
+
+                Assert.IsNotNull(news1);
+                Assert.IsNotNull(news2);
+            }
+        }
+
+
+        [TestMethod]
         public void TestRepoSelectAndUpdate()
         {
             using (var repository = new NewsRepository())
@@ -37,6 +98,7 @@ namespace Keede.DAL.DomainBase.UnitTest
 
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;
+
 
                 news1.Title = "RepoTitle11";
                 repository.Save(news1);
@@ -105,33 +167,7 @@ namespace Keede.DAL.DomainBase.UnitTest
             }
         }
 
-        [TestMethod]
-        public void TestRepoAdd()
-        {
-            using (var repository = new NewsRepository())
-            {
-                var news1 = new News();
-                news1.Id = 8;
-                news1.Title = "title5";
-                var result=repository.Add(news1);
 
-                Assert.IsTrue(result);
-            }
-        }
-
-        [TestMethod]
-        public void TestRepoRemove()
-        {
-            using (var repository = new NewsRepository())
-            {
-                var news1 = new News();
-                news1.Id = 4;
-                news1.Title = "title5";
-                var result = repository.Remove(news1);
-
-                Assert.IsTrue(result);
-            }
-        }
 
         [TestMethod]
         public void TestRepoRemoveWhereSql()

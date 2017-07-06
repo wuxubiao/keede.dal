@@ -40,7 +40,7 @@ namespace Keede.DAL.DomainBase.Repositories
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false);
-            var value = conn.Insert(data, DbTransaction) > 0;
+            var value = conn.InsertEx(data, DbTransaction) > 0;
             CloseConnection(conn);
             return value;
         }
@@ -141,6 +141,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="id"></param>
         /// <param name="isUpdateLock"></param>
         /// <returns></returns>
+        [Obsolete("未实现")]
         public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
@@ -221,8 +222,5 @@ namespace Keede.DAL.DomainBase.Repositories
             CloseConnection(conn);
             return pagedList;
         }
-
-
-
     }
 }
