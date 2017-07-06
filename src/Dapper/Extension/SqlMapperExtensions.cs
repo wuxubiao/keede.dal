@@ -369,6 +369,8 @@ namespace Dapper.Extension
 
         /// <summary>
         /// Inserts an entity into table "Ts" and returns identity id or number if inserted rows if inserting a list.
+        /// 修复了主键为非自增列的表不能返回正确结果
+        /// !@#$%修改标记
         /// </summary>
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="entityToInsert">Entity to insert, can be list of entities</param>
@@ -629,30 +631,6 @@ namespace Dapper.Extension
             var name = GetTableName(type);
             var statement = $"delete from {name}";
             var deleted = connection.Execute(statement, null, transaction, commandTimeout);
-            return deleted > 0;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="whereSql"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <returns></returns>
-        public static bool Delete<T>(this IDbConnection connection, string whereSql, object parameterObject = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        {
-
-            whereSql = whereSql.Trim();
-            if (string.IsNullOrEmpty(whereSql)) throw new ArgumentNullException("where is null");
-
-            whereSql = whereSql.StartsWith("WHERE", StringComparison.CurrentCultureIgnoreCase) ? " " + whereSql + " " : " WHERE " + whereSql + " ";
-            var type = typeof(T);
-            var name = GetTableName(type);
-            var statement = $"delete from {name}" + whereSql;
-
-            var deleted = connection.Execute(statement, parameterObject, transaction, commandTimeout);
             return deleted > 0;
         }
 

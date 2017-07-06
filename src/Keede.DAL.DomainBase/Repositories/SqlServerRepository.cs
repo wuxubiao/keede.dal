@@ -45,6 +45,15 @@ namespace Keede.DAL.DomainBase.Repositories
             return value;
         }
 
+        public override bool AddBatch(IList<TEntity> list)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            var conn = OpenDbConnection(false);
+            var value = conn.InsertBulk(list, DbTransaction) > 0;
+            CloseConnection(conn);
+            return value;
+        }
+
         /// <summary>
         /// 
         /// </summary>

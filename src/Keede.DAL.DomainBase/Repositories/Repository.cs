@@ -21,6 +21,13 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public abstract bool AddBatch(IList<TEntity> list);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         public abstract bool Save(TEntity data);

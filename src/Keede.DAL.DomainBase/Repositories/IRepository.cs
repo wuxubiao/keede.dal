@@ -22,6 +22,13 @@ namespace Keede.DAL.DomainBase.Repositories
         bool Add(TEntity data);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        bool AddBatch(IList<TEntity> list);
+
+        /// <summary>
         /// Save the modified item to the repository
         /// </summary>
         /// <param name="data"></param>

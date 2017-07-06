@@ -37,6 +37,7 @@ namespace Dapper.Extension
             pagedList.FillQueryData(total, datas);
         }
 
+        #region 新增分页方法
         /// <summary>
         /// 目前只有针对sql server的实现
         /// </summary>
@@ -99,6 +100,7 @@ namespace Dapper.Extension
                 , end
                 , orderBy);
         }
+        #endregion 新增分页方法
     }
 
     /// <summary>
