@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Dapper.Extension
@@ -116,7 +117,7 @@ namespace Dapper.Extension
 
 
         /// <summary>
-        /// 
+        /// 性能有问题，锁表操作
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
@@ -135,6 +136,20 @@ namespace Dapper.Extension
             var dynParms = new DynamicParameters();
             dynParms.Add("@id", id);
             return connection.Execute(sql, dynParms, transaction, commandTimeout) > 0;
+        }
+
+        private static IList<PropertyInfo> GetKeys<T>(string method)
+        {
+            var type = typeof(T);
+            var keys = KeyPropertiesCache(type);
+            var explicitKeys = ExplicitKeyPropertiesCache(type);
+            var keyCount = keys.Count + explicitKeys.Count;
+            //if (keyCount > 1)
+            //    throw new DataException($"{method}<T> only supports an entity with a single [Key] or [ExplicitKey] property");
+            if (keyCount == 0)
+                throw new DataException($"{method}<T> only supports an entity with a [Key] or an [ExplicitKey] property");
+
+            return keys.Any() ? keys : explicitKeys;
         }
 
         /// <summary>

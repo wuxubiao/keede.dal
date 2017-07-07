@@ -261,3 +261,4 @@ __pycache__/
 *.pyc
 /src/Dapper/Extension/Attribute
 /src/Dapper/Extension/SqlAdapter
+/src/Dapper/Extension/Mapping.cs

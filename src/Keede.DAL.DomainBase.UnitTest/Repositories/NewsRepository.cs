@@ -11,7 +11,7 @@ using Keede.DAL.RWSplitting;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
-    public class NewsRepository : SqlServerRepository<News>, INewsRepository<News>
+    public class NewsRepository_ : SqlServerRepository<News>, INewsRepository<News>
     {
         /// <summary>
         /// 

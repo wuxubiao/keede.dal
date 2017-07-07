@@ -255,7 +255,7 @@ namespace Dapper.Extension
             string sql;
             if (!_getQueries.TryGetValue(cacheType.TypeHandle, out sql))
             {
-                GetSingleKey<T>(nameof(GetAll));
+                //GetSingleKey<T>(nameof(GetAll));
                 var name = GetTableName(type);
                 var canReadProperties = TypePropertiesCanReadCache(type);
                 if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
@@ -300,7 +300,7 @@ namespace Dapper.Extension
             string sql;
             if (!_getQueries.TryGetValue(cacheType.TypeHandle, out sql))
             {
-                GetSingleKey<T>(nameof(GetAll));
+                //GetSingleKey<T>(nameof(GetAll));
                 var name = GetTableName(type);
                 var canReadProperties = TypePropertiesCanReadCache(type);
                 if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");

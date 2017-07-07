@@ -27,7 +27,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestUnitWrokSelectAndUpdate()
         {
-            NewsRepository repository = new NewsRepository();
+            NewsRepository_ repository = new NewsRepository_();
 
             var news = new News();
             news.Id = 998;
@@ -58,7 +58,7 @@ namespace Keede.DAL.DomainBase.UnitTest
 
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
             {
-                NewsRepository repository = new NewsRepository();//.SetDbTransaction(unitOfWork.DbTransaction);
+                NewsRepository_ repository = new NewsRepository_();//.SetDbTransaction(unitOfWork.DbTransaction);
                 
                 if (!unitOfWork.TryLockEntityObject<News>(3, 1))
                 {
@@ -76,7 +76,7 @@ namespace Keede.DAL.DomainBase.UnitTest
                 if (news2 == null) return;
                 //unitOfWork.BeginTransaction();//开启事务
 
-                news1.Title= "UnitWrokTitle1";
+                news1.Title= "UnitWrokTitle1211";
                 unitOfWork.RegisterModified(news1);
                 /////////////////////////////////////////////////////////////////////////////
 
@@ -93,7 +93,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
-                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
+                var repository = new NewsRepository_().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
                 news1.Id = 6;
@@ -115,7 +115,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
-                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
+                var repository = new NewsRepository_().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var dynParms1 = new DynamicParameters();
                 dynParms1.Add("@id", 2);
@@ -137,7 +137,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
-                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
+                var repository = new NewsRepository_().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
                 news1.Id = 6;

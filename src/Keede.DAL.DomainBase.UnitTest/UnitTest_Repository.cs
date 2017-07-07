@@ -28,12 +28,12 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
-        public void TestRepoAdd()
+        public void TestReRRTpoAdd()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var news1 = new News();
-                news1.Id = 4;
+                news1.GId = 9;
                 news1.Title = "title4";
                 var result = repository.Add(news1);
 
@@ -44,11 +44,11 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestSave()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var news1 = new News();
 
-                news1.Id = 4;
+                news1.GId = 4;
                 news1.Title = "title4";
                 news1.Content = "aaa";
                 var result = repository.Save(news1);
@@ -60,7 +60,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestRepoRemove()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var news1 = new News();
                 news1.Id = 4;
@@ -74,7 +74,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestRepoRemoveWhereSql()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var result = repository.Remove("  id=999");
 
@@ -85,7 +85,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestGet()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var dynParms1 = new DynamicParameters();
                 dynParms1.Add("@id", 2);
@@ -99,9 +99,9 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
-        public void TestGetListGenerics()
+        public void TestGetList()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var dynParms2 = new DynamicParameters();
                 dynParms2.Add("@num", 5);
@@ -116,7 +116,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestGetPagedList()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
                 var dynParms3 = new DynamicParameters();
@@ -132,13 +132,31 @@ namespace Keede.DAL.DomainBase.UnitTest
             }
         }
 
+        [TestMethod]
+        public void TestGetAll()
+        {
+            using (var repository = new NewsRepository_())
+            {
+                var list4 = repository.GetAll();
+
+                Assert.IsTrue(list4.Count > 0);
+            }
+        }
+
+        [TestMethod]
+        public void TestGetCount()
+        {
+            var repository = new NewsRepository_();
+            var num = repository.GetCount("select count(*) from news where id>5");
+            Assert.IsTrue(num > 0);
+        }
 
         [TestMethod]
         public void TestRepoSelectAndUpdate()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
-                var repository1 = new NewsRepository();
+                var repository1 = new NewsRepository_();
                 var news3 = repository1.GetById(1,false);
 
                 var news1 = repository.GetById(1);
@@ -158,24 +176,16 @@ namespace Keede.DAL.DomainBase.UnitTest
         public void TestRepoINewsRepository()
         {
             //Keede.DAL.DomainBase.UnitTest.Models
-            INewsRepository<News> news = new NewsRepository();
+            INewsRepository<News> news = new NewsRepository_();
             news.TestAdd(1);
-            IRepository<News> news2 = new NewsRepository();
+            IRepository<News> news2 = new NewsRepository_();
             //news2.
-        }
-
-        [TestMethod]
-        public void TestGetCount()
-        {
-            var repository = new NewsRepository();
-            var num = repository.GetCount("select count(*) from news where id>5");
-            Assert.IsTrue(num > 0);
         }
 
         [TestMethod]
         public void TestRepoSelect()
         {
-            using (var repository = new NewsRepository())
+            using (var repository = new NewsRepository_())
             {
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;
