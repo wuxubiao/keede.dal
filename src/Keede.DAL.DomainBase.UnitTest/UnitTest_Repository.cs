@@ -72,6 +72,17 @@ namespace Keede.DAL.DomainBase.UnitTest
         }
 
         [TestMethod]
+        public void TestRepoRemoveWhereSql()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var result = repository.Remove("  id=999");
+
+                Assert.IsTrue(result);
+            }
+        }
+
+        [TestMethod]
         public void TestGet()
         {
             using (var repository = new NewsRepository())
@@ -84,6 +95,40 @@ namespace Keede.DAL.DomainBase.UnitTest
 
                 Assert.IsNotNull(news1);
                 Assert.IsNotNull(news2);
+            }
+        }
+
+        [TestMethod]
+        public void TestGetListGenerics()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var dynParms2 = new DynamicParameters();
+                dynParms2.Add("@num", 5);
+                var list2 = repository.GetList<News>("select * from news where id>@num", dynParms2);
+                var list3 = repository.GetList<News>("select * from news where id>5");
+
+                Assert.IsTrue(list2.Count > 0);
+                Assert.IsTrue(list3.Count > 0);
+            }
+        }
+
+        [TestMethod]
+        public void TestGetPagedList()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
+                var dynParms3 = new DynamicParameters();
+                dynParms3.Add("@num", 6);
+                var list5 = repository.GetPagedList("where id<=@num", " id desc ", dynParms3, 2, 3);
+
+                var sql = "select * from News where id>2 order by id desc ";
+                var list6 = repository.GetPagedList<News>(sql, null, 1, 2);
+
+                Assert.IsTrue(list4.Items.Count > 0);
+                Assert.IsTrue(list5.Items.Count > 0);
+                Assert.IsTrue(list6.Count > 0);
             }
         }
 
@@ -123,7 +168,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         public void TestGetCount()
         {
             var repository = new NewsRepository();
-            var num = repository.GetCount("select * from news where id>5");
+            var num = repository.GetCount("select count(*) from news where id>5");
             Assert.IsTrue(num > 0);
         }
 
@@ -164,19 +209,6 @@ namespace Keede.DAL.DomainBase.UnitTest
                 Assert.IsTrue(list4.Items.Count > 0);
                 Assert.IsTrue(list5.Items.Count > 0);
                 Assert.IsTrue(list6.Count > 0);
-            }
-        }
-
-
-
-        [TestMethod]
-        public void TestRepoRemoveWhereSql()
-        {
-            using (var repository = new NewsRepository())
-            {
-                var result = repository.Remove("  id=999");
-
-                Assert.IsTrue(result);
             }
         }
 

@@ -141,7 +141,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="id"></param>
         /// <param name="isUpdateLock"></param>
         /// <returns></returns>
-        [Obsolete("未实现")]
+        [Obsolete("isUpdateLock未实现")]
         public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
