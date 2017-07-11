@@ -27,7 +27,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestUnitWrokSelectAndUpdate()
         {
-            NewsRepository_ repository = new NewsRepository_();
+            NewsRepository repository = new NewsRepository();
 
             var news = new News();
             news.Id = 998;
@@ -58,7 +58,7 @@ namespace Keede.DAL.DomainBase.UnitTest
 
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
             {
-                NewsRepository_ repository = new NewsRepository_();//.SetDbTransaction(unitOfWork.DbTransaction);
+                NewsRepository repository = new NewsRepository();//.SetDbTransaction(unitOfWork.DbTransaction);
                 
                 if (!unitOfWork.TryLockEntityObject<News>(3, 1))
                 {
@@ -93,7 +93,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
-                var repository = new NewsRepository_().SetDbTransaction(unitOfWork.DbTransaction);
+                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
                 news1.Id = 6;
@@ -106,6 +106,7 @@ namespace Keede.DAL.DomainBase.UnitTest
                 unitOfWork.RegisterAdded(news2);
 
                 var result=unitOfWork.Commit();
+
                 Assert.IsTrue(result);
             }
         }
@@ -115,7 +116,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
-                var repository = new NewsRepository_().SetDbTransaction(unitOfWork.DbTransaction);
+                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var dynParms1 = new DynamicParameters();
                 dynParms1.Add("@id", 2);
@@ -137,7 +138,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
             {
-                var repository = new NewsRepository_().SetDbTransaction(unitOfWork.DbTransaction);
+                var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
                 news1.Id = 6;

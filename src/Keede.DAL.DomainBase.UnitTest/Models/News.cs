@@ -14,13 +14,13 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         //[ExplicitKey]
         //public int GId { get; set; }
 
-        [AutoKey("ddd")]
-        public int GId { get; set; }
+        //[AutoKey("ddd")]
+        //public int GId { get; set; }
 
         //[ExplicitKey]
         //public override int Id { get; set; }
 
-        [IgnoreRead]
+        [ExplicitKey]
         public override int Id { get; set; }
 
         //[ExplicitKey]

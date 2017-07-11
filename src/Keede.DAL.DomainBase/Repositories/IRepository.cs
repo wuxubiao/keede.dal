@@ -26,7 +26,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        bool AddBatch(IList<TEntity> list);
+        bool BatchAdd<T>(IList<T> list);
 
         /// <summary>
         /// Save the modified item to the repository
@@ -48,7 +48,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="where"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        bool Remove(string whereSql, object parameterObject = null);
+        int Remove(string whereSql, object parameterObject = null);
 
         /// <summary>
         /// Get single item from the repository by custom condition

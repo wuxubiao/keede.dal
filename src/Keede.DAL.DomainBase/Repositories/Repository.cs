@@ -23,7 +23,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public abstract bool AddBatch(IList<TEntity> list);
+        public abstract bool BatchAdd<T>(IList<T> list);
 
         /// <summary>
         /// 
@@ -45,7 +45,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="where"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract bool Remove(string whereSql, object parameterObject = null);
+        public abstract int Remove(string whereSql, object parameterObject = null);
 
         /// <summary>
         /// 

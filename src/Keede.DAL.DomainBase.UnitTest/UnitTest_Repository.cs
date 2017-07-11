@@ -22,35 +22,66 @@ namespace Keede.DAL.DomainBase.UnitTest
     {
         public UnitTest_Repository()
         {
-            string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
+            //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
+            string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
         }
 
         [TestMethod]
-        public void TestReRRTpoAdd()
+        public void TestAdd()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var news1 = new News();
-                news1.GId = 9;
-                news1.Title = "title4";
+                news1.Id = 10;
+                news1.Title = "title10";
                 var result = repository.Add(news1);
+
+                news1.Id = 11;
+                news1.Title = "title11";
+                var result2 = repository.Add(news1);
+
+                Assert.IsTrue(result);
+                Assert.IsTrue(result2);
+            }
+        }
+
+        [TestMethod]
+        public void TestBatchAdd()
+        {
+            using (var repository = new NewsRepository())
+            {
+                IList<News> list = new List<News>();
+
+                var news1 = new News();
+                news1.Id = 20;
+                news1.Title = "title20";
+
+                list.Add(news1);
+
+                var news2 = new News();
+                news2.Id = 21;
+                news2.Title = "title21";
+                list.Add(news2);
+
+                var result= repository.BatchAdd(list);
 
                 Assert.IsTrue(result);
             }
+
         }
 
         [TestMethod]
         public void TestSave()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var news1 = new News();
 
-                news1.GId = 4;
-                news1.Title = "title4";
-                news1.Content = "aaa";
+                news1.Id = 10;
+                news1.Title = "title10";
+                news1.Content = "10title";
                 var result = repository.Save(news1);
 
                 Assert.IsNotNull(result);
@@ -60,11 +91,11 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestRepoRemove()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var news1 = new News();
-                news1.Id = 4;
-                news1.Title = "title4";
+                news1.Id = 10;
+                news1.Title = "title10";
                 var result = repository.Remove(news1);
 
                 Assert.IsTrue(result);
@@ -74,18 +105,18 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestRepoRemoveWhereSql()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
-                var result = repository.Remove("  id=999");
+                var result = repository.Remove("  id=11");
 
-                Assert.IsTrue(result);
+                Assert.IsTrue(result>0);
             }
         }
 
         [TestMethod]
         public void TestGet()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var dynParms1 = new DynamicParameters();
                 dynParms1.Add("@id", 2);
@@ -101,7 +132,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestGetList()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var dynParms2 = new DynamicParameters();
                 dynParms2.Add("@num", 5);
@@ -116,7 +147,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestGetPagedList()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
                 var dynParms3 = new DynamicParameters();
@@ -135,7 +166,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestGetAll()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var list4 = repository.GetAll();
 
@@ -146,29 +177,27 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestGetCount()
         {
-            var repository = new NewsRepository_();
-            var num = repository.GetCount("select count(*) from news where id>5");
+            var repository = new NewsRepository();
+            var num = repository.GetCount("select count(*) from news");
             Assert.IsTrue(num > 0);
         }
 
         [TestMethod]
         public void TestRepoSelectAndUpdate()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
-                var repository1 = new NewsRepository_();
-                var news3 = repository1.GetById(1,false);
+                var repository1 = new NewsRepository();
 
                 var news1 = repository.GetById(1);
-                if (news1 == null) return;
+                news1.Title = "Title"+DateTime.Now;
+                var result=repository.Save(news1);
 
-
-                news1.Title = "RepoTitle11";
-                repository.Save(news1);
                 var news2 = repository.GetById(2);
-                if (news2 == null) return;
+
                 Assert.IsNotNull(news1);
                 Assert.IsNotNull(news2);
+                Assert.IsTrue(result);
             }
         }
 
@@ -176,16 +205,20 @@ namespace Keede.DAL.DomainBase.UnitTest
         public void TestRepoINewsRepository()
         {
             //Keede.DAL.DomainBase.UnitTest.Models
-            INewsRepository<News> news = new NewsRepository_();
-            news.TestAdd(1);
-            IRepository<News> news2 = new NewsRepository_();
-            //news2.
+            INewsRepository<News> newsRepository = new NewsRepository();
+            newsRepository.TestAdd(1);
+
+            IRepository<News> repository = new NewsRepository();
+            News news = new News();
+            news.Id = 11;
+
+            Assert.IsTrue(repository.Add(news));
         }
 
         [TestMethod]
         public void TestRepoSelect()
         {
-            using (var repository = new NewsRepository_())
+            using (var repository = new NewsRepository())
             {
                 var news1 = repository.GetById(1);
                 if (news1 == null) return;

@@ -262,3 +262,5 @@ __pycache__/
 /src/Dapper/Extension/Attribute
 /src/Dapper/Extension/SqlAdapter
 /src/Dapper/Extension/Mapping.cs
+/src/Dapper/Extension/*
+/src/Dapper/Extension/Attribute/IgnoreReadAttribute.cs

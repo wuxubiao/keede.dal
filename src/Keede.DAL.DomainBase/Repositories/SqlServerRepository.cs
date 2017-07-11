@@ -5,6 +5,7 @@ using System.Linq;
 using Dapper;
 using Dapper.Extension;
 using Keede.DAL.RWSplitting;
+using System.Data.SqlClient;
 
 namespace Keede.DAL.DomainBase.Repositories
 {
@@ -45,13 +46,45 @@ namespace Keede.DAL.DomainBase.Repositories
             return value;
         }
 
-        public override bool AddBatch(IList<TEntity> list)
+        public override bool BatchAdd<T>(IList<T> list)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             var conn = OpenDbConnection(false);
-            var value = conn.InsertBulk(list, DbTransaction) > 0;
+            var dt = conn.GetTableSchema(list);
+            var value = BulkToDB(conn, dt);
+            //var value = conn.InsertEx(list, DbTransaction) > 0;
             CloseConnection(conn);
             return value;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conn"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private static bool BulkToDB(IDbConnection conn, DataTable dt)
+        {
+            SqlConnection sqlConn = conn as SqlConnection;
+            SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn);
+            bulkCopy.DestinationTableName = dt.TableName;
+            bulkCopy.BatchSize = dt.Rows.Count;
+
+            try
+            {
+                if (dt != null && dt.Rows.Count != 0)
+                    bulkCopy.WriteToServer(dt);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (bulkCopy != null)
+                    bulkCopy.Close();
+            }
+            return true;
         }
 
         /// <summary>
@@ -88,7 +121,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="where"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public override bool Remove(string whereSql, object parameterObject = null)
+        public override int Remove(string whereSql, object parameterObject = null)
         {
             var conn = OpenDbConnection(false);
             var value = conn.Delete<TEntity>(whereSql, parameterObject, DbTransaction);
