@@ -151,8 +151,86 @@ namespace Dapper.Extension
             }
             return list;
         }
+
+        /// <summary>
+        /// Updates entity in table "Ts", checks if the entity is modified if the entity is tracked by the Get() extension.
+        /// </summary>
+        /// <typeparam name="T">Type to be updated</typeparam>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="entityToUpdate">Entity to be updated</param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <code>
+        /// <example>
+        /// var id = Guid.Parse("...");
+        /// IDbConnection dbConnection = new SqlConnection(...);
+        /// var order = dbConnection.Get&lt;Order&gt;(id);
+        /// order.OrderState = 5; 
+        /// dbConnection.Update&lt;T&gt;(order);
+        /// </example>
+        /// </code>
+        /// <returns>true if updated, false if not found or not modified (tracked entities)</returns>
+        public static bool Update<T>(this IDbConnection connection, T entityToUpdate, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            var proxy = entityToUpdate as IProxy;
+            if (proxy != null)
+            {
+                if (!proxy.IsDirty) return false;
+            }
+
+            var type = typeof(T);
+
+            if (type.IsArray)
+            {
+                type = type.GetElementType();
+            }
+            else if (type.IsGenericType())
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            var keyProperties = KeyPropertiesCache(type).ToList();  //added ToList() due to issue #418, must work on a list copy
+            var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
+            if (!keyProperties.Any() && !explicitKeyProperties.Any())
+                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
+
+            var name = GetTableName(type);
+
+            var sb = new StringBuilder();
+            sb.AppendFormat("update {0} set ", name);
+
+            var allProperties = TypePropertiesCache(type);
+            keyProperties.AddRange(explicitKeyProperties);
+            var computedProperties = ComputedPropertiesCache(type);
+            var nonIdProps = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
+
+            var adapter = GetFormatter(connection);
+
+            for (var i = 0; i < nonIdProps.Count; i++)
+            {
+                var property = nonIdProps.ElementAt(i);
+                AppendColumnNameEqualsValue(sb, property);  //fix for issue #336
+                if (i < nonIdProps.Count - 1)
+                    sb.AppendFormat(", ");
+            }
+            sb.Append(" where ");
+            for (var i = 0; i < keyProperties.Count; i++)
+            {
+                var property = keyProperties.ElementAt(i);
+                AppendColumnNameEqualsValue(sb, property);  //fix for issue #336
+                if (i < keyProperties.Count - 1)
+                    sb.AppendFormat(" and ");
+            }
+            var updated = connection.Execute(sb.ToString(), entityToUpdate, commandTimeout: commandTimeout, transaction: transaction);
+            return updated > 0;
+        }
         #endregion 改动方法
-        
+
+        public static void AppendColumnNameEqualsValue(StringBuilder sb, PropertyInfo property)
+        {
+            sb.AppendFormat("[{0}] = @{1}", GetCustomColumnName(property), property.Name);
+        }
+
         #region 新增方法
         private static readonly ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>> _readTypeProperties = new ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>>();
 
@@ -262,7 +340,7 @@ namespace Dapper.Extension
         /// </example>
         /// </code>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static long InsertEx<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static long Insert<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             var isList = false;
 
@@ -296,7 +374,8 @@ namespace Dapper.Extension
             for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
             {
                 var property = allPropertiesExceptKeyAndComputed.ElementAt(i);
-                adapter.AppendColumnName(sbColumnList, property.Name);  //fix for issue #336
+
+                adapter.AppendColumnName(sbColumnList, GetCustomColumnName(property));  //fix for issue #336
                 if (i < allPropertiesExceptKeyAndComputed.Count - 1)
                     sbColumnList.Append(", ");
             }
@@ -329,16 +408,26 @@ namespace Dapper.Extension
             return returnVal;
         }
 
-        /// <summary>
-        /// 性能有问题，锁表操作
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="id"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <returns></returns>
-        public static bool UpdateId<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction, int commandTimeout = 3)
+        private static string GetCustomColumnName(PropertyInfo property)
+        {
+            string result = property.Name;
+            var attributes = property.GetCustomAttributes(true).Where(p => p is CustomColumnAttribute).FirstOrDefault();
+            if (attributes != null)
+            {
+                result = (attributes as CustomColumnAttribute).Name;
+            }
+            return result;
+        }
+    /// <summary>
+    /// 性能有问题，锁表操作
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="connection"></param>
+    /// <param name="id"></param>
+    /// <param name="transaction"></param>
+    /// <param name="commandTimeout"></param>
+    /// <returns></returns>
+    public static bool UpdateId<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction, int commandTimeout = 3)
         {
             var type = typeof(T);
             var key = GetSingleKey<T>(nameof(Get));
@@ -371,41 +460,6 @@ namespace Dapper.Extension
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
         /// <param name="list"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <returns></returns>
-        public static long BatchInsert<T>(this IDbConnection connection, IList<T> list, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        {
-            long deleted = 0;
-            //if (list != null && list.Count > 0)
-            //{
-            //    T model = list.FirstOrDefault();
-            //    var ps = model.GetType().GetProperties();
-            //    List<string> @colms = new List<string>();
-            //    List<string> @params = new List<string>();
-
-            //    foreach (var p in ps)
-            //    {
-            //        if (!p.CustomAttributes.Any(x => x.AttributeType == typeof(PrimaryKeyAttribute)) && !p.CustomAttributes.Any(x => x.AttributeType == typeof(DBIgnoreAttribute)))
-            //        {
-            //            @colms.Add(string.Format("[{0}]", p.Name));
-            //            @params.Add(string.Format("@{0}", p.Name));
-            //        }
-            //    }
-            //    var sql = string.Format("INSERT INTO [{0}] ({1}) VALUES({2})", typeof(T).Name, string.Join(", ", @colms), string.Join(", ", @params));
-
-            //    deleted = connection.Execute(sql, list, null, null, null);
-            //}
-
-            return deleted;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="list"></param>
         /// <returns></returns>
         public static DataTable GetTableSchema<T>(this IDbConnection connection, IList<T> list)
         {
@@ -425,20 +479,26 @@ namespace Dapper.Extension
             var computedProperties = ComputedPropertiesCache(type);
             var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
 
+
             DataTable dt = new DataTable();
             dt.TableName = GetTableName(type);
 
+            if(keyProperties.Count>0)
+            {
+                dt.Columns.Add(new DataColumn(GetCustomColumnName(keyProperties[0]), keyProperties[0].PropertyType));
+            }
+
             foreach (var propertie in allPropertiesExceptKeyAndComputed)
             {
-                var column = new DataColumn(propertie.Name, propertie.PropertyType);
+                var column = new DataColumn(GetCustomColumnName(propertie), propertie.PropertyType);
                 dt.Columns.Add(column);
             }
 
             foreach (var item in list)
             {
                 DataRow rs = dt.NewRow();
-                int i = 0;
-                foreach(var propertie in allPropertiesExceptKeyAndComputed)
+                int i = keyProperties.Count > 0 ? 1 : 0;
+                foreach (var propertie in allPropertiesExceptKeyAndComputed)
                 {
                     rs[i] = type.GetProperty(propertie.Name).GetValue(item, null);
                     i++;

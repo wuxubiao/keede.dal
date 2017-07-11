@@ -41,7 +41,7 @@ namespace Keede.DAL.DomainBase.Repositories
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false);
-            var value = conn.InsertEx(data, DbTransaction) > 0;
+            var value = conn.Insert(data, DbTransaction) > 0;
             CloseConnection(conn);
             return value;
         }

@@ -42,6 +42,11 @@ namespace Keede.DAL.DomainBase.UnitTest
                 news1.Title = "title11";
                 var result2 = repository.Add(news1);
 
+                var customRepository = new NewsCustomRepository();
+                var newsCustom = new NewsCustom();
+                newsCustom.Title = "title";
+                customRepository.Add(newsCustom);
+
                 Assert.IsTrue(result);
                 Assert.IsTrue(result2);
             }
@@ -65,9 +70,25 @@ namespace Keede.DAL.DomainBase.UnitTest
                 news2.Title = "title21";
                 list.Add(news2);
 
-                var result= repository.BatchAdd(list);
+                var result = repository.BatchAdd(list);
+
+                IList<NewsCustom> list2 = new List<NewsCustom>();
+
+                var customRepository = new NewsCustomRepository();
+                var newsCustom = new NewsCustom();
+                newsCustom.Title = "title21";
+                newsCustom.Content = "ss";
+                list2.Add(newsCustom);
+
+                var newsCustom2 = new NewsCustom();
+                newsCustom2.Title = "title21";
+                newsCustom2.Content = "ss";
+                list2.Add(newsCustom2);
+
+                var result1=customRepository.BatchAdd(list2);
 
                 Assert.IsTrue(result);
+                Assert.IsTrue(result1);
             }
 
         }
@@ -80,9 +101,17 @@ namespace Keede.DAL.DomainBase.UnitTest
                 var news1 = new News();
 
                 news1.Id = 10;
-                news1.Title = "title10";
-                news1.Content = "10title";
+                news1.Title = "title";
+                news1.Content = "Content"+DateTime.Now;
                 var result = repository.Save(news1);
+
+                var newsCustom = new NewsCustom();
+
+                var customRepository = new NewsCustomRepository();
+                newsCustom.Id = 10;
+                newsCustom.Title = "title";
+                newsCustom.Content = "Content" + DateTime.Now;
+                var result1 = customRepository.Save(newsCustom);
 
                 Assert.IsNotNull(result);
             }

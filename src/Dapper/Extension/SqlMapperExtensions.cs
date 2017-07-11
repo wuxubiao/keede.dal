@@ -207,140 +207,67 @@ namespace Dapper.Extension
         /// </example>
         /// </code>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static long Insert<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        {
-            var isList = false;
+        //public static long Insert<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        //{
+        //    var isList = false;
 
-            var type = typeof(T);
+        //    var type = typeof(T);
 
-            if (type.IsArray)
-            {
-                isList = true;
-                type = type.GetElementType();
-            }
-            else if (type.IsGenericType())
-            {
-                isList = true;
-                type = type.GetGenericArguments()[0];
-            }
+        //    if (type.IsArray)
+        //    {
+        //        isList = true;
+        //        type = type.GetElementType();
+        //    }
+        //    else if (type.IsGenericType())
+        //    {
+        //        isList = true;
+        //        type = type.GetGenericArguments()[0];
+        //    }
 
-            var name = GetTableName(type);
-            var sbColumnList = new StringBuilder(null);
-            var allProperties = TypePropertiesCache(type);
-            var keyProperties = KeyPropertiesCache(type);
-            var computedProperties = ComputedPropertiesCache(type);
-            var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
+        //    var name = GetTableName(type);
+        //    var sbColumnList = new StringBuilder(null);
+        //    var allProperties = TypePropertiesCache(type);
+        //    var keyProperties = KeyPropertiesCache(type);
+        //    var computedProperties = ComputedPropertiesCache(type);
+        //    var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
 
-            var adapter = GetFormatter(connection);
+        //    var adapter = GetFormatter(connection);
 
-            for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
-            {
-                var property = allPropertiesExceptKeyAndComputed.ElementAt(i);
-                adapter.AppendColumnName(sbColumnList, property.Name);  //fix for issue #336
-                if (i < allPropertiesExceptKeyAndComputed.Count - 1)
-                    sbColumnList.Append(", ");
-            }
+        //    for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
+        //    {
+        //        var property = allPropertiesExceptKeyAndComputed.ElementAt(i);
+        //        adapter.AppendColumnName(sbColumnList, property.Name);  //fix for issue #336
+        //        if (i < allPropertiesExceptKeyAndComputed.Count - 1)
+        //            sbColumnList.Append(", ");
+        //    }
 
-            var sbParameterList = new StringBuilder(null);
-            for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
-            {
-                var property = allPropertiesExceptKeyAndComputed.ElementAt(i);
-                sbParameterList.AppendFormat("@{0}", property.Name);
-                if (i < allPropertiesExceptKeyAndComputed.Count - 1)
-                    sbParameterList.Append(", ");
-            }
+        //    var sbParameterList = new StringBuilder(null);
+        //    for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
+        //    {
+        //        var property = allPropertiesExceptKeyAndComputed.ElementAt(i);
+        //        sbParameterList.AppendFormat("@{0}", property.Name);
+        //        if (i < allPropertiesExceptKeyAndComputed.Count - 1)
+        //            sbParameterList.Append(", ");
+        //    }
 
-            int returnVal;
-            var wasClosed = connection.State == ConnectionState.Closed;
-            if (wasClosed) connection.Open();
+        //    int returnVal;
+        //    var wasClosed = connection.State == ConnectionState.Closed;
+        //    if (wasClosed) connection.Open();
 
-            if (!isList)    //single entity
-            {
-                returnVal = adapter.Insert(connection, transaction, commandTimeout, name, sbColumnList.ToString(),
-                    sbParameterList.ToString(), keyProperties, entityToInsert);
-            }
-            else
-            {
-                //insert list of entities
-                var cmd = $"insert into {name} ({sbColumnList}) values ({sbParameterList})";
-                returnVal = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
-            }
-            if (wasClosed) connection.Close();
-            return returnVal;
-        }
-
-        /// <summary>
-        /// Updates entity in table "Ts", checks if the entity is modified if the entity is tracked by the Get() extension.
-        /// </summary>
-        /// <typeparam name="T">Type to be updated</typeparam>
-        /// <param name="connection">Open SqlConnection</param>
-        /// <param name="entityToUpdate">Entity to be updated</param>
-        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
-        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
-        /// <code>
-        /// <example>
-        /// var id = Guid.Parse("...");
-        /// IDbConnection dbConnection = new SqlConnection(...);
-        /// var order = dbConnection.Get&lt;Order&gt;(id);
-        /// order.OrderState = 5; 
-        /// dbConnection.Update&lt;T&gt;(order);
-        /// </example>
-        /// </code>
-        /// <returns>true if updated, false if not found or not modified (tracked entities)</returns>
-        public static bool Update<T>(this IDbConnection connection, T entityToUpdate, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        {
-            var proxy = entityToUpdate as IProxy;
-            if (proxy != null)
-            {
-                if (!proxy.IsDirty) return false;
-            }
-
-            var type = typeof(T);
-
-            if (type.IsArray)
-            {
-                type = type.GetElementType();
-            }
-            else if (type.IsGenericType())
-            {
-                type = type.GetGenericArguments()[0];
-            }
-
-            var keyProperties = KeyPropertiesCache(type).ToList();  //added ToList() due to issue #418, must work on a list copy
-            var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
-            if (!keyProperties.Any() && !explicitKeyProperties.Any())
-                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
-
-            var name = GetTableName(type);
-
-            var sb = new StringBuilder();
-            sb.AppendFormat("update {0} set ", name);
-
-            var allProperties = TypePropertiesCache(type);
-            keyProperties.AddRange(explicitKeyProperties);
-            var computedProperties = ComputedPropertiesCache(type);
-            var nonIdProps = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
-
-            var adapter = GetFormatter(connection);
-
-            for (var i = 0; i < nonIdProps.Count; i++)
-            {
-                var property = nonIdProps.ElementAt(i);
-                adapter.AppendColumnNameEqualsValue(sb, property.Name);  //fix for issue #336
-                if (i < nonIdProps.Count - 1)
-                    sb.AppendFormat(", ");
-            }
-            sb.Append(" where ");
-            for (var i = 0; i < keyProperties.Count; i++)
-            {
-                var property = keyProperties.ElementAt(i);
-                adapter.AppendColumnNameEqualsValue(sb, property.Name);  //fix for issue #336
-                if (i < keyProperties.Count - 1)
-                    sb.AppendFormat(" and ");
-            }
-            var updated = connection.Execute(sb.ToString(), entityToUpdate, commandTimeout: commandTimeout, transaction: transaction);
-            return updated > 0;
-        }
+        //    if (!isList)    //single entity
+        //    {
+        //        returnVal = adapter.Insert(connection, transaction, commandTimeout, name, sbColumnList.ToString(),
+        //            sbParameterList.ToString(), keyProperties, entityToInsert);
+        //    }
+        //    else
+        //    {
+        //        //insert list of entities
+        //        var cmd = $"insert into {name} ({sbColumnList}) values ({sbParameterList})";
+        //        returnVal = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
+        //    }
+        //    if (wasClosed) connection.Close();
+        //    return returnVal;
+        //}
 
         /// <summary>
         /// Delete entity in table "Ts".
@@ -595,6 +522,7 @@ namespace Dapper.Extension
     public class TableAttribute : Attribute
     {
         /// <summary>
+        /// 如不打TableAttribute标签，则会把类名+字母s作为表名
         /// 构造函数
         /// </summary>
         /// <param name="tableName"></param>
@@ -615,6 +543,15 @@ namespace Dapper.Extension
     [AttributeUsage(AttributeTargets.Property)]
     public class KeyAttribute : Attribute
     {
+        //public KeyAttribute()
+        //{
+        //    Name = "Id";
+        //}
+        //public KeyAttribute(string keyName)
+        //{
+        //    Name = keyName;
+        //}
+        //public string Name { get; private set; }
     }
 
     /// <summary>
@@ -623,6 +560,15 @@ namespace Dapper.Extension
     [AttributeUsage(AttributeTargets.Property)]
     public class ExplicitKeyAttribute : Attribute
     {
+        //public ExplicitKeyAttribute()
+        //{
+
+        //}
+        //public ExplicitKeyAttribute(string keyName)
+        //{
+        //    Name = keyName;
+        //}
+        //public string Name { get; private set; }
     }
 
     /// <summary>

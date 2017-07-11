@@ -21,9 +21,9 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         //public override int Id { get; set; }
 
         [ExplicitKey]
+        [CustomColumn("Gid")]
         public override int Id { get; set; }
 
-        //[ExplicitKey]
         public string Title { get; set; }
 
         public string Content { get; set; }
