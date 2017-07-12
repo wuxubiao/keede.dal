@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace Keede.DAL.DomainBase.UnitTest.Models
 {
-    [Table("News")]
-    public class News : Entity<int>
+    [Table("NewsCustom")]
+    public class NewsCustom : Entity<int>
     {
         //[ExplicitKey]
         //public int GId { get; set; }
@@ -20,14 +20,11 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         //[ExplicitKey]
         //public override int Id { get; set; }
 
-        [ExplicitKey]
-        [Column("GId")]
+        [Key]
         public override int Id { get; set; }
 
-        [Column("Title")]
         public string Title { get; set; }
 
-        [Column("Content")]
         public string Content { get; set; }
     }
 }

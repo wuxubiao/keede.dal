@@ -6,11 +6,14 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Threading;
 using Keede.DAL.DomainBase.Unitwork;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
 using Keede.DAL.DomainBase.UnitTest.Models;
 using Dapper;
 using Keede.DAL.DomainBase.Repositories;
+using System.Linq;
+using System.Reflection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Dapper.Extension;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
@@ -26,6 +29,11 @@ namespace Keede.DAL.DomainBase.UnitTest
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
+
+            //TypeMapper.Initialize("Keede.DAL.DomainBase.UnitTest.Models");
+            TypeMapper.SetTypeMap(typeof(News));
+
+            //SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
         }
 
         [TestMethod]
@@ -44,7 +52,7 @@ namespace Keede.DAL.DomainBase.UnitTest
 
                 var customRepository = new NewsCustomRepository();
                 var newsCustom = new NewsCustom();
-                newsCustom.Title = "title";
+                newsCustom.Title = "title2121";
                 customRepository.Add(newsCustom);
 
                 Assert.IsTrue(result);
@@ -108,7 +116,7 @@ namespace Keede.DAL.DomainBase.UnitTest
                 var newsCustom = new NewsCustom();
 
                 var customRepository = new NewsCustomRepository();
-                newsCustom.Id = 10;
+                newsCustom.Id = 9;
                 newsCustom.Title = "title";
                 newsCustom.Content = "Content" + DateTime.Now;
                 var result1 = customRepository.Save(newsCustom);
@@ -136,7 +144,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (var repository = new NewsRepository())
             {
-                var result = repository.Remove("  id=11");
+                var result = repository.Remove("  Gid=11");
 
                 Assert.IsTrue(result>0);
             }
@@ -145,16 +153,25 @@ namespace Keede.DAL.DomainBase.UnitTest
         [TestMethod]
         public void TestGet()
         {
+            //var map = new CustomPropertyTypeMap(typeof(News),
+            //    (type, columnName) => type.GetProperties().FirstOrDefault(prop => SqlMapperExtensions.GetDescriptionFromAttribute(prop) == columnName));
+            //SqlMapper.SetTypeMap(typeof(News), map);
+            //TypeMapper.SetTypeMap(typeof(News));
+
             using (var repository = new NewsRepository())
             {
+
                 var dynParms1 = new DynamicParameters();
                 dynParms1.Add("@id", 2);
-                var news2 = repository.Get("select * from news where id=@id", dynParms1);
+                var news2 = repository.Get("select * from news where Gid=@id", dynParms1);
 
-                var news1 = repository.Get<News>("select * from news where id=@id", dynParms1);
+                var news1 = repository.Get<News>("select * from news where Gid=@id", dynParms1);
+
+                var news3 = repository.GetById(2);
 
                 Assert.IsNotNull(news1);
                 Assert.IsNotNull(news2);
+                Assert.IsNotNull(news3);
             }
         }
 
@@ -165,8 +182,8 @@ namespace Keede.DAL.DomainBase.UnitTest
             {
                 var dynParms2 = new DynamicParameters();
                 dynParms2.Add("@num", 5);
-                var list2 = repository.GetList<News>("select * from news where id>@num", dynParms2);
-                var list3 = repository.GetList<News>("select * from news where id>5");
+                var list2 = repository.GetList<News>("select * from news where Gid>@num", dynParms2);
+                var list3 = repository.GetList<News>("select * from news where Gid>5");
 
                 Assert.IsTrue(list2.Count > 0);
                 Assert.IsTrue(list3.Count > 0);
@@ -178,12 +195,12 @@ namespace Keede.DAL.DomainBase.UnitTest
         {
             using (var repository = new NewsRepository())
             {
-                var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
+                var list4 = repository.GetPagedList("where Gid<=6", " order by Gid desc ", null, 2, 3);
                 var dynParms3 = new DynamicParameters();
                 dynParms3.Add("@num", 6);
-                var list5 = repository.GetPagedList("where id<=@num", " id desc ", dynParms3, 2, 3);
+                var list5 = repository.GetPagedList("where Gid<=@num", " Gid desc ", dynParms3, 2, 3);
 
-                var sql = "select * from News where id>2 order by id desc ";
+                var sql = "select * from News where Gid>2 order by Gid desc ";
                 var list6 = repository.GetPagedList<News>(sql, null, 1, 2);
 
                 Assert.IsTrue(list4.Items.Count > 0);
