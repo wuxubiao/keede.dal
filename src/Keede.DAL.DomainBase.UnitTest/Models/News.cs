@@ -27,7 +27,10 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         [Column("Title")]
         public string Title { get; set; }
 
-        [Column("Content")]
+        //[Column("Content")]
         public string Content { get; set; }
+
+        [IgnoreRead]
+        public string ContentTest { get; set; }
     }
 }

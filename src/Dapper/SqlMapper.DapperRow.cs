@@ -5,27 +5,27 @@ using System.Linq;
 
 namespace Dapper
 {
-    public static partial class SqlMapper
+    partial class SqlMapper
     {
         private sealed class DapperRow
             : System.Dynamic.IDynamicMetaObjectProvider
             , IDictionary<string, object>
         {
-            private readonly DapperTable table;
-            private object[] values;
+            readonly DapperTable table;
+            object[] values;
 
             public DapperRow(DapperTable table, object[] values)
             {
-                this.table = table ?? throw new ArgumentNullException(nameof(table));
-                this.values = values ?? throw new ArgumentNullException(nameof(values));
+                if (table == null) throw new ArgumentNullException(nameof(table));
+                if (values == null) throw new ArgumentNullException(nameof(values));
+                this.table = table;
+                this.values = values;
             }
-
             private sealed class DeadValue
             {
                 public static readonly DeadValue Default = new DeadValue();
-                private DeadValue() { /* hiding constructor */ }
+                private DeadValue() { }
             }
-
             int ICollection<KeyValuePair<string, object>>.Count
             {
                 get
@@ -39,9 +39,9 @@ namespace Dapper
                 }
             }
 
-            public bool TryGetValue(string key, out object value)
+            public bool TryGetValue(string name, out object value)
             {
-                var index = table.IndexOfName(key);
+                var index = table.IndexOfName(name);
                 if (index < 0)
                 { // doesn't exist
                     value = null;
@@ -117,7 +117,8 @@ namespace Dapper
 
             bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item)
             {
-                return TryGetValue(item.Key, out object value) && Equals(value, item.Value);
+                object value;
+                return TryGetValue(item.Key, out value) && Equals(value, item.Value);
             }
 
             void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
@@ -161,7 +162,7 @@ namespace Dapper
 
             object IDictionary<string, object>.this[string key]
             {
-                get { TryGetValue(key, out object val); return val; }
+                get { object val; TryGetValue(key, out val); return val; }
                 set { SetValue(key, value, false); }
             }
 

@@ -4,9 +4,9 @@ using System.Threading;
 
 namespace Dapper
 {
-    public static partial class SqlMapper
+    partial class SqlMapper
     {
-        private class CacheInfo
+        class CacheInfo
         {
             public DeserializerState Deserializer { get; set; }
             public Func<IDataReader, object>[] OtherDeserializers { get; set; }

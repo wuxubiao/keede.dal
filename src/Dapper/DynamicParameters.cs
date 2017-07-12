@@ -12,18 +12,27 @@ using ApplicationException = System.InvalidOperationException;
 
 namespace Dapper
 {
+
     /// <summary>
     /// A bag of parameters that can be passed to the Dapper Query and Execute methods
     /// </summary>
     public partial class DynamicParameters : SqlMapper.IDynamicParameters, SqlMapper.IParameterLookup, SqlMapper.IParameterCallbacks
     {
         internal const DbType EnumerableMultiParameter = (DbType)(-1);
-        private static readonly Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> paramReaderCache = new Dictionary<SqlMapper.Identity, Action<IDbCommand, object>>();
-        private readonly Dictionary<string, ParamInfo> parameters = new Dictionary<string, ParamInfo>();
-        private List<object> templates;
+        static Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> paramReaderCache = new Dictionary<SqlMapper.Identity, Action<IDbCommand, object>>();
 
-        object SqlMapper.IParameterLookup.this[string name] =>
-            parameters.TryGetValue(name, out ParamInfo param) ? param.Value : null;
+        Dictionary<string, ParamInfo> parameters = new Dictionary<string, ParamInfo>();
+        List<object> templates;
+
+        object SqlMapper.IParameterLookup.this[string member]
+        {
+            get
+            {
+                ParamInfo param;
+                return parameters.TryGetValue(member, out param) ? param.Value : null;
+            }
+        }
+
 
         /// <summary>
         /// construct a dynamic parameter bag
@@ -93,13 +102,8 @@ namespace Dapper
         }
 
         /// <summary>
-        /// Add a parameter to this dynamic parameter list.
+        /// Add a parameter to this dynamic parameter list
         /// </summary>
-        /// <param name="name">The name of the parameter.</param>
-        /// <param name="value">The value of the parameter.</param>
-        /// <param name="dbType">The type of the parameter.</param>
-        /// <param name="direction">The in or out direction of the parameter.</param>
-        /// <param name="size">The size of the parameter.</param>
         public void Add(string name, object value, DbType? dbType, ParameterDirection? direction, int? size)
         {
             parameters[Clean(name)] = new ParamInfo
@@ -113,16 +117,11 @@ namespace Dapper
         }
 
         /// <summary>
-        /// Add a parameter to this dynamic parameter list.
+        /// Add a parameter to this dynamic parameter list
         /// </summary>
-        /// <param name="name">The name of the parameter.</param>
-        /// <param name="value">The value of the parameter.</param>
-        /// <param name="dbType">The type of the parameter.</param>
-        /// <param name="direction">The in or out direction of the parameter.</param>
-        /// <param name="size">The size of the parameter.</param>
-        /// <param name="precision">The precision of the parameter.</param>
-        /// <param name="scale">The scale of the parameter.</param>
-        public void Add(string name, object value = null, DbType? dbType = null, ParameterDirection? direction = null, int? size = null, byte? precision = null, byte? scale = null)
+        public void Add(
+            string name, object value = null, DbType? dbType = null, ParameterDirection? direction = null, int? size = null, byte? precision = null, byte? scale = null
+)
         {
             parameters[Clean(name)] = new ParamInfo
             {
@@ -136,7 +135,7 @@ namespace Dapper
             };
         }
 
-        private static string Clean(string name)
+        static string Clean(string name)
         {
             if (!string.IsNullOrEmpty(name))
             {
@@ -250,6 +249,7 @@ namespace Dapper
                 }
                 else
                 {
+
                     bool add = !command.Parameters.Contains(name);
                     IDbDataParameter p;
                     if (add)
@@ -307,6 +307,7 @@ namespace Dapper
         /// </summary>
         public IEnumerable<string> ParameterNames => parameters.Select(p => p.Key);
 
+
         /// <summary>
         /// Get the value of a parameter
         /// </summary>
@@ -348,21 +349,18 @@ namespace Dapper
             // Is it even a MemberExpression?
             var lastMemberAccess = expression.Body as MemberExpression;
 
-            if (lastMemberAccess == null
-                || (!(lastMemberAccess.Member is PropertyInfo)
-                    && !(lastMemberAccess.Member is FieldInfo)))
+            if (lastMemberAccess == null ||
+                (!(lastMemberAccess.Member is PropertyInfo) &&
+                !(lastMemberAccess.Member is FieldInfo)))
             {
-                if (expression.Body.NodeType == ExpressionType.Convert
-                    && expression.Body.Type == typeof(object)
-                    && ((UnaryExpression)expression.Body).Operand is MemberExpression)
+                if (expression.Body.NodeType == ExpressionType.Convert &&
+                    expression.Body.Type == typeof(object) &&
+                    ((UnaryExpression)expression.Body).Operand is MemberExpression)
                 {
                     // It's got to be unboxed
                     lastMemberAccess = (MemberExpression)((UnaryExpression)expression.Body).Operand;
                 }
-                else
-                {
-                    @throw();
-                }
+                else @throw();
             }
 
             // Does the chain consist of MemberExpressions leading to a ParameterExpression of type T?
@@ -381,13 +379,14 @@ namespace Dapper
                 var constant = diving?.Expression as ParameterExpression;
                 diving = diving?.Expression as MemberExpression;
 
-                if (constant != null && constant.Type == typeof(T))
+                if (constant != null &&
+                    constant.Type == typeof(T))
                 {
                     break;
                 }
-                else if (diving == null
-                    || (!(diving.Member is PropertyInfo)
-                        && !(diving.Member is FieldInfo)))
+                else if (diving == null ||
+                    (!(diving.Member is PropertyInfo) &&
+                    !(diving.Member is FieldInfo)))
                 {
                     @throw();
                 }
@@ -423,7 +422,7 @@ namespace Dapper
                 }
                 else // Else it must be a field!
                 {
-                    il.Emit(OpCodes.Ldfld, (FieldInfo)member); // [Member{i}]
+                    il.Emit(OpCodes.Ldfld, ((FieldInfo)member)); // [Member{i}]
                 }
             }
 
@@ -442,7 +441,7 @@ namespace Dapper
             }
             else
             {
-                il.Emit(OpCodes.Stfld, (FieldInfo)lastMember); // SET
+                il.Emit(OpCodes.Stfld, ((FieldInfo)lastMember)); // SET
             }
 
             il.Emit(OpCodes.Ret); // GO
@@ -458,10 +457,11 @@ namespace Dapper
             (outputCallbacks ?? (outputCallbacks = new List<Action>())).Add(() =>
             {
                 // Finally, prep the parameter and attach the callback to it
+                ParamInfo parameter;
                 var targetMemberType = lastMemberAccess?.Type;
                 int sizeToSet = (!size.HasValue && targetMemberType == typeof(string)) ? DbString.DefaultLength : size ?? 0;
 
-                if (parameters.TryGetValue(dynamicParamName, out ParamInfo parameter))
+                if (parameters.TryGetValue(dynamicParamName, out parameter))
                 {
                     parameter.ParameterDirection = parameter.AttachedParam.Direction = ParameterDirection.InputOutput;
 
@@ -472,9 +472,10 @@ namespace Dapper
                 }
                 else
                 {
+                    SqlMapper.ITypeHandler handler;
                     dbType = (!dbType.HasValue)
 #pragma warning disable 618
-                    ? SqlMapper.LookupDbType(targetMemberType, targetMemberType?.Name, true, out SqlMapper.ITypeHandler handler)
+                    ? SqlMapper.LookupDbType(targetMemberType, targetMemberType?.Name, true, out handler)
 #pragma warning restore 618
                     : dbType;
 
@@ -492,10 +493,10 @@ namespace Dapper
         }
 
         private List<Action> outputCallbacks;
-
+        
         void SqlMapper.IParameterCallbacks.OnCompleted()
         {
-            foreach (var param in from p in parameters select p.Value)
+            foreach (var param in (from p in parameters select p.Value))
             {
                 param.OutputCallback?.Invoke(param.OutputTarget, this);
             }

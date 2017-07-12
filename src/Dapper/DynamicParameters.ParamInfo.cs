@@ -3,9 +3,9 @@ using System.Data;
 
 namespace Dapper
 {
-    public partial class DynamicParameters
+    partial class DynamicParameters
     {
-        private sealed class ParamInfo
+        sealed class ParamInfo
         {
             public string Name { get; set; }
             public object Value { get; set; }

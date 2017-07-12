@@ -2,7 +2,7 @@
 
 namespace Dapper
 {
-    public static partial class SqlMapper
+    partial class SqlMapper
     {
         /// <summary>
         /// Implement this interface to pass an arbitrary db specific set of parameters to Dapper

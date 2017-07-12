@@ -27,7 +27,7 @@ namespace Dapper
             _type = type;
         }
 #if COREFX
-        private static bool IsParameterMatch(ParameterInfo[] x, ParameterInfo[] y)
+        static bool IsParameterMatch(ParameterInfo[] x, ParameterInfo[] y)
         {
             if (ReferenceEquals(x, y)) return true;
             if (x == null || y == null) return false;

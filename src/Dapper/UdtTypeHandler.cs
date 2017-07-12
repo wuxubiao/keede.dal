@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Dapper
 {
-    public static partial class SqlMapper
+    partial class SqlMapper
     {
 #if !COREFX
         /// <summary>
@@ -14,15 +14,13 @@ namespace Dapper
         {
             private readonly string udtTypeName;
             /// <summary>
-            /// Creates a new instance of UdtTypeHandler with the specified <see cref="UdtTypeHandler"/>.
+            /// Creates a new instance of UdtTypeHandler with the specified UdtTypeName
             /// </summary>
-            /// <param name="udtTypeName">The user defined type name.</param>
             public UdtTypeHandler(string udtTypeName)
             {
                 if (string.IsNullOrEmpty(udtTypeName)) throw new ArgumentException("Cannot be null or empty", udtTypeName);
                 this.udtTypeName = udtTypeName;
             }
-
             object ITypeHandler.Parse(Type destinationType, object value)
             {
                 return value is DBNull ? null : value;

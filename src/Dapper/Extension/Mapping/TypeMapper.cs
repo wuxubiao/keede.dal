@@ -23,6 +23,7 @@ namespace Dapper.Extension
 
         public static void SetTypeMap(Type type)
         {
+            //string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.Ordinal)));//
             var map = new CustomPropertyTypeMap(type,
                           (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => GetDescriptionFromAttribute(prop) == columnName));
             SqlMapper.SetTypeMap(type, map);
@@ -36,6 +37,7 @@ namespace Dapper.Extension
             return (string)data?.ConstructorArguments.Single().Value;
 #else
             var attrib = (ColumnAttribute)Attribute.GetCustomAttribute(member, typeof(ColumnAttribute), false);
+            if (attrib == null) return member.Name;
             return attrib?.Name;
 #endif
         }

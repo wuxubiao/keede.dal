@@ -6,16 +6,16 @@ using System.Text;
 
 namespace Dapper
 {
-    public static partial class SqlMapper
+    partial class SqlMapper
     {
+
         private class TypeDeserializerCache
         {
             private TypeDeserializerCache(Type type)
             {
                 this.type = type;
             }
-
-            private static readonly Hashtable byType = new Hashtable();
+            static readonly Hashtable byType = new Hashtable();
             private readonly Type type;
             internal static void Purge(Type type)
             {
@@ -24,7 +24,6 @@ namespace Dapper
                     byType.Remove(type);
                 }
             }
-
             internal static void Purge()
             {
                 lock (byType)
@@ -49,10 +48,8 @@ namespace Dapper
                 }
                 return found.GetReader(reader, startBound, length, returnNullIfFirstMissing);
             }
-
-            private readonly Dictionary<DeserializerKey, Func<IDataReader, object>> readers = new Dictionary<DeserializerKey, Func<IDataReader, object>>();
-
-            private struct DeserializerKey : IEquatable<DeserializerKey>
+            private Dictionary<DeserializerKey, Func<IDataReader, object>> readers = new Dictionary<DeserializerKey, Func<IDataReader, object>>();
+            struct DeserializerKey : IEquatable<DeserializerKey>
             {
                 private readonly int startBound, length;
                 private readonly bool returnNullIfFirstMissing;
@@ -88,8 +85,10 @@ namespace Dapper
                     }
                 }
 
-                public override int GetHashCode() => hashCode;
-
+                public override int GetHashCode()
+                {
+                    return hashCode;
+                }
                 public override string ToString()
                 { // only used in the debugger
                     if (names != null)
@@ -109,26 +108,24 @@ namespace Dapper
                     }
                     return base.ToString();
                 }
-
                 public override bool Equals(object obj)
                 {
                     return obj is DeserializerKey && Equals((DeserializerKey)obj);
                 }
-
                 public bool Equals(DeserializerKey other)
                 {
-                    if (hashCode != other.hashCode
-                        || startBound != other.startBound
-                        || length != other.length
-                        || returnNullIfFirstMissing != other.returnNullIfFirstMissing)
+                    if (this.hashCode != other.hashCode
+                        || this.startBound != other.startBound
+                        || this.length != other.length
+                        || this.returnNullIfFirstMissing != other.returnNullIfFirstMissing)
                     {
                         return false; // clearly different
                     }
                     for (int i = 0; i < length; i++)
                     {
-                        if ((names?[i] ?? reader?.GetName(startBound + i)) != (other.names?[i] ?? other.reader?.GetName(startBound + i))
+                        if ((this.names?[i] ?? this.reader?.GetName(startBound + i)) != (other.names?[i] ?? other.reader?.GetName(startBound + i))
                             ||
-                            (types?[i] ?? reader?.GetFieldType(startBound + i)) != (other.types?[i] ?? other.reader?.GetFieldType(startBound + i))
+                            (this.types?[i] ?? this.reader?.GetFieldType(startBound + i)) != (other.types?[i] ?? other.reader?.GetFieldType(startBound + i))
                             )
                         {
                             return false; // different column name or type
@@ -137,7 +134,6 @@ namespace Dapper
                     return true;
                 }
             }
-
             private Func<IDataReader, object> GetReader(IDataReader reader, int startBound, int length, bool returnNullIfFirstMissing)
             {
                 if (length < 0) length = reader.FieldCount - startBound;
@@ -159,5 +155,6 @@ namespace Dapper
                 }
             }
         }
+
     }
 }

@@ -26,5 +26,9 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         public string Title { get; set; }
 
         public string Content { get; set; }
+
+        [IgnoreRead]
+        public string ContentTest { get; set; }
+
     }
 }

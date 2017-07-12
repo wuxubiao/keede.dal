@@ -2,7 +2,7 @@
 
 namespace Dapper
 {
-    public static partial class SqlMapper
+    partial class SqlMapper
     {
         /// <summary>
         /// Represents a placeholder for a value that should be replaced as a literal value in the resulting sql

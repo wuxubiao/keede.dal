@@ -44,10 +44,12 @@ namespace Keede.DAL.DomainBase.UnitTest
                 var news1 = new News();
                 news1.Id = 10;
                 news1.Title = "title10";
+                news1.Content = DateTime.Now.ToString();
                 var result = repository.Add(news1);
 
                 news1.Id = 11;
                 news1.Title = "title11";
+                news1.Content = DateTime.Now.ToString();
                 var result2 = repository.Add(news1);
 
                 var customRepository = new NewsCustomRepository();
@@ -168,6 +170,10 @@ namespace Keede.DAL.DomainBase.UnitTest
                 var news1 = repository.Get<News>("select * from news where Gid=@id", dynParms1);
 
                 var news3 = repository.GetById(2);
+
+                var custom = new NewsCustomRepository();
+                var cust = custom.GetById(1);
+                var cust2 = custom.Get("select * from NewsCustom where id=@id", dynParms1);
 
                 Assert.IsNotNull(news1);
                 Assert.IsNotNull(news2);
