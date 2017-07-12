@@ -13,29 +13,7 @@ namespace Dapper.Extension
     /// </summary>
     public static partial class SqlMapperExtensions
     {
-        /// <summary>Query paged data from a single table.
-        /// 目前只有针对sql server的实现
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="pagedList"></param>
-        /// <param name="paramterObjects"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout">超时时间，单位：秒</param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static void QueryPaged<T>(this IDbConnection connection, ref PagedList<T> pagedList, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            var type = typeof(T);
-            var canReadProperties = TypePropertiesCanReadCache(type);
-            if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
-            string columns = $"[{string.Join("],[", canReadProperties.Select(p => p.Name).ToArray())}]";
-            var table = GetTableName(type);
-            var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, pagedList.OrderBy, table, pagedList.WhereSql, (pagedList.PageIndex - 1) * pagedList.PageSize + 1, pagedList.PageIndex * pagedList.PageSize);
-            var datas = connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
-            var countSql = $"SELECT COUNT(0) FROM {table} {pagedList.WhereSql} ";
-            var total = connection.QueryFirstOrDefault<int>(countSql, paramterObjects, transaction);
-            pagedList.FillQueryData(total, datas);
-        }
+
 
         #region 新增分页方法
         /// <summary>

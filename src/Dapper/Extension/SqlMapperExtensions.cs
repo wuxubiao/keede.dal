@@ -269,65 +269,7 @@ namespace Dapper.Extension
         //    return returnVal;
         //}
 
-        /// <summary>
-        /// Delete entity in table "Ts".
-        /// </summary>
-        /// <typeparam name="T">Type of entity</typeparam>
-        /// <param name="connection">Open SqlConnection</param>
-        /// <param name="entityToDelete">Entity to delete</param>
-        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
-        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
-        /// <code>
-        /// <example>
-        /// var id = Guid.Parse("...");
-        /// IDbConnection dbConnection = new SqlConnection(...);
-        /// var order = dbConnection.Get&lt;Order&gt;(id);
-        /// if (order != null)
-        /// { 
-        ///     dbConnection.Delete&lt;T&gt;(order);
-        /// }
-        /// </example>
-        /// </code> 
-        /// <returns>true if deleted, false if not found</returns>
-        public static bool Delete<T>(this IDbConnection connection, T entityToDelete, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        {
-            if (entityToDelete == null)
-                throw new ArgumentException("Cannot Delete null Object", nameof(entityToDelete));
 
-            var type = typeof(T);
-
-            if (type.IsArray)
-            {
-                type = type.GetElementType();
-            }
-            else if (type.IsGenericType())
-            {
-                type = type.GetGenericArguments()[0];
-            }
-
-            var keyProperties = KeyPropertiesCache(type).ToList();  //added ToList() due to issue #418, must work on a list copy
-            var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
-            if (!keyProperties.Any() && !explicitKeyProperties.Any())
-                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
-
-            var name = GetTableName(type);
-            keyProperties.AddRange(explicitKeyProperties);
-
-            var sb = new StringBuilder();
-            sb.AppendFormat("delete from {0} where ", name);
-
-            var adapter = GetFormatter(connection);
-
-            for (var i = 0; i < keyProperties.Count; i++)
-            {
-                var property = keyProperties.ElementAt(i);
-                adapter.AppendColumnNameEqualsValue(sb, property.Name);  //fix for issue #336
-                if (i < keyProperties.Count - 1)
-                    sb.AppendFormat(" and ");
-            }
-            var deleted = connection.Execute(sb.ToString(), entityToDelete, transaction, commandTimeout);
-            return deleted > 0;
-        }
 
         /// <summary>
         /// Delete all entities in the table related to the type T.

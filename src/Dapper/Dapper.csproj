@@ -45,9 +45,10 @@
     <Compile Include="CommandDefinition.cs" />
     <Compile Include="CommandFlags.cs" />
     <Compile Include="CustomPropertyTypeMap.cs" />
-    <Compile Include="Extension\Attribute\CustomColumnAttribute.cs" />
     <Compile Include="Extension\Attribute\IgnoreReadAttribute.cs" />
     <Compile Include="Extension\Kede.SqlMapperExtensions.cs" />
+    <Compile Include="Extension\Attribute\ColumnAttribute.cs" />
+    <Compile Include="Extension\Mapping\TypeMapper.cs" />
     <Compile Include="Extension\SqlMapperExtensions.Async.cs" />
     <Compile Include="Extension\SqlMapperExtensions.cs" />
     <Compile Include="Extension\SqlMapperExtensions.Paged.cs" />

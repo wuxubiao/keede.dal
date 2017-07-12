@@ -70,8 +70,8 @@ namespace Dapper.Extension
                 var name = GetTableName(type);
                 var canReadProperties = TypePropertiesCanReadCache(type);
                 if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
-                string columns = $"[{string.Join("],[", canReadProperties.Select(p => p.Name).ToArray())}]";
-                sql = $"select {columns} from {name} where {key.Name} = @id";
+                string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
+                sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
                 GetQueries[type.TypeHandle] = sql;
             }
 
@@ -104,6 +104,30 @@ namespace Dapper.Extension
             return obj;
         }
 
+        /// <summary>Query paged data from a single table.
+        /// 目前只有针对sql server的实现
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="pagedList"></param>
+        /// <param name="paramterObjects"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout">超时时间，单位：秒</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static void QueryPaged<T>(this IDbConnection connection, ref PagedList<T> pagedList, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var type = typeof(T);
+            var canReadProperties = TypePropertiesCanReadCache(type);
+            if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
+            string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
+            var table = GetTableName(type);
+            var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, pagedList.OrderBy, table, pagedList.WhereSql, (pagedList.PageIndex - 1) * pagedList.PageSize + 1, pagedList.PageIndex * pagedList.PageSize);
+            var datas = connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+            var countSql = $"SELECT COUNT(0) FROM {table} {pagedList.WhereSql} ";
+            var total = connection.QueryFirstOrDefault<int>(countSql, paramterObjects, transaction);
+            pagedList.FillQueryData(total, datas);
+        }
+
         /// <summary>
         /// ！@#有改动，select按IsReadable取出
         /// 阮哥
@@ -129,7 +153,7 @@ namespace Dapper.Extension
                 var name = GetTableName(type);
                 var canReadProperties = TypePropertiesCanReadCache(type);
                 if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
-                string columns = $"[{string.Join("],[", canReadProperties.Select(p => p.Name).ToArray())}]";
+                string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
                 sql = $"SELECT {columns} FROM " + name;
                 GetQueries[cacheType.TypeHandle] = sql;
             }
@@ -224,14 +248,86 @@ namespace Dapper.Extension
             var updated = connection.Execute(sb.ToString(), entityToUpdate, commandTimeout: commandTimeout, transaction: transaction);
             return updated > 0;
         }
+
+        /// <summary>
+        /// Delete entity in table "Ts".
+        /// </summary>
+        /// <typeparam name="T">Type of entity</typeparam>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="entityToDelete">Entity to delete</param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <code>
+        /// <example>
+        /// var id = Guid.Parse("...");
+        /// IDbConnection dbConnection = new SqlConnection(...);
+        /// var order = dbConnection.Get&lt;Order&gt;(id);
+        /// if (order != null)
+        /// { 
+        ///     dbConnection.Delete&lt;T&gt;(order);
+        /// }
+        /// </example>
+        /// </code> 
+        /// <returns>true if deleted, false if not found</returns>
+        public static bool Delete<T>(this IDbConnection connection, T entityToDelete, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            if (entityToDelete == null)
+                throw new ArgumentException("Cannot Delete null Object", nameof(entityToDelete));
+
+            var type = typeof(T);
+
+            if (type.IsArray)
+            {
+                type = type.GetElementType();
+            }
+            else if (type.IsGenericType())
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            var keyProperties = KeyPropertiesCache(type).ToList();  //added ToList() due to issue #418, must work on a list copy
+            var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
+            if (!keyProperties.Any() && !explicitKeyProperties.Any())
+                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
+
+            var name = GetTableName(type);
+            keyProperties.AddRange(explicitKeyProperties);
+
+            var sb = new StringBuilder();
+            sb.AppendFormat("delete from {0} where ", name);
+
+            var adapter = GetFormatter(connection);
+
+            for (var i = 0; i < keyProperties.Count; i++)
+            {
+                var property = keyProperties.ElementAt(i);
+                AppendColumnNameEqualsValue(sb, property);  //fix for issue #336
+                if (i < keyProperties.Count - 1)
+                    sb.AppendFormat(" and ");
+            }
+            var deleted = connection.Execute(sb.ToString(), entityToDelete, transaction, commandTimeout);
+            return deleted > 0;
+        }
+
         #endregion 改动方法
 
-        public static void AppendColumnNameEqualsValue(StringBuilder sb, PropertyInfo property)
+        #region 新增方法
+        private static void AppendColumnNameEqualsValue(StringBuilder sb, PropertyInfo property)
         {
             sb.AppendFormat("[{0}] = @{1}", GetCustomColumnName(property), property.Name);
         }
 
-        #region 新增方法
+        private static string GetCustomColumnName(PropertyInfo property)
+        {
+            string result = property.Name;
+            var attributes = property.GetCustomAttributes(true).Where(p => p is ColumnAttribute).FirstOrDefault();
+            if (attributes != null)
+            {
+                result = (attributes as ColumnAttribute).Name;
+            }
+            return result;
+        }
+
         private static readonly ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>> _readTypeProperties = new ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>>();
 
         /// <summary>
@@ -408,26 +504,16 @@ namespace Dapper.Extension
             return returnVal;
         }
 
-        private static string GetCustomColumnName(PropertyInfo property)
-        {
-            string result = property.Name;
-            var attributes = property.GetCustomAttributes(true).Where(p => p is CustomColumnAttribute).FirstOrDefault();
-            if (attributes != null)
-            {
-                result = (attributes as CustomColumnAttribute).Name;
-            }
-            return result;
-        }
-    /// <summary>
-    /// 性能有问题，锁表操作
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="connection"></param>
-    /// <param name="id"></param>
-    /// <param name="transaction"></param>
-    /// <param name="commandTimeout"></param>
-    /// <returns></returns>
-    public static bool UpdateId<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction, int commandTimeout = 3)
+        /// <summary>
+        /// 性能有问题，锁表操作
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="id"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static bool UpdateId<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction, int commandTimeout = 3)
         {
             var type = typeof(T);
             var key = GetSingleKey<T>(nameof(Get));
