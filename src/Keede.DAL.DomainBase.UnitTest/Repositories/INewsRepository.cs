@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
-    public interface INewsRepository<TEntity>
+    public interface INewsRepository: IRepository<News>
     {
         bool TestAdd(int id);
     }

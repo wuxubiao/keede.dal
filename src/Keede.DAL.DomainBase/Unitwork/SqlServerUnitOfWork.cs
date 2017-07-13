@@ -244,7 +244,7 @@ namespace Keede.DAL.DomainBase.Unitwork
                         Committed = true;
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         _openedTransaction.Rollback();
                         Committed = false;
@@ -339,7 +339,11 @@ namespace Keede.DAL.DomainBase.Unitwork
                 return constructor;
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(ent => !ent.GlobalAssemblyCache))
             {
-                foreach (var type in assembly.GetTypes().Where(ent => ent.BaseType == realType))
+                foreach (var type in assembly.GetTypes().Where(en => en.Namespace=="Keede.DAL.DomainBase.UnitTest"))
+                {
+                    var ss = type.BaseType;
+                }
+                foreach (var type in assembly.GetTypes().Where(ent=> ent.IsClass).Where(ent => ent.BaseType == realType || (ent.BaseType!=null && ent.BaseType.BaseType == realType)))
                 {
                     constructor = type.GetConstructor(new Type[0]);
                     _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);

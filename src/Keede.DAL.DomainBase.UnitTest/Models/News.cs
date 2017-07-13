@@ -30,7 +30,7 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         //[Column("Content")]
         public string Content { get; set; }
 
-        [IgnoreRead]
+        [Computed]
         public string ContentTest { get; set; }
     }
 }

@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Data.Common;
 using Keede.DAL.RWSplitting;
+using RepositoriesTests.Repositories;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
-    public class NewsRepository : SqlServerRepository<News>, INewsRepository<News>
+    public class NewsRepository : DapperRepositoryBase<News,int>, INewsRepository
     {
         /// <summary>
         /// 

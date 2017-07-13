@@ -8,6 +8,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
 using Keede.DAL.DomainBase.UnitTest.Models;
 using Dapper;
+using RepositoriesTests.Repositories;
+using Keede.DAL.DomainBase.Repositories;
+using Dapper.Extension;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
@@ -22,6 +25,21 @@ namespace Keede.DAL.DomainBase.UnitTest
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
+
+            TypeMapper.Initialize("Keede.DAL.DomainBase.UnitTest.Models");
+            TypeMapper.SetTypeMap(typeof(News));
+            TypeMapper.SetTypeMap(typeof(NewsCustom));
+        }
+
+        [TestMethod]
+        public void TestCustomRepository()
+        {
+            //ICustomRepository custom = new CustomRepository();
+            var news = new News{ Id=10,Title="title"+DateTime.Now};
+
+            IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
+            unitOfWork.RegisterAdded(news);
+            unitOfWork.Commit();
         }
 
         [TestMethod]
