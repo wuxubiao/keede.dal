@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Keede.DAL.DomainBase.UnitTest.Models
 {
+    [TypeMapper]
     [Table("News")]
     public class News : Entity<int>
     {
@@ -31,6 +32,7 @@ namespace Keede.DAL.DomainBase.UnitTest.Models
         public string Content { get; set; }
 
         [Computed]
+        [IgnoreRead]
         public string ContentTest { get; set; }
     }
 }

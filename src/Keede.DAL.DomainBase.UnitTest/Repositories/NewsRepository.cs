@@ -37,7 +37,6 @@ namespace Keede.DAL.DomainBase.UnitTest
 
         public bool TestAdd(int id)
         {
-            //var news=DbConnection.Query<News>("select * from news where id=1");
             return false;
         }
     }

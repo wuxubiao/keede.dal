@@ -40,6 +40,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Add(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = conn.Insert(data, DbTransaction) > 0;
             CloseConnection(conn);
@@ -49,6 +50,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool BatchAdd<T>(IList<T> list)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
+            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(false);
             var dt = conn.GetTableSchema(list);
             var value = BulkToDB(conn, dt);
@@ -95,6 +97,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Save(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = conn.Update(data, DbTransaction);
             CloseConnection(conn);
@@ -109,6 +112,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override bool Remove(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = conn.Delete(data, DbTransaction);
             CloseConnection(conn);
@@ -123,6 +127,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         public override int Remove(string whereSql, object parameterObject = null)
         {
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = conn.Delete<TEntity>(whereSql, parameterObject, DbTransaction);
             CloseConnection(conn);
@@ -138,6 +143,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override TEntity Get(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var value = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
             CloseConnection(conn);
@@ -148,6 +154,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override T Get<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
+            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
             var value = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
             CloseConnection(conn);
@@ -162,6 +169,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override TEntity GetById(dynamic id, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
             CloseConnection(conn);
@@ -178,6 +186,7 @@ namespace Keede.DAL.DomainBase.Repositories
         public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
             CloseConnection(conn);
@@ -201,6 +210,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
+            TypeMapper.SetTypeMap(typeof(T));
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
             var values = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
@@ -214,6 +224,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         public override IList<TEntity> GetAll( bool isReadDb = true)
         {
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var list = conn.GetAll<TEntity>().ToList();
             CloseConnection(conn);
@@ -231,6 +242,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         public override PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             PagedList<TEntity> pagedList = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
             conn.QueryPaged(ref pagedList, parameterObjects, DbTransaction);
@@ -250,6 +262,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <returns></returns>
         public override List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {
+            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
             var pagedList = conn.QueryPaged<T>(sql,pageIndex,pageSize, parameterObjects, DbTransaction);
             CloseConnection(conn);

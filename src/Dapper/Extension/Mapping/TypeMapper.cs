@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Dapper;
+using System.Collections;
 
 namespace Dapper.Extension
 {
     public static class TypeMapper
     {
+        private static readonly Hashtable _typeMaps = new Hashtable();
+
         public static void Initialize(string @namespace)
         {
             var types = from type in Assembly.GetCallingAssembly().GetTypes()//GetExecutingAssembly
@@ -21,12 +23,27 @@ namespace Dapper.Extension
             });
         }
 
-        public static void SetTypeMap(Type type)
+        public static void SetTypeMap(Type type, bool overWrite=false)
         {
-            //string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.Ordinal)));//
-            var map = new CustomPropertyTypeMap(type,
-                          (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => GetDescriptionFromAttribute(prop) == columnName));
-            SqlMapper.SetTypeMap(type, map);
+            if (type == null) throw new ArgumentNullException(nameof(type));
+
+            var tableAttr = type .GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "TypeMapperAttribute");
+            if (tableAttr != null)
+            {
+                var map = (CustomPropertyTypeMap)_typeMaps[type];
+
+                //string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.Ordinal)));//
+                if (overWrite || map == null)
+                {
+                    map = new CustomPropertyTypeMap(type,
+                                  (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => GetDescriptionFromAttribute(prop) == columnName));
+                    SqlMapper.SetTypeMap(type, map);
+                    lock (_typeMaps)
+                    {
+                        _typeMaps[type] = map;
+                    }
+                }
+            }
         }
 
         private static string GetDescriptionFromAttribute(MemberInfo member)

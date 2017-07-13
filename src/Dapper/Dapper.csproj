@@ -46,6 +46,7 @@
     <Compile Include="CommandFlags.cs" />
     <Compile Include="CustomPropertyTypeMap.cs" />
     <Compile Include="Extension\Attribute\IgnoreReadAttribute.cs" />
+    <Compile Include="Extension\Attribute\TypeMapperAttribute.cs" />
     <Compile Include="Extension\Kede.SqlMapperExtensions.cs" />
     <Compile Include="Extension\Attribute\ColumnAttribute.cs" />
     <Compile Include="Extension\Mapping\TypeMapper.cs" />
