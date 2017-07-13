@@ -459,12 +459,13 @@ namespace Dapper.Extension
 
     /// <summary>
     /// 自定义数据表名
+    /// 如不打TableAttribute标签，则会把类名+字母s作为表名
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class TableAttribute : Attribute
     {
         /// <summary>
-        /// 如不打TableAttribute标签，则会把类名+字母s作为表名
+        /// 
         /// 构造函数
         /// </summary>
         /// <param name="tableName"></param>

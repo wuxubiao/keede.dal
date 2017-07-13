@@ -18,7 +18,7 @@ namespace Dapper.Extension
             types.ToList().ForEach(type =>
             {
                 var map = new CustomPropertyTypeMap(type,
-                          (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => GetDescriptionFromAttribute(prop) == columnName));
+                          (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));//GetDescriptionFromAttribute(prop) == columnName));
                 SqlMapper.SetTypeMap(type, map);
             });
         }
@@ -32,11 +32,11 @@ namespace Dapper.Extension
             {
                 var map = (CustomPropertyTypeMap)_typeMaps[type];
 
-                //string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.Ordinal)));//
+                //string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));//
                 if (overWrite || map == null)
                 {
                     map = new CustomPropertyTypeMap(type,
-                                  (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => GetDescriptionFromAttribute(prop) == columnName));
+                                  (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));//GetDescriptionFromAttribute(prop) == columnName));
                     SqlMapper.SetTypeMap(type, map);
                     lock (_typeMaps)
                     {

@@ -604,14 +604,4 @@ namespace Dapper.Extension
 
         #endregion 新增方法
     }
-
-    //#region 新增Attribute
-    ///// <summary>
-    ///// 
-    ///// </summary>
-    //[AttributeUsage(AttributeTargets.Property)]
-    //public class IgnoreReadAttribute : Attribute
-    //{
-    //}
-    //#endregion 新增Attribute
 }
