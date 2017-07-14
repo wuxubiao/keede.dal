@@ -8,21 +8,10 @@ using System.Threading.Tasks;
 
 namespace Keede.DAL.DomainBase.UnitTest.Models
 {
-    [TypeMapper]
-    [Table("News")]
+    [Table("News"), TypeMapper]
     public class News : Entity<int>
     {
-        //[ExplicitKey]
-        //public int GId { get; set; }
-
-        //[AutoKey("ddd")]
-        //public int GId { get; set; }
-
-        //[ExplicitKey]
-        //public override int Id { get; set; }
-
-        [ExplicitKey]
-        [Column("GId")]
+        [ExplicitKey, Column("GId")]
         public override int Id { get; set; }
 
         [Column("Title")]

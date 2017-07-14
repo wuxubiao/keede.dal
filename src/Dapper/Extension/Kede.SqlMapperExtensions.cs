@@ -526,7 +526,7 @@ namespace Dapper.Extension
             var name = GetTableName(type);
             var canReadProperties = TypePropertiesCanReadCache(type);
             if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
-            string sql = $"update {name} set {key.Name}=@id where {key.Name} = @id";
+            string sql = $"update {name} set {GetCustomColumnName(key)}=@id where {GetCustomColumnName(key)} = @id";
             var dynParms = new DynamicParameters();
             dynParms.Add("@id", id);
             return connection.Execute(sql, dynParms, transaction, commandTimeout) > 0;

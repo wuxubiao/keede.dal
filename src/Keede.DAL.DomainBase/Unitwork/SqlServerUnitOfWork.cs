@@ -248,7 +248,7 @@ namespace Keede.DAL.DomainBase.Unitwork
                     {
                         _openedTransaction.Rollback();
                         Committed = false;
-                        throw;
+                        throw ex;
                     }
                 }
             }
