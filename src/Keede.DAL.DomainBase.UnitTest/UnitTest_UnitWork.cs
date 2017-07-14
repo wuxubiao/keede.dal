@@ -8,8 +8,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
 using Keede.DAL.DomainBase.UnitTest.Models;
 using Dapper;
-using RepositoriesTests.Repositories;
-using Keede.DAL.DomainBase.Repositories;
 using Dapper.Extension;
 
 namespace Keede.DAL.DomainBase.UnitTest
@@ -35,7 +33,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         public void TestCustomRepository()
         {
             //ICustomRepository custom = new CustomRepository();
-            var news = new News{ Id=10,Title="title"+DateTime.Now};
+            var news = new News{ Id=14,Title="title"+DateTime.Now};
 
             IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
             unitOfWork.RegisterAdded(news);

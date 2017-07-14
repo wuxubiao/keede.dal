@@ -337,20 +337,16 @@ namespace Keede.DAL.DomainBase.Unitwork
             ConstructorInfo constructor;
             if (_constructorDic.TryGetValue(realType.FullName, out constructor))
                 return constructor;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(ent => !ent.GlobalAssemblyCache))
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(ent => !ent.GlobalAssemblyCache && ent.FullName.ToLower().Contains("keede")))
             {
-                foreach (var type in assembly.GetTypes().Where(en => en.Namespace=="Keede.DAL.DomainBase.UnitTest"))
-                {
-                    var ss = type.BaseType;
-                }
-                foreach (var type in assembly.GetTypes().Where(ent=> ent.IsClass).Where(ent => ent.BaseType == realType || (ent.BaseType!=null && ent.BaseType.BaseType == realType)))
+                foreach (var type in assembly.GetTypes().Where(type => realType.IsAssignableFrom(type)))//assembly.GetTypes().Where(ent => ent.IsClass).Where(ent => ent.BaseType == realType || (ent.BaseType != null && ent.BaseType.BaseType == realType)))
                 {
                     constructor = type.GetConstructor(new Type[0]);
                     _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);
                     return constructor;
                 }
             }
-            throw new InstanceNotFoundException($"未找到实现{entityType.FullName}的仓储！");
+            throw new InstanceNotFoundException($"未找到实现{entityType.FullName}的仓储，确定该仓储的程序集名称包含\"Keede\"！");
         }
 
         private FastMethodUtility.FastInvokeHandler GetAddMethod(dynamic repository)

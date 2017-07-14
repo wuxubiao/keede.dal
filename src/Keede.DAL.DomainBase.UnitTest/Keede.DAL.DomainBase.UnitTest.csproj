@@ -7,8 +7,8 @@
     <ProjectGuid>{9B765F2D-63DE-4714-A4D5-0C8890604665}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RepositoriesTests</RootNamespace>
-    <AssemblyName>RepositoriesTests</AssemblyName>
+    <RootNamespace>Keede.RepositoriesTests</RootNamespace>
+    <AssemblyName>Keede.RepositoriesTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -61,8 +61,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\Person.cs" />
-    <Compile Include="Models\PersonDetail.cs" />
-    <Compile Include="Models\PersonScore.cs" />
     <Compile Include="Repositories\DapperRepositoryBase.cs" />
     <Compile Include="Repositories\INewCustomRepository.cs" />
     <Compile Include="Repositories\INewsRepository.cs" />
@@ -89,6 +87,9 @@
       <Project>{73C19C15-5933-489A-AE5D-275425709354}</Project>
       <Name>Keede.DAL.DomainBase</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Test_Master.sql" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

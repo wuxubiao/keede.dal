@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Data.Common;
 using Keede.DAL.RWSplitting;
-using RepositoriesTests.Repositories;
+using Keede.RepositoriesTests.Repositories;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
