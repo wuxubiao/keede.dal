@@ -43,12 +43,12 @@ namespace Keede.DAL.DomainBase.UnitTest
             using (var repository = new NewsRepository())
             {
                 var news1 = new News();
-                news1.Id = 10;
+                news1.GId = 10;
                 news1.Title = "title10";
                 news1.Content = DateTime.Now.ToString();
                 var result = repository.Add(news1);
 
-                news1.Id = 11;
+                news1.GId = 11;
                 news1.Title = "title11";
                 news1.Content = DateTime.Now.ToString();
                 var result2 = repository.Add(news1);
@@ -71,13 +71,13 @@ namespace Keede.DAL.DomainBase.UnitTest
                 IList<News> list = new List<News>();
 
                 var news1 = new News();
-                news1.Id = 20;
+                news1.GId = 20;
                 news1.Title = "title20";
 
                 list.Add(news1);
 
                 var news2 = new News();
-                news2.Id = 21;
+                news2.GId = 21;
                 news2.Title = "title21";
                 list.Add(news2);
 
@@ -111,7 +111,7 @@ namespace Keede.DAL.DomainBase.UnitTest
             {
                 var news1 = new News();
 
-                news1.Id = 10;
+                news1.GId = 10;
                 news1.Title = "title";
                 news1.Content = "Content"+DateTime.Now;
                 var result = repository.Save(news1);
@@ -134,7 +134,7 @@ namespace Keede.DAL.DomainBase.UnitTest
             using (var repository = new NewsRepository())
             {
                 var news1 = new News();
-                news1.Id = 10;
+                news1.GId = 10;
                 news1.Title = "title10";
                 var result = repository.Remove(news1);
 
@@ -262,7 +262,7 @@ namespace Keede.DAL.DomainBase.UnitTest
 
             IRepository<News> repository = new NewsRepository();
             News news = new News();
-            news.Id = 11;
+            news.GId = 11;
 
             Assert.IsTrue(repository.Add(news));
         }

@@ -12,7 +12,7 @@ using Keede.RepositoriesTests.Repositories;
 
 namespace Keede.DAL.DomainBase.UnitTest
 {
-    public class NewsRepository : DapperRepositoryBase<News,int>, INewsRepository
+    public class NewsRepository : SqlServerRepository<News>, INewsRepository
     {
         /// <summary>
         /// 

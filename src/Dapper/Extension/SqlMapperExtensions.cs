@@ -486,15 +486,7 @@ namespace Dapper.Extension
     [AttributeUsage(AttributeTargets.Property)]
     public class KeyAttribute : Attribute
     {
-        //public KeyAttribute()
-        //{
-        //    Name = "Id";
-        //}
-        //public KeyAttribute(string keyName)
-        //{
-        //    Name = keyName;
-        //}
-        //public string Name { get; private set; }
+
     }
 
     /// <summary>
@@ -503,15 +495,7 @@ namespace Dapper.Extension
     [AttributeUsage(AttributeTargets.Property)]
     public class ExplicitKeyAttribute : Attribute
     {
-        //public ExplicitKeyAttribute()
-        //{
 
-        //}
-        //public ExplicitKeyAttribute(string keyName)
-        //{
-        //    Name = keyName;
-        //}
-        //public string Name { get; private set; }
     }
 
     /// <summary>

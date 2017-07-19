@@ -33,7 +33,7 @@ namespace Keede.DAL.DomainBase.UnitTest
         public void TestCustomRepository()
         {
             //ICustomRepository custom = new CustomRepository();
-            var news = new News{ Id=14,Title="title"+DateTime.Now};
+            var news = new News{ GId=14,Title="title"+DateTime.Now};
 
             IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
             unitOfWork.RegisterAdded(news);
@@ -46,7 +46,7 @@ namespace Keede.DAL.DomainBase.UnitTest
             NewsRepository repository = new NewsRepository();
 
             var news = new News();
-            news.Id = 998;
+            news.GId = 998;
             news.Title = "UnitWrokTitle998";
 
             IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
@@ -112,12 +112,12 @@ namespace Keede.DAL.DomainBase.UnitTest
                 var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
-                news1.Id = 6;
+                news1.GId = 6;
                 news1.Title = "UnitWrokTitle6";
                 unitOfWork.RegisterAdded(news1);
 
                 var news2 = new News();
-                news2.Id = 7;
+                news2.GId = 7;
                 news2.Title = "UnitWrokTitle7";
                 unitOfWork.RegisterAdded(news2);
 
@@ -157,11 +157,11 @@ namespace Keede.DAL.DomainBase.UnitTest
                 var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
-                news1.Id = 6;
+                news1.GId = 6;
                 unitOfWork.RegisterRemoved(news1);
 
                 var news2 = new News();
-                news2.Id = 7;
+                news2.GId = 7;
                 unitOfWork.RegisterRemoved(news2);
 
                 var result = unitOfWork.Commit();

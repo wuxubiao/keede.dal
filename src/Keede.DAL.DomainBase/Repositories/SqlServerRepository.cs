@@ -16,14 +16,14 @@ namespace Keede.DAL.DomainBase.Repositories
     public class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
-        private IDbConnection OpenDbConnection(bool isReadDb = true)
+        protected IDbConnection OpenDbConnection(bool isReadDb = true)
         {
             var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(isReadDb);
             if (conn.State == ConnectionState.Broken || conn.State == ConnectionState.Closed) conn.Open();
             return conn;
         }
 
-        private void CloseConnection(IDbConnection conn)
+        protected void CloseConnection(IDbConnection conn)
         {
             if (DbTransaction != null) return;
             if (conn.State == ConnectionState.Open)
@@ -54,7 +54,6 @@ namespace Keede.DAL.DomainBase.Repositories
             var conn = OpenDbConnection(false);
             var dt = conn.GetTableSchema(list);
             var value = BulkToDB(conn, dt);
-            //var value = conn.InsertEx(list, DbTransaction) > 0;
             CloseConnection(conn);
             return value;
         }
