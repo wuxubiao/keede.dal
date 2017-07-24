@@ -102,6 +102,27 @@ namespace Dapper.Extension
             OrderBy = orderBy.Trim().StartsWith("ORDER BY",StringComparison.CurrentCultureIgnoreCase)?" "+orderBy+" ":" ORDER BY "+orderBy+" ";
         }
 
+        public PagedList(int pageIndex, int pageSize, long recordCount, IList<T> items)
+        {
+            PageIndex = pageIndex;
+            PageSize = pageSize;
+            RecordCount = recordCount;
+            Items = items;
+            PageCount = new Func<long>(delegate
+            {
+                var pages = RecordCount / PageSize;
+                if (RecordCount % PageSize != 0)
+                {
+                    pages = pages + 1;
+                }
+                if (PageIndex > pages)
+                {
+                    PageIndex = pages;
+                }
+                return pages;
+            }).Invoke();
+        }
+
         internal void FillQueryData(int recordCount, IList<T> dataList)
         {
             RecordCount = recordCount;
@@ -129,7 +150,7 @@ namespace Dapper.Extension
         /// <summary>
         ///
         /// </summary>
-        public long PageSize { get; }
+        public long PageSize { get; private set; }
 
         /// <summary>
         ///

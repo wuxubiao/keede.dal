@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -575,7 +576,7 @@ namespace Dapper.Extension
             DataTable dt = new DataTable();
             dt.TableName = GetTableName(type);
 
-            if(keyProperties.Count>0)
+            if (keyProperties.Count > 0)
             {
                 dt.Columns.Add(new DataColumn(GetCustomColumnName(keyProperties[0]), keyProperties[0].PropertyType));
             }
@@ -601,6 +602,311 @@ namespace Dapper.Extension
 
             return dt;
         }
+
+        #region SqlMapper_Extensions
+        /// <summary>Get data count from table with a specified condition.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="isOr"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int GetCount(this IDbConnection connection, object condition, string table, bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return QueryList<int>(connection, condition, table, "count(*)", isOr, transaction, commandTimeout).Single();
+        }
+
+        /// <summary>Query a list of data from table with a specified condition.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static IEnumerable<dynamic> QueryList(this IDbConnection connection, dynamic condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return QueryList<dynamic>(connection, condition, table, columns, isOr, transaction, commandTimeout);
+        }
+
+        /// <summary>Query a list of data from table with specified condition.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IEnumerable<T> QueryList<T>(this IDbConnection connection, object condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return connection.Query<T>(BuildQuerySQL(condition, table, columns, isOr), condition, transaction, true, commandTimeout);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="columns"></param>
+        /// <param name="isOr"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static PagedList<dynamic> QueryPaged(this IDbConnection connection, dynamic condition, string table, string orderBy, int pageIndex, int pageSize, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return QueryPaged<dynamic>(connection, condition, table, orderBy, pageIndex, pageSize, columns, isOr, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="columns"></param>
+        /// <param name="isOr"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static PagedList<T> QueryPaged<T>(this IDbConnection connection, dynamic condition, string table, string orderBy, int pageIndex, int pageSize, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var conditionObj = condition as object;
+            var whereFields = string.Empty;
+            var properties = GetFieldNames(conditionObj);
+            if (properties.Count > 0)
+            {
+                var separator = isOr ? " OR " : " AND ";
+                whereFields = " WHERE " + string.Join(separator, properties.Select(p => HandleKeyword(p) + " = @" + p));
+            }
+            var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER (ORDER BY {1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, whereFields, (pageIndex - 1) * pageSize + 1, pageIndex * pageSize);
+
+            var datas = connection.Query<T>(sql, conditionObj, transaction, true, commandTimeout).ToList();
+            var total = GetCount(connection, condition, table, isOr, transaction, commandTimeout);
+            return new PagedList<T>(pageIndex, pageSize, total, datas);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="data"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int Insert(this IDbConnection connection, dynamic data, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var obj = data as object;
+            var properties = GetPropertyAndFieldName(obj);
+            var fieldNames = properties.Values.ToList();
+            var columns = string.Join(",", fieldNames);
+            var values = string.Join(",", fieldNames.Select(p => "@" + p));
+            var sql = string.Format("insert into [{0}] ({1}) values ({2}) select cast(scope_identity() as bigint)", table, columns, values);
+
+            //return connection.Execute(sql, obj, transaction, commandTimeout);
+
+            var parameters = new DynamicParameters(data);
+            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+            //properties.ForEach(p => expandoObject.Add("@" + p.Value, p.Key.GetValue(data, null)));
+            foreach (var item in properties)
+            {
+                expandoObject.Add("@" + item.Value, item.Key.GetValue(data, null));
+            }
+
+            parameters.AddDynamicParams(expandoObject);
+
+            return connection.Execute(sql, parameters, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="data"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int Update(this IDbConnection connection, dynamic data, dynamic condition, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var obj = data as object;
+            var conditionObj = condition as object;
+
+            var wherePropertyInfos = GetPropertyAndFieldName(conditionObj);
+
+            var updateProperties = GetFieldNames(obj);
+            var whereProperties = wherePropertyInfos.Values.ToList();
+
+            var updateFields = string.Join(",", updateProperties.Select(p => HandleKeyword(p) + " = @" + p));
+            var whereFields = string.Empty;
+
+            if (whereProperties.Any())
+            {
+                whereFields = " where " + string.Join(" and ", whereProperties.Select(p => p + " = @w_" + p));
+            }
+
+            var sql = string.Format("update [{0}] set {1}{2}", table, updateFields, whereFields);
+
+            var parameters = new DynamicParameters(data);
+            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+            //wherePropertyInfos.ForEach(p => expandoObject.Add("w_" + p.Value, p.Key.GetValue(conditionObj, null)));
+
+            foreach (var item in wherePropertyInfos)
+            {
+                expandoObject.Add("w_" + item.Value, item.Key.GetValue(conditionObj, null));
+            }
+
+            parameters.AddDynamicParams(expandoObject);
+
+            return connection.Execute(sql, parameters, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int Delete(this IDbConnection connection, dynamic condition, string table, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var conditionObj = condition as object;
+            var whereFields = string.Empty;
+            var whereProperties = GetFieldNames(conditionObj);
+            if (whereProperties.Count > 0)
+            {
+                whereFields = " where " + string.Join(" and ", whereProperties.Select(p => HandleKeyword(p) + " = @" + p));
+            }
+
+            var sql = string.Format("delete from [{0}]{1}", table, whereFields);
+
+            return connection.Execute(sql, conditionObj, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="selectPart"></param>
+        /// <param name="isOr"></param>
+        /// <returns></returns>
+        private static string BuildQuerySQL(dynamic condition, string table, string selectPart = "*", bool isOr = false)
+        {
+            var conditionObj = condition as object;
+            var properties = GetFieldNames(conditionObj);
+            if (properties.Count == 0)
+            {
+                return string.Format("SELECT {1} FROM [{0}]", table, selectPart);
+            }
+
+            var separator = isOr ? " OR " : " AND ";
+            var wherePart = string.Join(separator, properties.Select(p => HandleKeyword(p) + " = @" + p));
+
+            return string.Format("SELECT {2} FROM [{0}] WHERE {1}", table, wherePart, selectPart);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private static List<string> GetFieldNames(object obj)
+        {
+            if (obj == null)
+            {
+                return new List<string>();
+            }
+            if (obj is DynamicParameters)
+            {
+                return (obj as DynamicParameters).ParameterNames.ToList();
+            }
+            Dictionary<PropertyInfo, string> propertyAndField = GetPropertyAndFieldName(obj);
+            return propertyAndField.Values.ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private static string HandleKeyword(string p)
+        {
+            switch (p)
+            {
+                case "Key":
+                    return "[Key]";
+                case "Description":
+                    return "[Description]";
+                default:
+                    return p;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static readonly ConcurrentDictionary<Type, Dictionary<PropertyInfo, string>> _paramCache = new ConcurrentDictionary<Type, Dictionary<PropertyInfo, string>>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private static Dictionary<PropertyInfo, string> GetPropertyAndFieldName(object obj)
+        {
+            if (obj == null)
+            {
+                return new Dictionary<PropertyInfo, string>();
+            }
+
+            Dictionary<PropertyInfo, string> propertyAndField;
+            if (_paramCache.TryGetValue(obj.GetType(), out propertyAndField))
+                return propertyAndField;
+
+            propertyAndField = new Dictionary<PropertyInfo, string>();
+            var properties = obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public).ToList();
+
+            foreach (var property in properties)
+            {
+                var computedAttribute = property.GetCustomAttributes(typeof(ComputedAttribute), false).SingleOrDefault();
+                if (computedAttribute != null)
+                    continue;
+
+                var attribute = property.GetCustomAttributes(typeof(ColumnAttribute), false).SingleOrDefault();
+
+                if (attribute == null)
+                {
+                    propertyAndField.Add(property, property.Name);
+                }
+                else
+                {
+                    var columnAttribute = (ColumnAttribute)attribute;
+
+                    propertyAndField.Add(property, string.IsNullOrWhiteSpace(columnAttribute.Name)
+                        ? property.Name
+                        : columnAttribute.Name);
+                }
+            }
+
+            _paramCache[obj.GetType()] = propertyAndField;
+            return propertyAndField;
+        }
+        #endregion SqlMapper_Extensions
 
         #endregion 新增方法
     }
