@@ -128,6 +128,34 @@ namespace Keede.DAL.DomainBase.Repositories
         public abstract List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
         #region IDisposable Members
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract TEntity Get(object condition, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract IList<TEntity> GetList(object condition, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract PagedList<TEntity> PageList(object condition, string orderBy, int pageIndex, int pageSize,
+            bool isReadDb = true);
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);

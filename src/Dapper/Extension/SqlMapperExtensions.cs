@@ -150,7 +150,7 @@ namespace Dapper.Extension
         /// </summary>
         public static TableNameMapperDelegate TableNameMapper;
 
-        private static string GetTableName(Type type)
+        public static string GetTableName(Type type)
         {
             string name;
             if (TypeTableName.TryGetValue(type.TypeHandle, out name)) return name;

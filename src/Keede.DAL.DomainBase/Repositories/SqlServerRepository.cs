@@ -16,14 +16,14 @@ namespace Keede.DAL.DomainBase.Repositories
     public class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
-        protected IDbConnection OpenDbConnection(bool isReadDb = true)
+        public IDbConnection OpenDbConnection(bool isReadDb = true)
         {
             var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(isReadDb);
             if (conn.State == ConnectionState.Broken || conn.State == ConnectionState.Closed) conn.Open();
             return conn;
         }
 
-        protected void CloseConnection(IDbConnection conn)
+        public void CloseConnection(IDbConnection conn)
         {
             if (DbTransaction != null) return;
             if (conn.State == ConnectionState.Open)
@@ -266,6 +266,48 @@ namespace Keede.DAL.DomainBase.Repositories
             var pagedList = conn.QueryPaged<T>(sql,pageIndex,pageSize, parameterObjects, DbTransaction);
             CloseConnection(conn);
             return pagedList;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override TEntity Get(object condition, bool isReadDb = true)
+        {
+            return GetList(condition, isReadDb).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override IList<TEntity> GetList(object condition, bool isReadDb = true)
+        {
+            if (condition == null)//var table = GetTableName(type);
+                throw new ArgumentNullException(nameof(condition));
+            var conn = OpenDbConnection(isReadDb);
+            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+            return conn.QueryList<TEntity>(condition, table, "*", false, null, new int?()).ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override PagedList<TEntity> PageList(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
+        {
+            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+            var conn = OpenDbConnection(isReadDb);
+            return conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, null, new int?());
         }
     }
 }

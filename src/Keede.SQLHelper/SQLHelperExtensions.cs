@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Framework.Data
+﻿namespace Keede.SQLHelper
 {
     public static partial class SqlHelper
     {
