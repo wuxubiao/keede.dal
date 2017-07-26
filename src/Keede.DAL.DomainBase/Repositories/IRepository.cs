@@ -156,7 +156,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        PagedList<TEntity> PageList(object condition, string orderBy, int pageIndex, int pageSize,
+        PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize,
             bool isReadDb = true);
     }
 }
