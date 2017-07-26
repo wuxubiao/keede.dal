@@ -465,11 +465,11 @@ namespace Keede.SQLHelper
             string title = "[" + DateTime.Now + "] SQL脚本运行错误信息";
             if (!string.IsNullOrEmpty(ErrorFilePath))
             {
-                LogHelper.Log("SQL.Error", ErrorFilePath, title, message);
+                //LogHelper.Log("SQL.Error", ErrorFilePath, title, message);
             }
             else
             {
-                LogHelper.Log("SQL.Error", title, message);
+                //LogHelper.Log("SQL.Error", title, message);
             }
         }
 

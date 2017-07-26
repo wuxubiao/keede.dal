@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
+using Framework.Common;
 using Keede.SQLHelper.Attributes;
 
 namespace Keede.SQLHelper.Mapper
