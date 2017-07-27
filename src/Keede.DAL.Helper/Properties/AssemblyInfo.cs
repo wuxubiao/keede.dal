@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Keede.Dapper")]
-[assembly: AssemblyDescription("在原生Dapper加了扩展")]
+[assembly: AssemblyTitle("Keede.DAL.Helper")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Keede")]
-[assembly: AssemblyProduct("Keede.Dapper")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyProduct("Keede.DAL.Helper")]
+[assembly: AssemblyCopyright("Copyright © Microsoft 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("c872a7d5-567a-4320-b805-fc32db20b8e1")]
+[assembly: Guid("362009f2-3f5f-44c3-ae34-8abeb35c2df4")]
 
 // 程序集的版本信息由下列四个值组成: 
 //
