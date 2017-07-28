@@ -1,5 +1,5 @@
-﻿using Keede.DAL.DomainBase.Repositories;
-using Keede.DAL.DomainBase.UnitTest.Models;
+﻿using Keede.DAL.DDD.Repositories;
+using Keede.DAL.DDD.UnitTest.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Data.Common;
 using Keede.DAL.RWSplitting;
 using Keede.RepositoriesTests.Repositories;
 
-namespace Keede.DAL.DomainBase.UnitTest
+namespace Keede.DAL.DDD.UnitTest
 {
     public class NewsRepository : SqlServerRepository<News>, INewsRepository
     {

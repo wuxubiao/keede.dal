@@ -36,14 +36,23 @@ namespace Keede.DAL.Helper
 
         #region -- Init()
 
+        public Database()
+            : base()
+        {
+        }
+
+        public Database(string dbName)
+            : base(dbName)
+        {
+        }
+
         /// <summary>
         ///
         /// </summary>
         /// <param name="connectionName"></param>
         /// <param name="exception"></param>
-        [Obsolete("This function is obsolete,don't use it in new project")]
-        public Database(DbExecuteException exception)
-            : base(exception)
+        public Database(DbExecuteException exception, string dbName = null)
+            : base(exception,dbName)
         {
         }
         #endregion -- Init()

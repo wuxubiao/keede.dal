@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Framework.DDD.EventHandle
+namespace Framework.Core.DDD.EventHandle
 {
     public class DomainEvent : IDomainEvent
     {

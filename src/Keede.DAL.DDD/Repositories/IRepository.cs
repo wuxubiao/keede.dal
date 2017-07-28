@@ -1,43 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
+using Dapper;
 using Dapper.Extension;
-using Keede.DAL.RWSplitting;
+using System;
 
-namespace Keede.DAL.DomainBase.Repositories
+namespace Keede.DAL.DDD.Repositories
 {
     /// <summary>
-    /// Represents the base class for repositories.
+    /// Represents that the implemented classes are repositories.
     /// </summary>
     /// <typeparam name="TEntity">The type of the aggregate root on which the repository operations
     /// should be performed.</typeparam>
-    public abstract class Repository<TEntity> : IRepository<TEntity>
+    public interface IRepository<TEntity>: IDisposable
         where TEntity : IEntity
     {
+        /// <summary>
+        /// Add a new item into the repository
+        /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public abstract bool Add(TEntity data);
+        bool Add(TEntity data);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public abstract bool BatchAdd<T>(IList<T> list);
+        bool BatchAdd<T>(IList<T> list);
 
         /// <summary>
-        /// 
+        /// Save the modified item to the repository
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public abstract bool Save(TEntity data);
+        bool Save(TEntity data);
 
         /// <summary>
-        /// 
+        /// Remove item from the repository by custom condition
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public abstract bool Remove(TEntity condition);
+        bool Remove(TEntity condition);
 
         /// <summary>
         /// 
@@ -45,40 +48,15 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="where"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract int Remove(string whereSql, object parameterObject = null);
+        int Remove(string whereSql, object parameterObject = null);
 
         /// <summary>
-        /// 
+        /// Get single item from the repository by custom condition
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract TEntity Get(string sql, object parameterObject = null, bool isReadDb = true);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public abstract TEntity GetById(dynamic id, bool isReadDb = true);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="isUpdateLock"></param>
-        /// <returns></returns>
-        public abstract TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameterObject"></param>
-        /// <returns></returns>
-        public abstract IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
-
-        //public abstract IList<TEntity> GetList(string where, object parameterObject = null);
+        TEntity Get(string sql,object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -88,7 +66,22 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+         T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+
+        /// <summary>
+        /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        TEntity GetById(dynamic id, bool isReadDb = true);
+
+        /// <summary>
+        /// 指定Id，获取一个实体对象；如果要求附带UPDLOCK更新锁，就能防止脏读数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isUpdateLock"></param>
+        /// <returns></returns>
+        TEntity GetById(dynamic id,bool isUpdateLock, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -97,12 +90,23 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
+        int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
+
         /// <summary>
         /// 
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract IList<TEntity> GetAll( bool isReadDb = true);
+        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+
+        /// <summary>
+        /// Get all items from the repository by custom condition
+        /// </summary>
+        /// <returns></returns>
+        IList<TEntity> GetAll(bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -113,7 +117,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public abstract PagedList<TEntity> GetPagedList(string where, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
+        PagedList<TEntity> GetPagedList(string whereSql, string orderBy,object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -125,8 +129,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
-        #region IDisposable Members
+        List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
 
         /// <summary>
         /// 
@@ -134,7 +137,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract TEntity Get(object condition, bool isReadDb = true);
+        TEntity Get(object condition, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -142,7 +145,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract IList<TEntity> GetList(object condition, bool isReadDb = true);
+        IList<TEntity> GetList(object condition, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -153,18 +156,7 @@ namespace Keede.DAL.DomainBase.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize,
+        PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize,
             bool isReadDb = true);
-
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
-        ~Repository()
-        {
-            Dispose();
-        }
-        #endregion
     }
 }

@@ -1,5 +1,5 @@
-﻿using Keede.DAL.DomainBase;
-using Keede.DAL.DomainBase.Repositories;
+﻿using Keede.DAL.DDD;
+using Keede.DAL.DDD.Repositories;
 using System;
 
 namespace Keede.RepositoriesTests.Repositories

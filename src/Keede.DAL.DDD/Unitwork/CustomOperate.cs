@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Keede.DAL.DomainBase.Unitwork
+namespace Keede.DAL.DDD.Unitwork
 {
     /// <summary>
     /// 

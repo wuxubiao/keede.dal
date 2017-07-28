@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Keede.DAL.DomainBase
+namespace Keede.DAL.DDD
 {
     /// <summary>
     /// 实体特性帮助类

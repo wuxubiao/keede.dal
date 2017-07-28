@@ -35,11 +35,11 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回int型数据类型值，指示被影响的数据行</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static int ExecuteNonQuery(string cmdText, params SqlParameter[] commandParameters)
+        public static int ExecuteNonQuery(string cmdText, string dbName = null, params SqlParameter[] commandParameters)
         {
             try
             {
-                using (var conn = SqlStatement.IsRead(cmdText) ? Databases.GetSqlConnection() : Databases.GetSqlConnection(false))
+                using (var conn = SqlStatement.IsRead(cmdText) ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName,false))
                 {
                     return conn.Execute(cmdText, commandParameters);
                 }
@@ -132,9 +132,9 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回SqlDataReader类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static SqlDataReader ExecuteReader(string cmdText, params SqlParameter[] commandParameters)
+        public static SqlDataReader ExecuteReader(string cmdText, string dbName = null, params SqlParameter[] commandParameters)
         {
-            return ExecuteReader(15, cmdText, commandParameters);
+            return ExecuteReader(15, cmdText, dbName, commandParameters);
         }
 
         /// <summary>
@@ -147,10 +147,10 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回SqlDataReader类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static SqlDataReader ExecuteReader(int timeOut, string cmdText, params SqlParameter[] commandParameters)
+        public static SqlDataReader ExecuteReader(int timeOut, string cmdText, string dbName = null, params SqlParameter[] commandParameters)
         {
             SqlDataReader rdr = null;
-            var conn = Databases.GetSqlConnection();
+            var conn = Databases.GetSqlConnection(dbName);
 
             //返回SqlDataReader结果需要开启SqlConnection
             //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
@@ -196,9 +196,9 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回object类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static object ExecuteScalar(string cmdText, params SqlParameter[] commandParameters)
+        public static object ExecuteScalar(string cmdText, string dbName = null, params SqlParameter[] commandParameters)
         {
-            return ExecuteScalar(cmdText, 15, commandParameters);
+            return ExecuteScalar(cmdText, 15, dbName, commandParameters);
         }
 
         /// <summary>
@@ -210,11 +210,11 @@ namespace Keede.DAL.Helper
         /// <param name="timeOut">数据运行超时时间</param>
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回object类查询结果</returns>
-        public static object ExecuteScalar(string cmdText, int timeOut, params SqlParameter[] commandParameters)
+        public static object ExecuteScalar(string cmdText, int timeOut, string dbName = null, params SqlParameter[] commandParameters)
         {
             try
             {
-                using (var connection = SqlStatement.IsRead(cmdText) ? Databases.GetSqlConnection() : Databases.GetSqlConnection(false))
+                using (var connection = SqlStatement.IsRead(cmdText) ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
                 {
                     object val = connection.ExecuteScalar(cmdText, commandParameters, null, timeOut);
                     return val;
@@ -242,35 +242,35 @@ namespace Keede.DAL.Helper
         /// <param name="cmdType">执行模式说明</param>
         /// <param name="cmdText">指令字符串</param>
         /// <param name="cmdParms">存储过程参数</param>
-        internal static void PrepareCommand(SqlCommand cmd, SqlConnection conn, SqlTransaction trans, string cmdText, IEnumerable<SqlParameter> cmdParms)
-        {
-            if (conn.State != ConnectionState.Open)
-                conn.Open();
+        //internal static void PrepareCommand(SqlCommand cmd, SqlConnection conn, SqlTransaction trans, string cmdText, IEnumerable<SqlParameter> cmdParms)
+        //{
+        //    if (conn.State != ConnectionState.Open)
+        //        conn.Open();
 
-            cmd.CommandText = cmdText;
+        //    cmd.CommandText = cmdText;
 
-            if (trans != null)
-                cmd.Transaction = trans;
+        //    if (trans != null)
+        //        cmd.Transaction = trans;
 
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.Clear();
-            if (cmdParms != null)
-            {
-                foreach (SqlParameter parm in cmdParms)
-                {
-                    if (parm != null)
-                    {
-                        if ((parm.Direction == ParameterDirection.InputOutput ||
-                            parm.Direction == ParameterDirection.Input) &&
-                            (parm.Value == null))
-                        {
-                            parm.Value = DBNull.Value;
-                        }
-                        cmd.Parameters.Add(parm);
-                    }
-                }
-            }
-        }
+        //    cmd.CommandType = CommandType.Text;
+        //    cmd.Parameters.Clear();
+        //    if (cmdParms != null)
+        //    {
+        //        foreach (SqlParameter parm in cmdParms)
+        //        {
+        //            if (parm != null)
+        //            {
+        //                if ((parm.Direction == ParameterDirection.InputOutput ||
+        //                    parm.Direction == ParameterDirection.Input) &&
+        //                    (parm.Value == null))
+        //                {
+        //                    parm.Value = DBNull.Value;
+        //                }
+        //                cmd.Parameters.Add(parm);
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion -- PrepareCommand
 
@@ -346,12 +346,12 @@ namespace Keede.DAL.Helper
         /// <param name="tableName">插入的表名</param>
         /// <param name="mappings">Key是模型中的字段名，Value是对应数据表中的字段名</param>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static Int32 BatchInsert<T>(IEnumerable<T> data, string tableName, Dictionary<string, string> mappings)
+        public static Int32 BatchInsert<T>(IEnumerable<T> data, string tableName, Dictionary<string, string> mappings, string dbName = null)
         {
             if (data == null || !data.Any())
                 return 0;
 
-            using (var conn = Databases.GetSqlConnection(false))
+            using (var conn = Databases.GetSqlConnection(dbName, false))
             {
                 conn.Open();
                 using (var transaction = conn.BeginTransaction())

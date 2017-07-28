@@ -7,7 +7,7 @@ using Dapper.Extension;
 using Keede.DAL.RWSplitting;
 using System.Data.SqlClient;
 
-namespace Keede.DAL.DomainBase.Repositories
+namespace Keede.DAL.DDD.Repositories
 {
     /// <summary>
     /// 

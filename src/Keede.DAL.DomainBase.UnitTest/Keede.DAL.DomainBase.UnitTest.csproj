@@ -79,13 +79,13 @@
       <Project>{c872a7d5-567a-4320-b805-fc32db20b8e1}</Project>
       <Name>Dapper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Keede.DAL.DDD\Keede.DAL.DDD.csproj">
+      <Project>{73C19C15-5933-489A-AE5D-275425709354}</Project>
+      <Name>Keede.DAL.DDD</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Keede.DAL.RWSplitting\Keede.DAL.RWSplitting.csproj">
       <Project>{ffdeb36e-a2c6-4fb4-a88e-0bdd49d83699}</Project>
       <Name>Keede.DAL.RWSplitting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Keede.DAL.DomainBase\Keede.DAL.DomainBase.csproj">
-      <Project>{73C19C15-5933-489A-AE5D-275425709354}</Project>
-      <Name>Keede.DAL.DomainBase</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

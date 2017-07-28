@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using Dapper.Extension;
 
-namespace Keede.DAL.DomainBase.Unitwork
+namespace Keede.DAL.DDD.Unitwork
 {
     /// <summary>
     /// Represents the base class for repository contexts.

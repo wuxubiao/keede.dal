@@ -3,14 +3,14 @@ using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Keede.DAL.DomainBase.Unitwork;
+using Keede.DAL.DDD.Unitwork;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Keede.DAL.RWSplitting;
-using Keede.DAL.DomainBase.UnitTest.Models;
+using Keede.DAL.DDD.UnitTest.Models;
 using Dapper;
 using Dapper.Extension;
 
-namespace Keede.DAL.DomainBase.UnitTest
+namespace Keede.DAL.DDD.UnitTest
 {
     /// <summary>
     /// UnitTest_UnitWork 的摘要说明
@@ -24,7 +24,7 @@ namespace Keede.DAL.DomainBase.UnitTest
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
-            TypeMapper.Initialize("Keede.DAL.DomainBase.UnitTest.Models");
+            TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
             TypeMapper.SetTypeMap(typeof(News));
             TypeMapper.SetTypeMap(typeof(NewsCustom));
         }

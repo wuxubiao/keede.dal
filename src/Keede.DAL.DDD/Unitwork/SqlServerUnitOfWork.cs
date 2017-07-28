@@ -7,11 +7,11 @@ using System.Linq;
 using System.Management.Instrumentation;
 using System.Reflection;
 using System.Threading;
-using Keede.DAL.DomainBase.Repositories;
+using Keede.DAL.DDD.Repositories;
 using Keede.DAL.Utility;
 using Keede.DAL.RWSplitting;
 
-namespace Keede.DAL.DomainBase.Unitwork
+namespace Keede.DAL.DDD.Unitwork
 {
     /// <summary>
     /// 

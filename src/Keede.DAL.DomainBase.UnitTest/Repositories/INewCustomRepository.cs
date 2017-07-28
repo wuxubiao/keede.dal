@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Keede.DAL.DomainBase.UnitTest
+namespace Keede.DAL.DDD.UnitTest
 {
     public interface INewCustomRepository<TEntity>
     {

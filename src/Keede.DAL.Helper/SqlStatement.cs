@@ -1,4 +1,6 @@
-﻿namespace Keede.DAL.Helper
+﻿using System;
+
+namespace Keede.DAL.Helper
 {
     public static class SqlStatement
     {
@@ -9,10 +11,13 @@
         /// <returns></returns>
         public static bool IsRead(string cmdText)
         {
-            if (cmdText.Trim().ToLower().StartsWith("select"))
-                return true;
-            else
+            if (cmdText.IndexOf("insert", StringComparison.OrdinalIgnoreCase) >0 || 
+                cmdText.IndexOf("delete", StringComparison.OrdinalIgnoreCase) > 0|| 
+                cmdText.IndexOf("update", StringComparison.OrdinalIgnoreCase) > 0||
+                cmdText.IndexOf("truncate", StringComparison.OrdinalIgnoreCase) > 0)
                 return false;
+            else
+                return true;
         }
     }   
 }

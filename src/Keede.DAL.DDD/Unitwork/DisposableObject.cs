@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Keede.DAL.DomainBase.Unitwork
+namespace Keede.DAL.DDD.Unitwork
 {
     /// <summary>
     /// Represents that the derived classes are disposable objects.

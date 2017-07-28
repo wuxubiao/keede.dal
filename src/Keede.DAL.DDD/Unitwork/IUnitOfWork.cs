@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace Keede.DAL.DomainBase.Unitwork
+namespace Keede.DAL.DDD.Unitwork
 {
     /// <summary>
     /// 表示所有集成于该接口的类型都是Unit Of Work的一种实现。

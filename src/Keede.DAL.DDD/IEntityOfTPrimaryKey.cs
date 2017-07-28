@@ -1,4 +1,4 @@
-﻿namespace Keede.DAL.DomainBase
+﻿namespace Keede.DAL.DDD
 {
     /// <summary>
     /// Defines interface for base entity type. All entities in the system must implement this interface.

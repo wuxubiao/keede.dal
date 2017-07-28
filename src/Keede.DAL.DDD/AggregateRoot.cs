@@ -1,4 +1,4 @@
-namespace Keede.DAL.DomainBase
+namespace Keede.DAL.DDD
 {
     /// <summary>
     /// 

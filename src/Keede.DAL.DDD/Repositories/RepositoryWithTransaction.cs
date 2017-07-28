@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace Keede.DAL.DomainBase.Repositories
+namespace Keede.DAL.DDD.Repositories
 {
     /// <summary>
     /// Represents the base class for repositories.

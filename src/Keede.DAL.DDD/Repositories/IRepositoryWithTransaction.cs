@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Keede.DAL.DomainBase.Repositories
+namespace Keede.DAL.DDD.Repositories
 {
     /// <summary>
     /// Represents that the implemented classes are repositories.

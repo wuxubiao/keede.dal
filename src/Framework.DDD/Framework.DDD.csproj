@@ -51,9 +51,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Keede.DAL.DomainBase\Keede.DAL.DomainBase.csproj">
+    <ProjectReference Include="..\Keede.DAL.DomainBase\Keede.DAL.DDD.csproj">
       <Project>{73c19c15-5933-489a-ae5d-275425709354}</Project>
-      <Name>Keede.DAL.DomainBase</Name>
+      <Name>Keede.DAL.DDD</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Keede.DAL.DomainBase
+namespace Keede.DAL.DDD
 {
     /// <summary>
     /// A shortcut of <see cref="Entity{TPrimaryKey}"/> for most used primary key type (<see cref="int"/>).

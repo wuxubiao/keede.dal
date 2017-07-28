@@ -1,8 +1,8 @@
 ﻿using System;
 using Dapper.Extension;
-using Keede.DAL.DomainBase;
+using Keede.DAL.DDD;
 
-namespace Keede.DAL.DomainBase.UnitTest.Models
+namespace Keede.DAL.DDD.UnitTest.Models
 {
     [Table("Person")]
     public class Person:Entity<Guid>

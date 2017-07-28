@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Framework.DDD.EventHandle
+namespace Framework.Core.DDD.EventHandle
 {
     public class DomainEventConsistentQueue : IDisposable
     {

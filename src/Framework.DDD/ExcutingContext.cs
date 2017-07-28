@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
-using Keede.DAL.DomainBase.Unitwork;
+using Keede.DAL.DDD.Unitwork;
 
 
-namespace Framework.DDD
+namespace Framework.Core.DDD
 {
     public class ExcutingContext
     {
