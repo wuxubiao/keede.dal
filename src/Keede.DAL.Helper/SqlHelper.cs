@@ -26,12 +26,15 @@ namespace Keede.DAL.Helper
         }
 
         #region -- ExecuteNonQuery
+
         /// <summary>
         /// 指定数据库连接字符串，以执行数据库访问。并返回受影响的数据行数。
         /// </summary>
-        /// <param name="connectionString">数据库连接字符串</param>
-        /// <param name="cmdType">数据库执行模式</param>
+        /// <param>数据库执行模式
+        ///     <name>cmdType</name>
+        /// </param>
         /// <param name="cmdText">数据库执行指令</param>
+        /// <param name="dbName"></param>
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回int型数据类型值，指示被影响的数据行</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
@@ -57,7 +60,6 @@ namespace Keede.DAL.Helper
         /// 传入执行事务，执行数据库访问，并返回受影响的数据行数。
         /// </summary>
         /// <param name="trans">现有的Sql事务</param>
-        /// <param name="cmdType">数据库执行模式</param>
         /// <param name="cmdText">指令字符串</param>
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回int型数据类型值，指示被影响的数据行</returns>
@@ -80,57 +82,14 @@ namespace Keede.DAL.Helper
         #endregion -- ExecuteNonQuery
 
         #region -- ExecuteDataTable
-        /// <summary>
-        /// 执行查询返回datatable数据
-        /// </summary>
-        /// <param name="connectionString">已有的SqlConnection数据库链接</param>
-        /// <param name="cmdType">数据库执行模式</param>
-        /// <param name="cmdText">指令字符串</param>
-        /// <param name="commandParameters">运行参数传递</param>
-        /// <returns>返回 DataTable 类型数据</returns>
-        //public static DataTable ExecuteDataTable(string cmdText, params SqlParameter[] commandParameters)
-        //{
-        //    try
-        //    {
-        //            using (var conn = Databases.GetSqlConnection() )
-        //            {
-        //                SqlCommand cmd = conn.CreateCommand();
-        //                PrepareCommand(cmd, conn, null, cmdText, commandParameters);
-        //                using (var da = new SqlDataAdapter(cmd))
-        //                {
-        //                    var ds = new DataSet();
-        //                    try
-        //                    {
-        //                        da.Fill(ds, "table");
-        //                        cmd.Parameters.Clear();
-        //                    }
-        //                    catch (SqlException ex)
-        //                    {
-        //                        throw new Exception(ex.Message);
-        //                    }
-        //                    return ds.Tables[0];
-        //                }
-        //            }
-        //    }
-        //    catch (Exception exp)
-        //    {
-        //        string errorMsg = exp.Message + "\r\n";
-        //        var sqlText = GetSQLParamsText(cmdText, commandParameters);
-        //        CreateErrorMsg(errorMsg + sqlText);
-        //        throw exp;
-        //    }
-        //}
-        #endregion -- ExecuteDataTable
 
-        #region -- ExecuteReader
         /// <summary>
-        /// 返回数据库查询结果
+        /// 
         /// </summary>
-        /// <param name="connectionString">数据库连接字符串</param>
-        /// <param name="cmdType">数据库执行模式</param>
-        /// <param name="cmdText">指令字符串</param>
-        /// <param name="commandParameters">运行参数传递</param>
-        /// <returns>返回SqlDataReader类查询结果</returns>
+        /// <param name="cmdText"></param>
+        /// <param name="dbName"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public static SqlDataReader ExecuteReader(string cmdText, string dbName = null, params SqlParameter[] commandParameters)
         {
@@ -140,10 +99,9 @@ namespace Keede.DAL.Helper
         /// <summary>
         /// 返回数据库查询结果,设定超时时间,用于耗时的查询
         /// </summary>
-        /// <param name="connectionString">数据库连接字符串</param>
         /// <param name="timeOut">超时时间</param>
-        /// <param name="cmdType">数据库执行模式</param>
         /// <param name="cmdText">指令字符串</param>
+        /// <param name="dbName"></param>
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回SqlDataReader类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
@@ -187,12 +145,12 @@ namespace Keede.DAL.Helper
         #endregion -- ExecuteReader
 
         #region -- ExecuteScalar
+
         /// <summary>
         /// 传入数据库连接字符串，执行查询，并返回查询所返回的结果集中第一行的第一列。
         /// </summary>
-        /// <param name="connectionString">数据库连接字符串</param>
-        /// <param name="cmdType">数据库执行模式</param>
         /// <param name="cmdText">指令字符串</param>
+        /// <param name="dbName"></param>
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回object类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
@@ -204,10 +162,9 @@ namespace Keede.DAL.Helper
         /// <summary>
         /// 大规模查询，执行查询，并返回查询所返回的结果集中第一行的第一列。
         /// </summary>
-        /// <param name="connectionString">数据库连接字符串</param>
-        /// <param name="cmdType">数据库执行模式</param>
         /// <param name="cmdText">指令字符串</param>
         /// <param name="timeOut">数据运行超时时间</param>
+        /// <param name="dbName"></param>
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回object类查询结果</returns>
         public static object ExecuteScalar(string cmdText, int timeOut, string dbName = null, params SqlParameter[] commandParameters)
@@ -240,46 +197,13 @@ namespace Keede.DAL.Helper
         /// <param name="conn">SqlConnection object</param>
         /// <param name="trans">SqlTransaction object</param>
         /// <param name="cmdType">执行模式说明</param>
-        /// <param name="cmdText">指令字符串</param>
         /// <param name="cmdParms">存储过程参数</param>
-        //internal static void PrepareCommand(SqlCommand cmd, SqlConnection conn, SqlTransaction trans, string cmdText, IEnumerable<SqlParameter> cmdParms)
-        //{
-        //    if (conn.State != ConnectionState.Open)
-        //        conn.Open();
-
-        //    cmd.CommandText = cmdText;
-
-        //    if (trans != null)
-        //        cmd.Transaction = trans;
-
-        //    cmd.CommandType = CommandType.Text;
-        //    cmd.Parameters.Clear();
-        //    if (cmdParms != null)
-        //    {
-        //        foreach (SqlParameter parm in cmdParms)
-        //        {
-        //            if (parm != null)
-        //            {
-        //                if ((parm.Direction == ParameterDirection.InputOutput ||
-        //                    parm.Direction == ParameterDirection.Input) &&
-        //                    (parm.Value == null))
-        //                {
-        //                    parm.Value = DBNull.Value;
-        //                }
-        //                cmd.Parameters.Add(parm);
-        //            }
-        //        }
-        //    }
-        //}
-
-        #endregion -- PrepareCommand
-
-        #region -- log
-
         /// <summary>
         /// 获取带有参数的脚本执行文本内容
         /// </summary>
-        /// <param name="cmdText"></param>
+        /// <param name="cmdText">
+        ///     指令字符串
+        /// </param>
         /// <param name="cmdParams"></param>
         /// <returns></returns>
         private static string GetSQLParamsText(string cmdText, params SqlParameter[] cmdParams)
@@ -341,10 +265,10 @@ namespace Keede.DAL.Helper
         /// 批量插入，手动映射表字段
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="connectionString"> </param>
         /// <param name="data">数据源</param>
         /// <param name="tableName">插入的表名</param>
         /// <param name="mappings">Key是模型中的字段名，Value是对应数据表中的字段名</param>
+        /// <param name="dbName"></param>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public static Int32 BatchInsert<T>(IEnumerable<T> data, string tableName, Dictionary<string, string> mappings, string dbName = null)
         {

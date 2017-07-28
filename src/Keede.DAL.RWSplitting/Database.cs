@@ -19,7 +19,7 @@ namespace Keede.DAL.RWSplitting
         
         private static IDbConnection CreateConnction(string dbName = null, bool isReadDb = true)
         {
-            var connectionStr = dbName == null ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
+            var connectionStr = string.IsNullOrEmpty(dbName) ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
             return new SqlConnection(connectionStr);
         }
         #endregion IDbConnection对象
@@ -37,7 +37,7 @@ namespace Keede.DAL.RWSplitting
 
         private static SqlConnection CreateSqlConnection(string dbName = null, bool isReadDb = true)
         {
-            var connectionStr = dbName == null ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
+            var connectionStr = string.IsNullOrEmpty(dbName) ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
             return new SqlConnection(connectionStr);
         }
         #endregion SqlConnection对象
@@ -55,7 +55,7 @@ namespace Keede.DAL.RWSplitting
 
         private static string CreateConnctionStr(string dbName = null, bool isReadDb = true)
         {
-            return dbName == null ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
+            return string.IsNullOrEmpty(dbName) ? ConnectionContainer.GetConnction(isReadDb) : ConnectionContainer.GetConnction(dbName, isReadDb);
         }
         #endregion SqlConnection连接字符串
 

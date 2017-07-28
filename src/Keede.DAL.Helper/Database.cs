@@ -46,11 +46,11 @@ namespace Keede.DAL.Helper
         {
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="connectionName"></param>
+        ///  <summary>
+        /// 
+        ///  </summary>
         /// <param name="exception"></param>
+        /// <param name="dbName"></param>
         public Database(DbExecuteException exception, string dbName = null)
             : base(exception,dbName)
         {
@@ -112,7 +112,6 @@ namespace Keede.DAL.Helper
         /// <summary>
         /// 执行数据操作
         /// </summary>
-        /// <param name="commandType"></param>
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -141,13 +140,12 @@ namespace Keede.DAL.Helper
             return GetValue<TValue>(sql, parameters);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="commandType"></param>
+        ///  <summary>
+        /// 
+        ///  </summary>
         /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+        ///  <param name="parameters"></param>
+        ///  <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public TValue GetValue<TValue>(string sql, params Parameter[] parameters)
         {
@@ -225,13 +223,12 @@ namespace Keede.DAL.Helper
             return Single<T>(sql, parameters);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="commandType"></param>
+        ///  <summary>
+        /// 
+        ///  </summary>
         /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+        ///  <param name="parameters"></param>
+        ///  <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public T Single<T>(string sql, params Parameter[] parameters) where T : class, new()
         {
@@ -271,13 +268,12 @@ namespace Keede.DAL.Helper
             return Select<T>(sql, parameters);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="commandType"></param>
+        ///  <summary>
+        /// 
+        ///  </summary>
         /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
+        ///  <param name="parameters"></param>
+        ///  <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public IEnumerable<T> Select<T>(string sql, params Parameter[] parameters) where T : class, new()
         {

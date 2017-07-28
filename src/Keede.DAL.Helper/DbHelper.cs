@@ -47,11 +47,11 @@ namespace Keede.DAL.Helper
             Init(null, dbName);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="connectionName"></param>
+        ///  <summary>
+        /// 
+        ///  </summary>
         /// <param name="exception"></param>
+        /// <param name="dbName"></param>
         internal DbHelper(DbExecuteException exception, string dbName = null)
         {
             Init(exception,dbName);
@@ -67,7 +67,6 @@ namespace Keede.DAL.Helper
         /// 传入执行事务，执行数据库访问，并返回受影响的数据行数。
         /// uparameters 类型参数传递。
         /// </summary>
-        /// <param name="cmdType">数据库执行模式</param>
         /// <param name="cmdText">指令字符串</param>
         /// <param name="parameters">运行参数传递</param>
         /// <returns>返回int型数据类型值，指示被影响的数据行</returns>
@@ -105,7 +104,6 @@ namespace Keede.DAL.Helper
         /// <summary>
         /// 返回数据库查询结果,设定超时时间,用于耗时的查询
         /// </summary>
-        /// <param name="cmdType">数据库执行模式</param>
         /// <param name="cmdText">指令字符串</param>
         /// <param name="parameters">运行参数传递</param>
         /// <returns>返回SqlDataReader类查询结果</returns>
@@ -134,7 +132,6 @@ namespace Keede.DAL.Helper
         /// 传入现有数据库连接，执行查询，并返回查询所返回的结果集中第一行的第一列。
         /// using the provided parameters.
         /// </summary>
-        /// <param name="cmdType">数据库执行模式</param>
         /// <param name="cmdText">指令字符串</param>
         /// <param name="parameters">运行参数传递</param>
         /// <returns>返回object类查询结果</returns>
