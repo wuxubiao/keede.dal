@@ -94,7 +94,7 @@ namespace Keede.DAL.DDD.Unitwork
             {
                 Interlocked.CompareExchange(ref _openedConnect, new SqlConnection(_dbConnectString), null);
             }
-            CheckCreatedConnectAndEnableTransaction();
+            //CheckCreatedConnectAndEnableTransaction();
         }
 
         ///// <summary>
@@ -241,12 +241,14 @@ namespace Keede.DAL.DDD.Unitwork
                         }
 
                         _openedTransaction.Commit();
+                        _openedTransaction.Connection.Close();
                         Committed = true;
                         return true;
                     }
                     catch (Exception ex)
                     {
                         _openedTransaction.Rollback();
+                        _openedTransaction.Connection.Close();
                         Committed = false;
                         throw ex;
                     }
@@ -296,12 +298,14 @@ namespace Keede.DAL.DDD.Unitwork
                         }
 
                         trans.Commit();
+                        trans.Connection.Close();
                         Committed = true;
                         return true;
                     }
                     catch (Exception)
                     {
                         trans.Rollback();
+                        trans.Connection.Close();
                         Committed = false;
                         throw;
                     }
