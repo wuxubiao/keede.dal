@@ -16,6 +16,11 @@ namespace Keede.DAL.DDD.Repositories
     public class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
         public IDbConnection OpenDbConnection(bool isReadDb = true)
         {
             var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(isReadDb);
@@ -23,6 +28,10 @@ namespace Keede.DAL.DDD.Repositories
             return conn;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conn"></param>
         public void CloseConnection(IDbConnection conn)
         {
             if (DbTransaction != null) return;
@@ -47,6 +56,12 @@ namespace Keede.DAL.DDD.Repositories
             return value;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public override bool BatchAdd<T>(IList<T> list)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
@@ -149,7 +164,14 @@ namespace Keede.DAL.DDD.Repositories
             return value;
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
         public override T Get<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
@@ -192,6 +214,13 @@ namespace Keede.DAL.DDD.Repositories
             return value;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
         public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));

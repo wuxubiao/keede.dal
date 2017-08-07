@@ -37,11 +37,18 @@ namespace Keede.DAL.Helper
             set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         internal DbHelper()
         {
             Init(null);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbName"></param>
         internal DbHelper(string dbName)
         {
             Init(null, dbName);
@@ -57,6 +64,11 @@ namespace Keede.DAL.Helper
             Init(exception,dbName);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="dbName"></param>
         private void Init(DbExecuteException exception, string dbName = null)
         {
             OnDbExecuteException = exception;
@@ -163,6 +175,10 @@ namespace Keede.DAL.Helper
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cmdText"></param>
         private void MakeCommandTextLog(string cmdText)
         {
             if (IsOpenTransaction && Transaction != null)
@@ -174,52 +190,6 @@ namespace Keede.DAL.Helper
                 CommandTextBuilder.Append(cmdText + " || ");
             }
         }
-
-        /// <summary>
-        /// 数据库指令执行模块
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="cmdType">执行模式说明</param>
-        /// <param name="cmdText">指令字符串</param>
-        /// <param name="cmdParms">存储过程参数</param>
-        //internal IDbCommand CreateCommand(IDbConnection connection, CommandType cmdType, string cmdText, IEnumerable<Parameter> cmdParms)
-        //{
-        //    Command = connection.CreateCommand();
-        //    Command.CommandType = cmdType;
-        //    Command.CommandText = cmdText;
-        //    if (connection.State != ConnectionState.Open)
-        //    {
-        //        connection.Open();
-        //    }
-        //    if (Command.Connection == null)
-        //    {
-        //        Command.Connection = connection;
-        //    }
-        //    if (IsOpenTransaction && Transaction != null)
-        //    {
-        //        Command.Transaction = Transaction;
-        //        if (CommandTextBuilder == null)
-        //        {
-        //            CommandTextBuilder = new StringBuilder();
-        //        }
-        //        CommandTextBuilder.Append(cmdText + " || ");
-        //    }
-        //    if (cmdParms != null)
-        //    {
-        //        foreach (var p in cmdParms)
-        //        {
-        //            if (p != null)
-        //            {
-        //                var parm = Command.CreateParameter();
-        //                parm.ParameterName = p.Name;
-        //                parm.Value = p.Value ?? DBNull.Value;
-        //                parm.Direction = p.Direction;
-        //                Command.Parameters.Add(parm);
-        //            }
-        //        }
-        //    }
-        //    return Command;
-        //}
 
         #region -- Transaction()
 

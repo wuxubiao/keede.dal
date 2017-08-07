@@ -35,12 +35,18 @@ namespace Keede.DAL.Helper
         #endregion
 
         #region -- Init()
-
+        /// <summary>
+        /// 
+        /// </summary>
         public Database()
             : base()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbName"></param>
         public Database(string dbName)
             : base(dbName)
         {

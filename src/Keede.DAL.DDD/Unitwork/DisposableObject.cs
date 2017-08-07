@@ -24,6 +24,7 @@ namespace Keede.DAL.DDD.Unitwork
         /// <param name="disposing">A <see cref="System.Boolean"/> value which indicates whether
         /// the object should be disposed explicitly.</param>
         protected abstract void Dispose(bool disposing);
+
         /// <summary>
         /// Provides the facility that disposes the object in an explicit manner,
         /// preventing the Finalizer from being called after the object has been

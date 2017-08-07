@@ -28,14 +28,15 @@ namespace Keede.DAL.DDD.Unitwork
         /// </summary>
         public delegate void RollBackDel();
 
-        //private readonly bool _isEnableUpdateLock;
         private readonly string _dbConnectString;
         private IDbConnection _openedConnect;
         private IDbTransaction _openedTransaction;
+
         /// <summary>
         /// 全局缓存，缓存仓储的构造函数
         /// </summary>
         private static readonly ConcurrentDictionary<string, ConstructorInfo> _constructorDic = new ConcurrentDictionary<string, ConstructorInfo>();
+
         /// <summary>
         /// 临时缓存，记录当前工作单元上下文中用到的仓储
         /// </summary>
@@ -49,6 +50,7 @@ namespace Keede.DAL.DDD.Unitwork
         /// 
         /// </summary>
         public event CommittedDel CommittedEvent;
+
         /// <summary>
         /// 
         /// </summary>
@@ -79,7 +81,7 @@ namespace Keede.DAL.DDD.Unitwork
         /// </summary>
         /// <param name="dbName"></param>
         /// <param name="isReadDb"></param>
-        public SqlServerUnitOfWork(string dbName, bool isReadDb = true)
+        public SqlServerUnitOfWork(string dbName, bool isReadDb = false)
         {
             _dbConnectString=Databases.GetDbConnectionStr(dbName, isReadDb);
             Init();
@@ -94,13 +96,7 @@ namespace Keede.DAL.DDD.Unitwork
             {
                 Interlocked.CompareExchange(ref _openedConnect, new SqlConnection(_dbConnectString), null);
             }
-            //CheckCreatedConnectAndEnableTransaction();
         }
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //public override bool EnableUpdateLock => _isEnableUpdateLock;
 
         /// <summary>
         /// 

@@ -430,6 +430,11 @@ namespace Keede.DAL.Helper
             return ToDataTable(list.ToList(), propertyName);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         private static bool IsNullableType(Type t)
         {
             return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);

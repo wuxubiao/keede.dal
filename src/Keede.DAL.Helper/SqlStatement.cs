@@ -2,6 +2,9 @@
 
 namespace Keede.DAL.Helper
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class SqlStatement
     {
         /// <summary>

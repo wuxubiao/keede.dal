@@ -48,6 +48,7 @@ namespace Keede.DAL.DDD.Unitwork
                 _localDeletedCollection.Dispose();
                 _localModifiedCollection.Dispose();
                 _localNewCollection.Dispose();
+                _localCustomOperateCollection.Dispose();
             }
         }
         #endregion
