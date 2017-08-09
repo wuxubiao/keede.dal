@@ -106,6 +106,7 @@ namespace Keede.DAL.Helper
         /// 调用此方法，请先调用Run和AddParameter加入运行的脚本和参数
         /// </para>
         /// </summary>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public bool Execute(bool isReadDb=true)
@@ -118,6 +119,7 @@ namespace Keede.DAL.Helper
         /// <summary>
         /// 执行数据操作
         /// </summary>
+        /// <param name="isReadDb"></param>
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -137,6 +139,7 @@ namespace Keede.DAL.Helper
         /// 调用此方法，请先调用Run和AddParameter加入运行的脚本和参数
         /// </para>
         /// </summary>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public TValue GetValue<TValue>(bool isReadDb=true)
@@ -149,6 +152,7 @@ namespace Keede.DAL.Helper
         ///  <summary>
         /// 
         ///  </summary>
+        /// <param name="isReadDb"></param>
         /// <param name="sql"></param>
         ///  <param name="parameters"></param>
         ///  <returns></returns>
@@ -173,6 +177,7 @@ namespace Keede.DAL.Helper
         /// 注释：调用此方法，请先调用Run和AddParameter加入运行的脚本和参数
         /// </para>
         /// </summary>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public IEnumerable<TValue> GetValues<TValue>(bool isReadDb = true)
@@ -185,7 +190,7 @@ namespace Keede.DAL.Helper
         /// <summary>
         /// 获取一个值类型的集合数据
         /// </summary>
-        /// <param name="commandType"></param>
+        /// <param name="isReadDb"></param>
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
@@ -220,6 +225,7 @@ namespace Keede.DAL.Helper
         /// 调用此方法，请先调用Run和AddParameter加入运行的脚本和参数
         /// </para>
         /// </summary>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public T Single<T>(bool isReadDb = true) where T : class, new()
@@ -232,7 +238,8 @@ namespace Keede.DAL.Helper
         ///  <summary>
         /// 
         ///  </summary>
-        /// <param name="sql"></param>
+        ///  <param name="isReadDb"></param>
+        ///  <param name="sql"></param>
         ///  <param name="parameters"></param>
         ///  <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
@@ -265,6 +272,7 @@ namespace Keede.DAL.Helper
         /// 调用此方法，请先调用Run和AddParameter加入运行的脚本和参数
         /// </para>
         /// </summary>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
         public IEnumerable<T> Select<T>(bool isReadDb = true) where T : class, new()
@@ -277,6 +285,7 @@ namespace Keede.DAL.Helper
         ///  <summary>
         /// 
         ///  </summary>
+        /// <param name="isReadDb"></param>
         /// <param name="sql"></param>
         ///  <param name="parameters"></param>
         ///  <returns></returns>
@@ -309,6 +318,7 @@ namespace Keede.DAL.Helper
         /// 获取翻页实体对象信息，内带有数据集合
         /// </summary>
         /// <typeparam name="T">泛类型（请传递引用类型）</typeparam>
+        /// <param name="isReadDb"></param>
         /// <param name="query">数据脚本</param>
         /// <param name="parameters">参数集合</param>
         /// <returns></returns>
@@ -324,6 +334,7 @@ namespace Keede.DAL.Helper
         /// 获取翻页实体对象信息，内带有数据集合
         /// </summary>
         /// <typeparam name="T">泛类型（请传递引用类型）</typeparam>
+        /// <param name="isReadDb"></param>
         /// <param name="pageIndex">起始页</param>
         /// <param name="pageSize">每页数</param>
         /// <param name="sql">数据脚本</param>
@@ -354,6 +365,7 @@ namespace Keede.DAL.Helper
         /// 获取翻页实体对象信息，内带有数据集合
         /// </summary>
         /// <typeparam name="T">泛类型（请传递引用类型）</typeparam>
+        /// <param name="isReadDb"></param>
         /// <param name="start">起始数据记录索引</param>
         /// <param name="limit">限制读取条数</param>
         /// <param name="sql">数据脚本</param>
