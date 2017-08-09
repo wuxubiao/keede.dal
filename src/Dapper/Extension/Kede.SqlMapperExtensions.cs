@@ -1,11 +1,4 @@
-﻿/*
- * 
- * 
- * 
- * 
- */
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
@@ -16,6 +9,9 @@ using System.Text;
 
 namespace Dapper.Extension
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static partial class SqlMapperExtensions
     {
         #region 改动方法
@@ -67,7 +63,6 @@ namespace Dapper.Extension
             //var keyProperties = KeyPropertiesCache(type);
             //var computedProperties = ComputedPropertiesCache(type);
             //var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
-
 
             var type = typeof(T);
             string sql;
@@ -319,11 +314,21 @@ namespace Dapper.Extension
         #endregion 改动方法
 
         #region 新增方法
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sb"></param>
+        /// <param name="property"></param>
         private static void AppendColumnNameEqualsValue(StringBuilder sb, PropertyInfo property)
         {
             sb.AppendFormat("[{0}] = @{1}", GetCustomColumnName(property), property.Name);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
         private static string GetCustomColumnName(PropertyInfo property)
         {
             string result = property.Name;
@@ -335,6 +340,9 @@ namespace Dapper.Extension
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private static readonly ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>> _readTypeProperties = new ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>>();
 
         /// <summary>
@@ -533,6 +541,12 @@ namespace Dapper.Extension
             return connection.Execute(sql, dynParms, transaction, commandTimeout) > 0;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="method"></param>
+        /// <returns></returns>
         private static IList<PropertyInfo> GetKeys<T>(string method)
         {
             var type = typeof(T);

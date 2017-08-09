@@ -7,14 +7,11 @@ using System.Text.RegularExpressions;
 
 namespace Dapper.Extension
 {
-
     /// <summary>
     /// 
     /// </summary>
     public static partial class SqlMapperExtensions
     {
-
-
         #region 新增分页方法
         /// <summary>
         /// 目前只有针对sql server的实现
@@ -35,6 +32,9 @@ namespace Dapper.Extension
             return connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
         }
 
+        /// <summary>
+        /// order by 正则
+        /// </summary>
         private static readonly Regex OrderByRegexSqlServer = new Regex(@"\s*order\s+by\s+[^\s,\)\(]+(?:\s+(?:asc|desc))?(?:\s*,\s*[^\s,\)\(]+(?:\s+(?:asc|desc))?)*", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
@@ -123,6 +123,11 @@ namespace Dapper.Extension
             }).Invoke();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="recordCount"></param>
+        /// <param name="dataList"></param>
         internal void FillQueryData(int recordCount, IList<T> dataList)
         {
             RecordCount = recordCount;

@@ -316,7 +316,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override IList<TEntity> GetList(object condition, bool isReadDb = true)
         {
-            if (condition == null)//var table = GetTableName(type);
+            if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
             var conn = OpenDbConnection(isReadDb);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));

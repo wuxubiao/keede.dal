@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Dapper.Extension
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class TypeMapperAttribute: Attribute
     {

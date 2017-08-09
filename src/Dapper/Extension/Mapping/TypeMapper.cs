@@ -5,10 +5,17 @@ using System.Collections;
 
 namespace Dapper.Extension
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class TypeMapper
     {
         private static readonly Hashtable _typeMaps = new Hashtable();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="namespace"></param>
         public static void Initialize(string @namespace)
         {
             var types = from type in Assembly.GetCallingAssembly().GetTypes()//GetExecutingAssembly
@@ -23,6 +30,11 @@ namespace Dapper.Extension
             });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="overWrite"></param>
         public static void SetTypeMap(Type type, bool overWrite=false)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
@@ -46,6 +58,11 @@ namespace Dapper.Extension
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns></returns>
         private static string GetDescriptionFromAttribute(MemberInfo member)
         {
             if (member == null) return null;
