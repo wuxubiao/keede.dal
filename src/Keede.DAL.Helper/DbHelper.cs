@@ -83,9 +83,9 @@ namespace Keede.DAL.Helper
         /// <param name="parameters">运行参数传递</param>
         /// <returns>返回int型数据类型值，指示被影响的数据行</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        internal int ExecuteNonQuery(string cmdText, params Parameter[] parameters)
+        internal int ExecuteNonQuery(bool isReadDb, string cmdText, params Parameter[] parameters)
         {
-            IDbConnection conn = IsOpenTransaction ? CurrentConnection : (SqlStatement.IsRead(cmdText) ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
+            IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
             try
             {
                 //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
@@ -120,11 +120,11 @@ namespace Keede.DAL.Helper
         /// <param name="parameters">运行参数传递</param>
         /// <returns>返回SqlDataReader类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        internal IDataReader ExecuteReader(string cmdText, params Parameter[] parameters)
+        internal IDataReader ExecuteReader(bool isReadDb, string cmdText, params Parameter[] parameters)
         {
             try
             {
-                IDbConnection conn = IsOpenTransaction ? CurrentConnection : Databases.GetSqlConnection(DbName);
+                IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName, false));
                 MakeCommandTextLog(cmdText);
                 var reader = conn.ExecuteReader(cmdText, parameters, Transaction);
 
@@ -148,9 +148,9 @@ namespace Keede.DAL.Helper
         /// <param name="parameters">运行参数传递</param>
         /// <returns>返回object类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        internal object ExecuteScalar(string cmdText, params Parameter[] parameters)
+        internal object ExecuteScalar(bool isReadDb, string cmdText, params Parameter[] parameters)
         {
-            IDbConnection conn = IsOpenTransaction ? CurrentConnection : (SqlStatement.IsRead(cmdText) ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
+            IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
             try
             {
                 MakeCommandTextLog(cmdText);

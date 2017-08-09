@@ -108,11 +108,11 @@ namespace Keede.DAL.Helper
         /// </summary>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public bool Execute()
+        public bool Execute(bool isReadDb=true)
         {
             var sql = CurrentSQL;
             var parameters = CurrentParameter.ToArray();
-            return Execute(sql, parameters);
+            return Execute(isReadDb, sql, parameters);
         }
 
         /// <summary>
@@ -122,9 +122,9 @@ namespace Keede.DAL.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public bool Execute(string sql, params Parameter[] parameters)
+        public bool Execute(bool isReadDb, string sql, params Parameter[] parameters)
         {
-            return ExecuteNonQuery(sql, parameters) > 0;
+            return ExecuteNonQuery(isReadDb, sql, parameters) > 0;
         }
 
         #endregion -- Execute()
@@ -139,11 +139,11 @@ namespace Keede.DAL.Helper
         /// </summary>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public TValue GetValue<TValue>()
+        public TValue GetValue<TValue>(bool isReadDb=true)
         {
             var sql = CurrentSQL;
             var parameters = CurrentParameter.ToArray();
-            return GetValue<TValue>(sql, parameters);
+            return GetValue<TValue>(isReadDb, sql, parameters);
         }
 
         ///  <summary>
@@ -153,9 +153,9 @@ namespace Keede.DAL.Helper
         ///  <param name="parameters"></param>
         ///  <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public TValue GetValue<TValue>(string sql, params Parameter[] parameters)
+        public TValue GetValue<TValue>(bool isReadDb, string sql, params Parameter[] parameters)
         {
-            var value = ExecuteScalar(sql, parameters);
+            var value = ExecuteScalar(isReadDb, sql, parameters);
             if (value != null)
             {
                 return (TValue)value;
@@ -175,11 +175,11 @@ namespace Keede.DAL.Helper
         /// </summary>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public IEnumerable<TValue> GetValues<TValue>()
+        public IEnumerable<TValue> GetValues<TValue>(bool isReadDb = true)
         {
             var sql = CurrentSQL;
             var parameters = CurrentParameter.ToArray();
-            return GetValues<TValue>(sql, parameters);
+            return GetValues<TValue>(isReadDb, sql, parameters);
         }
 
         /// <summary>
@@ -190,10 +190,10 @@ namespace Keede.DAL.Helper
         /// <param name="parameters"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public IList<TValue> GetValues<TValue>(string sql, params Parameter[] parameters)
+        public IList<TValue> GetValues<TValue>(bool isReadDb, string sql, params Parameter[] parameters)
         {
             var items = new List<TValue>();
-            using (var reader = ExecuteReader(sql, parameters))
+            using (var reader = ExecuteReader(isReadDb, sql, parameters))
             {
                 if (reader != null)
                 {
@@ -222,11 +222,11 @@ namespace Keede.DAL.Helper
         /// </summary>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public T Single<T>() where T : class, new()
+        public T Single<T>(bool isReadDb = true) where T : class, new()
         {
             var sql = CurrentSQL;
             var parameters = CurrentParameter.ToArray();
-            return Single<T>(sql, parameters);
+            return Single<T>(isReadDb, sql, parameters);
         }
 
         ///  <summary>
@@ -236,13 +236,13 @@ namespace Keede.DAL.Helper
         ///  <param name="parameters"></param>
         ///  <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public T Single<T>(string sql, params Parameter[] parameters) where T : class, new()
+        public T Single<T>(bool isReadDb, string sql, params Parameter[] parameters) where T : class, new()
         {
             var type = typeof(T);
             var dataReader = DataReader.Create(type);
             if (dataReader != null)
             {
-                using (var reader = ExecuteReader(sql, parameters))
+                using (var reader = ExecuteReader(isReadDb, sql, parameters))
                 {
                     if (reader.Read())
                     {
@@ -267,11 +267,11 @@ namespace Keede.DAL.Helper
         /// </summary>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public IEnumerable<T> Select<T>() where T : class, new()
+        public IEnumerable<T> Select<T>(bool isReadDb = true) where T : class, new()
         {
             var sql = CurrentSQL;
             var parameters = CurrentParameter.ToArray();
-            return Select<T>(sql, parameters);
+            return Select<T>(isReadDb, sql, parameters);
         }
 
         ///  <summary>
@@ -281,14 +281,14 @@ namespace Keede.DAL.Helper
         ///  <param name="parameters"></param>
         ///  <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public IEnumerable<T> Select<T>(string sql, params Parameter[] parameters) where T : class, new()
+        public IEnumerable<T> Select<T>(bool isReadDb, string sql, params Parameter[] parameters) where T : class, new()
         {
             var type = typeof(T);
             var items = new List<T>();
             var dataReader = DataReader.Create(type);
             if (dataReader != null)
             {
-                using (var reader = ExecuteReader(sql, parameters))
+                using (var reader = ExecuteReader(isReadDb, sql, parameters))
                 {
                     while (reader.Read())
                     {
@@ -313,10 +313,10 @@ namespace Keede.DAL.Helper
         /// <param name="parameters">参数集合</param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public PageItems<T> SelectByPage<T>(PageQuery query, params Parameter[] parameters) where T : class, new()
+        public PageItems<T> SelectByPage<T>(bool isReadDb, PageQuery query, params Parameter[] parameters) where T : class, new()
         {
-            var recordcount = GetValue<int>(query.ToCountQuery(), parameters);
-            var items = Select<T>(query.ToFullQuery(), parameters);
+            var recordcount = GetValue<int>(isReadDb, query.ToCountQuery(), parameters);
+            var items = Select<T>(isReadDb, query.ToFullQuery(), parameters);
             return new PageItems<T>((int)(query.EndRow - query.StartRow) + 1, recordcount, items);
         }
 
@@ -330,7 +330,7 @@ namespace Keede.DAL.Helper
         /// <param name="parameters">参数集合</param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public PageItems<T> SelectByPage<T>(int pageIndex, int pageSize, string sql, params Parameter[] parameters)
+        public PageItems<T> SelectByPage<T>(bool isReadDb, int pageIndex, int pageSize, string sql, params Parameter[] parameters)
             where T : class, new()
         {
             long start = 0;
@@ -345,8 +345,8 @@ namespace Keede.DAL.Helper
             string sqlPage;
             string sqlCount;
             BuildPageQueries(start, pageSize, sql, out sqlCount, out sqlPage);
-            var recordcount = GetValue<int>(sqlCount, parameters);
-            var items = Select<T>(sqlPage, parameters);
+            var recordcount = GetValue<int>(isReadDb, sqlCount, parameters);
+            var items = Select<T>(isReadDb, sqlPage, parameters);
             return new PageItems<T>(pageIndex, pageSize, recordcount, items);
         }
 
@@ -360,7 +360,7 @@ namespace Keede.DAL.Helper
         /// <param name="parameters">参数集合</param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public PageItems<T> SelectByPage<T>(long start, long limit, string sql, params Parameter[] parameters)
+        public PageItems<T> SelectByPage<T>(bool isReadDb, long start, long limit, string sql, params Parameter[] parameters)
             where T : class, new()
         {
             string sqlPage;
@@ -370,8 +370,8 @@ namespace Keede.DAL.Helper
             {
                 sqlPage += " ORDER BY 1";
             }
-            var recordcount = GetValue<int>(sqlCount, parameters);
-            var items = Select<T>(sqlPage, parameters);
+            var recordcount = GetValue<int>(isReadDb, sqlCount, parameters);
+            var items = Select<T>(isReadDb, sqlPage, parameters);
             return new PageItems<T>((int)limit, recordcount, items);
         }
 
