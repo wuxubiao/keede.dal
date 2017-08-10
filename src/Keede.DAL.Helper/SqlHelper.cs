@@ -80,6 +80,34 @@ namespace Keede.DAL.Helper
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbName"></param>
+        /// <param name="isReadDb"></param>
+        /// <param name="cmdType"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+        [Obsolete("This function is obsolete,don't use it in new project")]
+        public static int ExecuteNonQuerySP(string dbName, bool isReadDb, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
+        {
+            try
+            {
+                using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                {
+                    return conn.Execute(cmdText, commandParameters, null, 15, cmdType);
+                }
+            }
+            catch (SqlException exp)
+            {
+                string errorMsg = exp.Message + "\r\n";
+                var sqlText = GetSQLParamsText(cmdText, commandParameters);
+                CreateErrorMsg(errorMsg + sqlText);
+                throw exp;
+            }
+        }
+
         #endregion -- ExecuteNonQuery
 
         #region -- ExecuteReader
@@ -145,6 +173,71 @@ namespace Keede.DAL.Helper
                 throw exp;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbName"></param>
+        /// <param name="isReadDb"></param>
+        /// <param name="cmdType"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+        [Obsolete("This function is obsolete,don't use it in new project")]
+        public static SqlDataReader ExecuteReaderSP(string dbName, bool isReadDb, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
+        {
+            return ExecuteReaderSP(dbName, isReadDb, 15, cmdType, cmdText, commandParameters);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbName"></param>
+        /// <param name="isReadDb"></param>
+        /// <param name="timeOut"></param>
+        /// <param name="cmdType"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+        [Obsolete("This function is obsolete,don't use it in new project")]
+        public static SqlDataReader ExecuteReaderSP(string dbName, bool isReadDb, int timeOut, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
+        {
+            SqlDataReader rdr = null;
+            var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false);
+
+            //返回SqlDataReader结果需要开启SqlConnection
+            //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
+            try
+            {
+                rdr = (SqlDataReader)conn.ExecuteReader(cmdText, commandParameters, null, timeOut, cmdType);
+                return rdr;
+            }
+            catch (SqlException exp)
+            {
+                string errorMsg = exp.Message + "\r\n";
+                var sqlText = GetSQLParamsText(cmdText, commandParameters);
+                CreateErrorMsg(errorMsg + sqlText);
+                if (rdr != null && rdr.IsClosed)
+                {
+                    rdr.Close();
+                }
+                conn.Close();
+                throw exp;
+            }
+            catch (InvalidOperationException exp)
+            {
+                string errorMsg = exp.Message + "\r\n";
+                var sqlText = GetSQLParamsText(cmdText, commandParameters);
+                CreateErrorMsg(errorMsg + sqlText);
+                if (rdr != null && rdr.IsClosed)
+                {
+                    rdr.Close();
+                }
+                conn.Close();
+                throw exp;
+            }
+        }
+
         #endregion -- ExecuteReader
 
         #region -- ExecuteScalar
@@ -191,6 +284,50 @@ namespace Keede.DAL.Helper
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbName"></param>
+        /// <param name="isReadDb"></param>
+        /// <param name="cmdType"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+        [Obsolete("This function is obsolete,don't use it in new project")]
+        public static object ExecuteScalarSP(string dbName, bool isReadDb, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
+        {
+            return ExecuteScalarSP(dbName, isReadDb, cmdType, cmdText, 15, commandParameters);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbName"></param>
+        /// <param name="isReadDb"></param>
+        /// <param name="cmdType"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="timeOut"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+        [Obsolete("This function is obsolete,don't use it in new project")]
+        public static object ExecuteScalarSP(string dbName, bool isReadDb, CommandType cmdType, string cmdText, int timeOut, params SqlParameter[] commandParameters)
+        {
+            try
+            {
+                using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                {
+                    object val = connection.ExecuteScalar(cmdText, commandParameters, null, timeOut, cmdType);
+                    return val;
+                }
+            }
+            catch (SqlException exp)
+            {
+                string errorMsg = exp.Message + "\r\n";
+                var sqlText = GetSQLParamsText(cmdText, commandParameters);
+                CreateErrorMsg(errorMsg + sqlText);
+                throw exp;
+            }
+        }
         #endregion -- ExecuteScalar
 
         #region -- PrepareCommand
