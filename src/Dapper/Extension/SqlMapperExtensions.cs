@@ -463,7 +463,7 @@ namespace Dapper.Extension
 /// <summary>
 /// 
 /// </summary>
-public interface ISqlAdapter
+public partial interface ISqlAdapter
 {
     /// <summary>
     /// 
@@ -494,7 +494,7 @@ public interface ISqlAdapter
     void AppendColumnNameEqualsValue(StringBuilder sb, string columnName);
 }
 
-public class SqlServerAdapter : ISqlAdapter
+public partial class SqlServerAdapter : ISqlAdapter
 {
     /// <summary>
     /// 
@@ -547,7 +547,7 @@ public class SqlServerAdapter : ISqlAdapter
     }
 }
 
-public class SqlCeServerAdapter : ISqlAdapter
+public partial class SqlCeServerAdapter : ISqlAdapter
 {
     /// <summary>
     /// 
@@ -600,7 +600,7 @@ public class SqlCeServerAdapter : ISqlAdapter
     }
 }
 
-public class MySqlAdapter : ISqlAdapter
+public partial class MySqlAdapter : ISqlAdapter
 {
     /// <summary>
     /// 

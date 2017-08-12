@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ASYNC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -98,6 +98,7 @@
     <Compile Include="XmlHandlers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension\Kede.SqlMapperExtensions.Async.cs" />
     <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup />

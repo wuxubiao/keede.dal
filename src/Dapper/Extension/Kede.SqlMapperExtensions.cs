@@ -37,7 +37,7 @@ namespace Dapper.Extension
         }
 
         /// <summary>
-        /// ！@#有改动，select按IsReadable取出
+        /// 有改动，select按IsReadable取出
         /// 阮哥
         /// Returns a single entity by a single id from table "Ts".  
         /// Id must be marked with [Key] attribute.
@@ -58,6 +58,72 @@ namespace Dapper.Extension
         /// </code>
         /// <returns>Entity of T</returns>
         public static T Get<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            var type = typeof(T);
+            string sql;
+            if (!GetQueries.TryGetValue(type.TypeHandle, out sql))
+            {
+                var key = GetSingleKey<T>(nameof(Get));
+                var name = GetTableName(type);
+                var canReadProperties = TypePropertiesCanReadCache(type);
+                if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
+                string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
+                sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
+                GetQueries[type.TypeHandle] = sql;
+            }
+
+            var dynParms = new DynamicParameters();
+            dynParms.Add("@id", id);
+
+            T obj;
+
+            if (type.IsInterface())
+            {
+                var res = connection.Query(sql, dynParms).FirstOrDefault() as IDictionary<string, object>;
+
+                if (res == null)
+                    return default(T);
+
+                obj = ProxyGenerator.GetInterfaceProxy<T>();
+
+                foreach (var property in TypePropertiesCache(type))
+                {
+                    var val = res[property.Name];
+                    property.SetValue(obj, Convert.ChangeType(val, property.PropertyType), null);
+                }
+
+                ((IProxy)obj).IsDirty = false;   //reset change tracking and return
+            }
+            else
+            {
+                obj = connection.Query<T>(sql, dynParms, transaction, commandTimeout: commandTimeout).FirstOrDefault();
+            }
+            return obj;
+        }
+
+        /// <summary>
+        /// 有改动，select按IsReadable取出
+        /// 阮哥
+        /// Returns a single entity by a single id from table "Ts".  
+        /// Id must be marked with [Key] attribute.
+        /// Entities created from interfaces are tracked/intercepted for changes and used by the Update() extension
+        /// for optimal performance. 
+        /// </summary>
+        /// <typeparam name="T">Interface or type to create and populate</typeparam>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="id">Id of the entity to get, must be marked with [Key] attribute</param>
+        /// <param name="isUpdateLock"></param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <code>
+        /// <example>
+        /// IDbConnection dbConnection = new SqlConnection(...);
+        /// dbConnection.Get&lt;T&gt;(Guid.Parse("..."));//直接传递主键ID值获取信息
+        /// dbConnection.Get&lt;T&gt;(Guid.Parse("..."),null,100,false);//带有事务，超时时间，是否带更新锁读取
+        /// </example>
+        /// </code>
+        /// <returns>Entity of T</returns>
+        public static T Get<T>(this IDbConnection connection, dynamic id,bool isUpdateLock, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             //var allProperties = TypePropertiesCache(type);
             //var keyProperties = KeyPropertiesCache(type);
@@ -520,7 +586,7 @@ namespace Dapper.Extension
         }
 
         /// <summary>
-        /// 性能有问题，锁表操作
+        /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
