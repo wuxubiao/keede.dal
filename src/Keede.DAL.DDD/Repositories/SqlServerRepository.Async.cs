@@ -112,7 +112,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="where"></param>
+        /// <param name="whereSql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
         public override async Task<int> RemoveAsync(string whereSql, object parameterObject = null)
@@ -129,6 +129,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override async Task<TEntity> GetAsync(string sql, object parameterObject = null, bool isReadDb = true)
         {
@@ -162,6 +163,7 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override async Task<TEntity> GetByIdAsync(dynamic id, bool isReadDb = true)
         {
@@ -177,6 +179,8 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="isUpdateLock"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override async Task<TEntity> GetByIdAsync(dynamic id, bool isUpdateLock, bool isReadDb = true)
         {
@@ -209,6 +213,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override async Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
@@ -241,6 +246,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override async Task<PagedList<TEntity>> GetPagedListAsync(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {
