@@ -136,7 +136,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="where"></param>
+        /// <param name="whereSql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
         public override int Remove(string whereSql, object parameterObject = null)
@@ -153,6 +153,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override TEntity Get(string sql, object parameterObject = null, bool isReadDb = true)
         {
@@ -186,6 +187,7 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override TEntity GetById(dynamic id, bool isReadDb = true)
         {
@@ -201,6 +203,8 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="isUpdateLock"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true)
         {
@@ -233,6 +237,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
@@ -265,6 +270,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {

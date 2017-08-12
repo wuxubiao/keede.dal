@@ -99,7 +99,14 @@ namespace Dapper.Extension
                 var canReadProperties = TypePropertiesCanReadCache(type);
                 if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
                 string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
-                sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
+                if (isUpdateLock)
+                {
+                    sql = $"select {columns} from {name} WITH (UPDLOCK) where {GetCustomColumnName(key)} = @id";
+                }
+                else
+                {
+                    sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
+                }
                 GetQueries[type.TypeHandle] = sql;
             }
 
