@@ -123,7 +123,7 @@ namespace Dapper.Extension
         /// </example>
         /// </code>
         /// <returns>Entity of T</returns>
-        public static T Get<T>(this IDbConnection connection, dynamic id,bool isUpdateLock, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static T Get<T>(this IDbConnection connection, dynamic id, bool isUpdateLock, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             //var allProperties = TypePropertiesCache(type);
             //var keyProperties = KeyPropertiesCache(type);
@@ -139,7 +139,14 @@ namespace Dapper.Extension
                 var canReadProperties = TypePropertiesCanReadCache(type);
                 if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
                 string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
-                sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
+                if (isUpdateLock)
+                {
+                    sql = $"select {columns} from {name} WITH (UPDLOCK) where {GetCustomColumnName(key)} = @id";
+                }
+                else
+                {
+                    sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
+                }
                 GetQueries[type.TypeHandle] = sql;
             }
 
