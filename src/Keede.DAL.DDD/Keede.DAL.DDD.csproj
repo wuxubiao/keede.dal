@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ASYNC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -49,8 +49,10 @@
     <Compile Include="IEntityOfTPrimaryKey.cs" />
     <Compile Include="Repositories\IRepository.cs" />
     <Compile Include="Repositories\IRepositoryWithTransaction.cs" />
+    <Compile Include="Repositories\Repository.Async.cs" />
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="Repositories\RepositoryWithTransaction.cs" />
+    <Compile Include="Repositories\SqlServerRepository.Async.cs" />
     <Compile Include="Repositories\SqlServerRepository.cs" />
     <Compile Include="Unitwork\CustomOperate.cs" />
     <Compile Include="Unitwork\DisposableObject.cs" />
@@ -71,6 +73,9 @@
       <Project>{ffdeb36e-a2c6-4fb4-a88e-0bdd49d83699}</Project>
       <Name>Keede.DAL.RWSplitting</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Repositories\IRepository.Async.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

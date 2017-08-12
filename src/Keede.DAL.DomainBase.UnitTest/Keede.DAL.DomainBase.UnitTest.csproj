@@ -68,6 +68,7 @@
     <Compile Include="Repositories\NewCustomRepository.cs" />
     <Compile Include="Repositories\NewsRepository.cs" />
     <Compile Include="Repositories\PersonRepository.cs" />
+    <Compile Include="UnitTest_Repository.Async.cs" />
     <Compile Include="UnitTest_Repository.cs" />
     <Compile Include="UnitTest_UnitWork.cs" />
   </ItemGroup>

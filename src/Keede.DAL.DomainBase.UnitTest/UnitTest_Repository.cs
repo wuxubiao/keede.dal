@@ -1,29 +1,21 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Threading;
-using Keede.DAL.DDD.Unitwork;
-using Keede.DAL.RWSplitting;
-using Keede.DAL.DDD.UnitTest.Models;
 using Dapper;
 using Keede.DAL.DDD.Repositories;
-using System.Linq;
-using System.Reflection;
+using Keede.DAL.DDD.UnitTest;
+using Keede.DAL.DDD.UnitTest.Models;
+using Keede.DAL.RWSplitting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Dapper.Extension;
 
-namespace Keede.DAL.DDD.UnitTest
+namespace Keede.RepositoriesTests
 {
     /// <summary>
     /// UnitTest_UnitWork 的摘要说明
     /// </summary>
     [TestClass]
-    public class UnitTest_Repository
+    public class UnitTestRepository
     {
-        public UnitTest_Repository()
+        public UnitTestRepository()
         {
             //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
@@ -124,7 +116,8 @@ namespace Keede.DAL.DDD.UnitTest
                 newsCustom.Content = "Content" + DateTime.Now;
                 var result1 = customRepository.Save(newsCustom);
 
-                Assert.IsNotNull(result);
+                Assert.IsTrue(result);
+                Assert.IsTrue(result1);
             }
         }
 
