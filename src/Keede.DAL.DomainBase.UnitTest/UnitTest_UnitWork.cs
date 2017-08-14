@@ -30,6 +30,26 @@ namespace Keede.DAL.DDD.UnitTest
         }
 
         [TestMethod]
+        public void TestTryLockEntityObject()
+        {
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
+            {
+                unitOfWork.BeginTransaction();
+
+                NeNewsMultiIdws new1 = new NeNewsMultiIdws();
+                new1.Id = 1;
+                new1.GId = 1;
+
+                if (!unitOfWork.TryLockEntityObject(3, new1))
+                {
+                    return;
+                }
+
+                unitOfWork.Commit();
+            }
+        }
+
+        [TestMethod]
         public void TestCustomRepository()
         {
             //ICustomRepository custom = new CustomRepository();
@@ -66,7 +86,6 @@ namespace Keede.DAL.DDD.UnitTest
             //unitOfWork.RegisterModified(news1);
 
         }
-
 
         [TestMethod]
         public void TestUnitWrokSelectAndUpdateNews()

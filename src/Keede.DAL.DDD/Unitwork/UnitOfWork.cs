@@ -94,6 +94,18 @@ namespace Keede.DAL.DDD.Unitwork
         }
 
         /// <summary>
+        /// 尝试锁住对象
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="timeout"></param>
+        /// <param name="objs"></param>
+        /// <returns></returns>
+        public bool TryLockEntityObject<TEntity>(int timeout, params TEntity[] objs) where TEntity : IEntity
+        {
+            return objs.Select(obj=> DbConnection.UpdateId(obj, DbTransaction, timeout)).All(result => result);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         public abstract void BeginTransaction();
