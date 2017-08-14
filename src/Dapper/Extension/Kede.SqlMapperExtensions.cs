@@ -303,8 +303,6 @@ namespace Dapper.Extension
             var computedProperties = ComputedPropertiesCache(type);
             var nonIdProps = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
 
-            var adapter = GetFormatter(connection);
-
             for (var i = 0; i < nonIdProps.Count; i++)
             {
                 var property = nonIdProps.ElementAt(i);
@@ -612,6 +610,79 @@ namespace Dapper.Extension
             var dynParms = new DynamicParameters();
             dynParms.Add("@id", id);
             return connection.Execute(sql, dynParms, transaction, commandTimeout) > 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="obj"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static bool UpdateId<T>(this IDbConnection connection, T obj, IDbTransaction transaction, int commandTimeout = 3)
+        {
+            var proxy = obj as IProxy;
+            if (proxy != null)
+            {
+                if (!proxy.IsDirty) return false;
+            }
+
+            var type = typeof(T);
+
+            if (type.IsArray)
+            {
+                type = type.GetElementType();
+            }
+            else if (type.IsGenericType())
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            var keyProperties = KeyPropertiesCache(type).ToList();
+            var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
+            if (!keyProperties.Any() && !explicitKeyProperties.Any())
+                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
+
+            var name = GetTableName(type);
+
+            var sb = new StringBuilder();
+            sb.AppendFormat("update {0} set ", name);
+
+            keyProperties.AddRange(explicitKeyProperties);
+
+            for (var i = 0; i < keyProperties.Count; i++)
+            {
+                var property = keyProperties.ElementAt(i);
+                AppendColumnNameEqualsValue(sb, property); 
+                if (i < keyProperties.Count - 1)
+                    sb.AppendFormat(", ");
+            }
+
+            sb.Append(" where ");
+            for (var i = 0; i < keyProperties.Count; i++)
+            {
+                var property = keyProperties.ElementAt(i);
+                AppendColumnNameEqualsValue(sb, property); 
+                if (i < keyProperties.Count - 1)
+                    sb.AppendFormat(" and ");
+            }
+            var updated = connection.Execute(sb.ToString(), obj, commandTimeout: commandTimeout, transaction: transaction);
+            return updated > 0;
+
+
+
+
+            //var type = typeof(T);
+            //var key = GetSingleKey<T>(nameof(Get));
+            //var name = GetTableName(type);
+            //var canReadProperties = TypePropertiesCanReadCache(type);
+            //if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
+            //string sql = $"update {name} set {GetCustomColumnName(key)}=@id where {GetCustomColumnName(key)} = @id";
+            //var dynParms = new DynamicParameters();
+            //dynParms.Add("@id", id);
+            //return connection.Execute(sql, dynParms, transaction, commandTimeout) > 0;
         }
 
         /// <summary>

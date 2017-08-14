@@ -46,6 +46,16 @@ namespace Keede.DAL.DDD.Unitwork
             where TEntity : IEntity;
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="timeout"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        bool TryLockEntityObject<TEntity>(int timeout, params TEntity[] obj) 
+            where TEntity : IEntity;
+
+        /// <summary>
         /// 开启事务
         /// </summary>
         void BeginTransaction();
