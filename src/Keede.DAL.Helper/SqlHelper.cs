@@ -45,7 +45,7 @@ namespace Keede.DAL.Helper
             {
                 using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName,false))
                 {
-                    return conn.Execute(cmdText, commandParameters);
+                    return conn.Execute(cmdText, ConvertParameter(commandParameters));
                 }
             }
             catch (SqlException exp)
@@ -69,7 +69,7 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                trans.Connection.Execute(cmdText, commandParameters);
+                trans.Connection.Execute(cmdText, ConvertParameter(commandParameters));
             }
             catch (SqlException exp)
             {
@@ -96,7 +96,7 @@ namespace Keede.DAL.Helper
             {
                 using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
                 {
-                    return conn.Execute(cmdText, commandParameters, null, 15, cmdType);
+                    return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
                 }
             }
             catch (SqlException exp)
@@ -121,7 +121,7 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static SqlDataReader ExecuteReader(string dbName, bool isReadDb, string cmdText, params SqlParameter[] commandParameters)
+        public static IDataReader ExecuteReader(string dbName, bool isReadDb, string cmdText, params SqlParameter[] commandParameters)
         {
             return ExecuteReader(dbName, isReadDb, 15, cmdText, commandParameters);
         }
@@ -136,16 +136,16 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters">运行参数传递</param>
         /// <returns>返回SqlDataReader类查询结果</returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static SqlDataReader ExecuteReader(string dbName, bool isReadDb, int timeOut, string cmdText, params SqlParameter[] commandParameters)
+        public static IDataReader ExecuteReader(string dbName, bool isReadDb, int timeOut, string cmdText, params SqlParameter[] commandParameters)
         {
-            SqlDataReader rdr = null;
+            IDataReader rdr = null;
             var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false);
 
             //返回SqlDataReader结果需要开启SqlConnection
             //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
             try
             {
-                rdr=(SqlDataReader) conn.ExecuteReader(cmdText, commandParameters, null, timeOut);
+                rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut);
                 return rdr;
             }
             catch (SqlException exp)
@@ -184,7 +184,7 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static SqlDataReader ExecuteReaderSP(string dbName, bool isReadDb, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
+        public static IDataReader ExecuteReaderSP(string dbName, bool isReadDb, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
         {
             return ExecuteReaderSP(dbName, isReadDb, 15, cmdType, cmdText, commandParameters);
         }
@@ -200,16 +200,16 @@ namespace Keede.DAL.Helper
         /// <param name="commandParameters"></param>
         /// <returns></returns>
         [Obsolete("This function is obsolete,don't use it in new project")]
-        public static SqlDataReader ExecuteReaderSP(string dbName, bool isReadDb, int timeOut, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
+        public static IDataReader ExecuteReaderSP(string dbName, bool isReadDb, int timeOut, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
         {
-            SqlDataReader rdr = null;
+            IDataReader rdr = null;
             var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false);
 
             //返回SqlDataReader结果需要开启SqlConnection
             //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
             try
             {
-                rdr = (SqlDataReader)conn.ExecuteReader(cmdText, commandParameters, null, timeOut, cmdType);
+                rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
                 return rdr;
             }
             catch (SqlException exp)
@@ -271,7 +271,7 @@ namespace Keede.DAL.Helper
             {
                 using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName,false))
                 {
-                    object val = connection.ExecuteScalar(cmdText, commandParameters, null, timeOut);
+                    object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
                     return val;
                 }
             }
@@ -316,7 +316,7 @@ namespace Keede.DAL.Helper
             {
                 using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
                 {
-                    object val = connection.ExecuteScalar(cmdText, commandParameters, null, timeOut, cmdType);
+                    object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
                     return val;
                 }
             }
@@ -575,6 +575,24 @@ namespace Keede.DAL.Helper
         private static bool IsNullableType(Type t)
         {
             return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        private static DynamicParameters ConvertParameter(SqlParameter[] parameters)
+        {
+            if (parameters == null || parameters.Length <= 0) return null;
+
+            var result = new DynamicParameters();
+            foreach (var item in parameters)
+            {
+                result.Add(item.ParameterName, item.Value,item.DbType,item.Direction,item.Size);
+            }
+
+            return result;
         }
     }
 }

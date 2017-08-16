@@ -90,7 +90,7 @@ namespace Keede.DAL.Helper
             {
                 //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
                 MakeCommandTextLog(cmdText);
-                int val = conn.Execute(cmdText, parameters, Transaction); //cmd.ExecuteNonQuery();
+                int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction); //cmd.ExecuteNonQuery();
                 //cmd.Parameters.Clear();
                 return val;
             }
@@ -126,7 +126,7 @@ namespace Keede.DAL.Helper
             {
                 IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName, false));
                 MakeCommandTextLog(cmdText);
-                var reader = conn.ExecuteReader(cmdText, parameters, Transaction);
+                var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
 
                 //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
                 //var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -154,7 +154,7 @@ namespace Keede.DAL.Helper
             try
             {
                 MakeCommandTextLog(cmdText);
-                object val = conn.ExecuteScalar(cmdText, parameters, Transaction);
+                object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
 
                 //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
                 //object val = cmd.ExecuteScalar();
@@ -173,6 +173,24 @@ namespace Keede.DAL.Helper
                     CloseConnection(conn);
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        private DynamicParameters ConvertParameter(Parameter[] parameters)
+        {
+            if (parameters == null || parameters.Length <= 0) return null;
+
+            var result = new DynamicParameters();
+            foreach (var item in parameters)
+            {
+                result.Add(item.Name, item.Value);
+            }
+
+            return result;
         }
 
         /// <summary>
