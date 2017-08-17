@@ -63,7 +63,6 @@ namespace Keede.DAL.DDD.Unitwork
         public SqlServerUnitOfWork(string connectString)
         {
             _dbConnectString = connectString;
-            Init();
         }
 
         /// <summary>
@@ -73,7 +72,6 @@ namespace Keede.DAL.DDD.Unitwork
         public SqlServerUnitOfWork(bool isReadDb = false)
         {
             _dbConnectString=Databases.GetDbConnectionStr(isReadDb);
-            Init();
         }
 
         /// <summary>
@@ -84,19 +82,11 @@ namespace Keede.DAL.DDD.Unitwork
         public SqlServerUnitOfWork(string dbName, bool isReadDb = false)
         {
             _dbConnectString=Databases.GetDbConnectionStr(dbName, isReadDb);
-            Init();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void Init()
-        {
-            if (_openedConnect == null)
-            {
-                Interlocked.CompareExchange(ref _openedConnect, new SqlConnection(_dbConnectString), null);
-            }
-        }
 
         /// <summary>
         /// 
@@ -182,8 +172,12 @@ namespace Keede.DAL.DDD.Unitwork
         /// </summary>
         private void CheckCreatedConnectAndEnableTransaction(bool isEnableTransaction=true)
         {
-            if (_openedConnect.State == ConnectionState.Broken
-                || _openedConnect.State == ConnectionState.Closed)
+            if (_openedConnect == null)
+            {
+                Interlocked.CompareExchange(ref _openedConnect, new SqlConnection(_dbConnectString), null);
+            }
+
+            if (_openedConnect.State == ConnectionState.Broken || _openedConnect.State == ConnectionState.Closed)
             {
                 if (string.IsNullOrWhiteSpace(_openedConnect.ConnectionString))
                 {
