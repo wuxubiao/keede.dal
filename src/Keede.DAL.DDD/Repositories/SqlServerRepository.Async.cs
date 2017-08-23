@@ -45,7 +45,7 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(false);
             var dt = conn.GetTableSchema(list);
-            var value = await BulkToDBAsync(conn, dt);
+            var value = await BulkToDbAsync(conn, dt, DbTransaction);
             CloseConnection(conn);
             return value;
         }
@@ -55,11 +55,12 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="conn"></param>
         /// <param name="dt"></param>
+        /// <param name="dbTransaction"></param>
         /// <returns></returns>
-        private static async Task<bool> BulkToDBAsync(IDbConnection conn, DataTable dt)
+        private static async Task<bool> BulkToDbAsync(IDbConnection conn, DataTable dt, IDbTransaction dbTransaction)
         {
             SqlConnection sqlConn = conn as SqlConnection;
-            SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn);
+            SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn, SqlBulkCopyOptions.Default, (SqlTransaction)dbTransaction);
             bulkCopy.DestinationTableName = dt.TableName;
             bulkCopy.BatchSize = dt.Rows.Count;
 

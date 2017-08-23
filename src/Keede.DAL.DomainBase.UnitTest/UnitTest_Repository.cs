@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Dapper;
 using Keede.DAL.DDD.Repositories;
 using Keede.DAL.DDD.UnitTest;
@@ -27,6 +28,19 @@ namespace Keede.RepositoriesTests
             //TypeMapper.SetTypeMap(typeof(NewsCustom));
             
             //SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
+        }
+
+        [TestMethod]
+        public void TestDateTime()
+        {
+            var date = DateTime.Now;
+            var sql = new StringBuilder();
+            sql.Append(date);
+            var sqls = sql.ToString();
+
+            var sqlstr = "";
+            sqlstr += date;
+
         }
 
         [TestMethod]
@@ -60,38 +74,40 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
+                var tran=repository.BeginTransaction();
                 IList<News> list = new List<News>();
 
                 var news1 = new News();
-                news1.GId = 20;
-                news1.Title = "title20";
+                news1.GId = 220;
+                news1.Title = "title220";
 
                 list.Add(news1);
 
                 var news2 = new News();
-                news2.GId = 21;
-                news2.Title = "title21";
+                news2.GId = 221;
+                news2.Title = "title221";
                 list.Add(news2);
 
                 var result = repository.BatchAdd(list);
+                tran.Commit();
+                
+                //IList<NewsCustom> list2 = new List<NewsCustom>();
 
-                IList<NewsCustom> list2 = new List<NewsCustom>();
+                //var customRepository = new NewsCustomRepository();
+                //var newsCustom = new NewsCustom();
+                //newsCustom.Title = "title21";
+                //newsCustom.Content = "ss";
+                //list2.Add(newsCustom);
 
-                var customRepository = new NewsCustomRepository();
-                var newsCustom = new NewsCustom();
-                newsCustom.Title = "title21";
-                newsCustom.Content = "ss";
-                list2.Add(newsCustom);
+                //var newsCustom2 = new NewsCustom();
+                //newsCustom2.Title = "title21";
+                //newsCustom2.Content = "ss";
+                //list2.Add(newsCustom2);
 
-                var newsCustom2 = new NewsCustom();
-                newsCustom2.Title = "title21";
-                newsCustom2.Content = "ss";
-                list2.Add(newsCustom2);
-
-                var result1=customRepository.BatchAdd(list2);
+                //var result1=customRepository.BatchAdd(list2);
 
                 Assert.IsTrue(result);
-                Assert.IsTrue(result1);
+                //Assert.IsTrue(result1);
             }
 
         }
@@ -163,7 +179,7 @@ namespace Keede.RepositoriesTests
 
                 var news1 = repository.Get<News>("select * from news where Gid=@id", dynParms1);
 
-                var news3 = repository.GetById(2);
+                var news3 = repository.GetById(2,true,false);
 
                 var custom = new NewsCustomRepository();
                 var cust = custom.GetById(1);

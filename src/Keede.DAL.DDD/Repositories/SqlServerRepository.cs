@@ -44,6 +44,22 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public IDbTransaction BeginTransaction()
+        {
+            if (DbTransaction != null)
+                return DbTransaction;
+
+            var conn = Databases.GetDbConnection(false);
+            conn.Open();
+            DbTransaction = conn.BeginTransaction();
+
+            return DbTransaction;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         public override bool Add(TEntity data)
@@ -69,7 +85,7 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(false);
             var dt = conn.GetTableSchema(list);
-            var value = BulkToDB(conn, dt);
+            var value = BulkToDb(conn, dt, DbTransaction);
             CloseConnection(conn);
             return value;
         }
@@ -79,11 +95,12 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="conn"></param>
         /// <param name="dt"></param>
+        /// <param name="dbTransaction"></param>
         /// <returns></returns>
-        private static bool BulkToDB(IDbConnection conn, DataTable dt)
+        private static bool BulkToDb(IDbConnection conn, DataTable dt,IDbTransaction dbTransaction)
         {
             SqlConnection sqlConn = conn as SqlConnection;
-            SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn);
+            SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn, SqlBulkCopyOptions.Default, (SqlTransaction)dbTransaction);
             bulkCopy.DestinationTableName = dt.TableName;
             bulkCopy.BatchSize = dt.Rows.Count;
 
@@ -206,7 +223,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isUpdateLock"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true)
+        public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
             TypeMapper.SetTypeMap(typeof(TEntity));
