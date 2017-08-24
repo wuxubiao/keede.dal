@@ -18,12 +18,14 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public abstract bool Add(TEntity data);
 
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="list"></param>
+        /// <param name="destinationTableName"></param>
         /// <returns></returns>
-        public abstract bool BatchAdd<T>(IList<T> list);
+        public abstract bool BatchAdd<T>(IList<T> list, string destinationTableName=null);
 
         /// <summary>
         /// 

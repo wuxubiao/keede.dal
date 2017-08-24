@@ -62,17 +62,20 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
+        /// <param name="destinationTableName"></param>
         /// <returns></returns>
-        public override bool BatchAdd<T>(IList<T> list)
+        public override bool BatchAdd<T>(IList<T> list, string destinationTableName = null)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(false);
             var dt = conn.GetTableSchema(list);
+            if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
             var value = BulkToDb(conn, dt, DbTransaction);
             CloseConnection(conn);
             return value;
         }
+
 
         /// <summary>
         /// 
