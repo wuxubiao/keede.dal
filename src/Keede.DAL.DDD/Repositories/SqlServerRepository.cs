@@ -76,7 +76,6 @@ namespace Keede.DAL.DDD.Repositories
             return value;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -84,7 +83,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="dt"></param>
         /// <param name="dbTransaction"></param>
         /// <returns></returns>
-        private static bool BulkToDb(IDbConnection conn, DataTable dt,IDbTransaction dbTransaction)
+        private static bool BulkToDb(IDbConnection conn, DataTable dt, IDbTransaction dbTransaction)
         {
             SqlConnection sqlConn = conn as SqlConnection;
             SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn, SqlBulkCopyOptions.Default, (SqlTransaction)dbTransaction);
@@ -103,7 +102,7 @@ namespace Keede.DAL.DDD.Repositories
             }
             finally
             {
-                    bulkCopy.Close();
+                bulkCopy.Close();
             }
         }
 
@@ -190,6 +189,17 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override TEntity Get(object condition, bool isReadDb = true)
+        {
+            return GetList(condition, isReadDb).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="id"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
@@ -204,7 +214,7 @@ namespace Keede.DAL.DDD.Repositories
         }
 
         /// <summary>
-        /// 
+        /// isUpdateLock使用WITH (UPDLOCK)，其他事务可读取，不可更新
         /// </summary>
         /// <param name="id"></param>
         /// <param name="isUpdateLock"></param>
@@ -227,22 +237,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true)
-        {
-            if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb);
-            var values = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return values;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameterObject"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
         public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             TypeMapper.SetTypeMap(typeof(T));
@@ -256,14 +250,45 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override IList<TEntity> GetAll( bool isReadDb = true)
+        public override IList<TEntity> GetList(object condition, bool isReadDb = true)
+        {
+            if (condition == null)
+                throw new ArgumentNullException(nameof(condition));
+            var conn = OpenDbConnection(isReadDb);
+            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+            return conn.QueryList<TEntity>(condition, table, "*", false, null, new int?()).ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override IList<TEntity> GetAll(bool isReadDb = true)
         {
             TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var list = conn.GetAll<TEntity>().ToList();
             CloseConnection(conn);
             return list;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true)
+        {
+            if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
+            var conn = OpenDbConnection(isReadDb);
+            var values = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
+            CloseConnection(conn);
+            return values;
         }
 
         /// <summary>
@@ -290,7 +315,8 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="sql">sql语句须确保没有多余的空格</param>
+        /// <param name="sql">排序的字段必须select出来且不能带别名，如ORDER by XX.CreateTime将会报错，ORDER by CreateTime正常
+        /// sql语句须确保没有多余的空格</param>
         /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
@@ -300,35 +326,9 @@ namespace Keede.DAL.DDD.Repositories
         {
             TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
-            var pagedList = conn.QueryPaged<T>(sql,pageIndex,pageSize, parameterObjects, DbTransaction);
+            var pagedList = conn.QueryPaged<T>(sql, pageIndex, pageSize, parameterObjects, DbTransaction);
             CloseConnection(conn);
             return pagedList;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public override TEntity Get(object condition, bool isReadDb = true)
-        {
-            return GetList(condition, isReadDb).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public override IList<TEntity> GetList(object condition, bool isReadDb = true)
-        {
-            if (condition == null)
-                throw new ArgumentNullException(nameof(condition));
-            var conn = OpenDbConnection(isReadDb);
-            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            return conn.QueryList<TEntity>(condition, table, "*", false, null, new int?()).ToList();
         }
 
         /// <summary>

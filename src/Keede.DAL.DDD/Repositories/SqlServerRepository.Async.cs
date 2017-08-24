@@ -163,6 +163,17 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override async Task<TEntity> GetAsync(object condition, bool isReadDb = true)
+        {
+            return GetListAsync(condition, isReadDb).Result.ToList().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="id"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
@@ -177,7 +188,7 @@ namespace Keede.DAL.DDD.Repositories
         }
 
         /// <summary>
-        /// 
+        /// isUpdateLock使用WITH (UPDLOCK)，其他事务可读取，不可更新
         /// </summary>
         /// <param name="id"></param>
         /// <param name="isUpdateLock"></param>
@@ -200,22 +211,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override async Task<int> GetCountAsync(string sql, object parameterObject = null, bool isReadDb = true)
-        {
-            if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb);
-            var values = await conn.ExecuteScalarAsync<int>(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return values;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameterObject"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
         public override async Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             TypeMapper.SetTypeMap(typeof(T));
@@ -229,6 +224,22 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override async Task<IList<TEntity>> GetListAsync(object condition, bool isReadDb = true)
+        {
+            if (condition == null)
+                throw new ArgumentNullException(nameof(condition));
+            var conn = OpenDbConnection(isReadDb);
+            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+            var list = await conn.QueryListAsync<TEntity>(condition, table, "*", false, null, new int?());
+            return list.ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public override async Task<IList<TEntity>> GetAllAsync(bool isReadDb = true)
         {
@@ -237,6 +248,22 @@ namespace Keede.DAL.DDD.Repositories
             var list = await conn.GetAllAsync<TEntity>();
             CloseConnection(conn);
             return list.ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override async Task<int> GetCountAsync(string sql, object parameterObject = null, bool isReadDb = true)
+        {
+            if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
+            var conn = OpenDbConnection(isReadDb);
+            var values = await conn.ExecuteScalarAsync<int>(sql, parameterObject, DbTransaction);
+            CloseConnection(conn);
+            return values;
         }
 
         /// <summary>
@@ -263,7 +290,8 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="sql">sql语句须确保没有多余的空格</param>
+        /// <param name="sql">排序的字段必须select出来且不能带别名，如ORDER by XX.CreateTime将会报错，ORDER by CreateTime正常
+        /// sql语句须确保没有多余的空格</param>
         /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
@@ -276,33 +304,6 @@ namespace Keede.DAL.DDD.Repositories
             var pagedList = await conn.QueryPagedAsync<T>(sql, pageIndex, pageSize, parameterObjects, DbTransaction);
             CloseConnection(conn);
             return pagedList;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public override async Task<TEntity> GetAsync(object condition, bool isReadDb = true)
-        {
-            return GetListAsync(condition, isReadDb).Result.ToList().FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        public override async Task<IList<TEntity>> GetListAsync(object condition, bool isReadDb = true)
-        {
-            if (condition == null)
-                throw new ArgumentNullException(nameof(condition));
-            var conn = OpenDbConnection(isReadDb);
-            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            var list= await conn.QueryListAsync<TEntity>(condition, table, "*", false, null, new int?());
-            return list.ToList();
         }
 
         /// <summary>

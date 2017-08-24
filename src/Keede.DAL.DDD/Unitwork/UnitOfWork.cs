@@ -82,7 +82,7 @@ namespace Keede.DAL.DDD.Unitwork
         public abstract IDbConnection DbConnection { get; }
 
         /// <summary>
-        /// 尝试锁住对象
+        /// 尝试锁住对象，阻止其他事务读取、更新
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="id"></param>
@@ -94,7 +94,7 @@ namespace Keede.DAL.DDD.Unitwork
         }
 
         /// <summary>
-        /// 尝试锁住对象
+        /// 尝试锁住对象，阻止其他事务读取、更新
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="timeout"></param>
@@ -104,6 +104,18 @@ namespace Keede.DAL.DDD.Unitwork
         {
             return objs.Select(obj=> DbConnection.UpdateId(obj, DbTransaction, timeout)).All(result => result);
         }
+
+        //public TEntity TryLockEntityObjectAndReturn<TEntity>(int timeout, object id) where TEntity : IEntity
+        //{
+        //    DbConnection.UpdateId<TEntity>(id, DbTransaction, timeout);
+        //    return default(TEntity);
+        //}
+
+        //public TEntity TryLockEntityObjectAndReturn<TEntity>(int timeout, TEntity objs) where TEntity : IEntity
+        //{
+        //    DbConnection.UpdateId(objs, DbTransaction, timeout);
+        //    return default(TEntity);
+        //}
 
         /// <summary>
         /// 

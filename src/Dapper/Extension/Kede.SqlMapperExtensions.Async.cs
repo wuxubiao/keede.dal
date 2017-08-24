@@ -24,46 +24,7 @@ namespace Dapper.Extension
         /// <returns></returns>
         public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            var type = typeof(T);
-            string sql;
-            if (!GetQueries.TryGetValue(type.TypeHandle, out sql))
-            {
-                var key = GetSingleKey<T>(nameof(Get));
-                var name = GetTableName(type);
-                var canReadProperties = TypePropertiesCanReadCache(type);
-                if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
-                string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
-                sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
-                GetQueries[type.TypeHandle] = sql;
-            }
-
-            var dynParms = new DynamicParameters();
-            dynParms.Add("@id", id);
-
-            T obj;
-
-            if (type.IsInterface())
-            {
-                var res = await connection.QueryAsync(sql, dynParms).Result.FirstOrDefault() as IDictionary<string, object>;
-
-                if (res == null)
-                    return default(T);
-
-                obj = ProxyGenerator.GetInterfaceProxy<T>();
-
-                foreach (var property in TypePropertiesCache(type))
-                {
-                    var val = res[property.Name];
-                    property.SetValue(obj, Convert.ChangeType(val, property.PropertyType), null);
-                }
-
-                ((IProxy)obj).IsDirty = false;   //reset change tracking and return
-            }
-            else
-            {
-                obj = connection.QueryAsync<T>(sql, dynParms, transaction, commandTimeout: commandTimeout).Result.FirstOrDefault();
-            }
-            return obj;
+            return await GetAsync<T>(connection, id, false, transaction, commandTimeout);
         }
 
         /// <summary>
