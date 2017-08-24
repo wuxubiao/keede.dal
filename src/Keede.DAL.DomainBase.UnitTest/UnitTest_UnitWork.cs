@@ -20,13 +20,12 @@ namespace Keede.DAL.DDD.UnitTest
     {
         public UnitTest_UnitWork()
         {
-            string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
+            //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
+            string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
-            TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
-            TypeMapper.SetTypeMap(typeof(News));
-            TypeMapper.SetTypeMap(typeof(NewsCustom));
+
         }
 
         [TestMethod]
@@ -35,15 +34,27 @@ namespace Keede.DAL.DDD.UnitTest
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
             {
                 unitOfWork.BeginTransaction();
+                var repository = new NewsRepository();
+                var dynParms1 = new DynamicParameters();
+                repository.SetDbTransaction(unitOfWork.DbTransaction);
 
-                NeNewsMultiIdws new1 = new NeNewsMultiIdws();
-                new1.Id = 1;
-                new1.GId = 1;
+                unitOfWork.TryLockEntityObject<News>(1,2);
 
-                if (!unitOfWork.TryLockEntityObject(3, new1))
-                {
-                    return;
-                }
+                dynParms1.Add("@id", 2);
+                var news2 = repository.Get("select * from news where Gid=@id", dynParms1);
+                news2.Title = "123";
+                repository.Save(news2);
+
+                unitOfWork.Rollback();
+
+                //NeNewsMultiIdws new1 = new NeNewsMultiIdws();
+                //new1.Id = 1;
+                //new1.GId = 1;
+
+                //if (!unitOfWork.TryLockEntityObject(3, new1))
+                //{
+                //    return;
+                //}
 
                 unitOfWork.Commit();
             }
@@ -193,7 +204,7 @@ namespace Keede.DAL.DDD.UnitTest
         {
             var id1 = Guid.Parse("9E8D004F-21F6-432C-B1D5-DA5C01CA60DE");
             var id2 = Guid.Parse("848D4D32-6962-404D-BDFC-E61F2094D76C");
-            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork(false))
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
             {
                 var repository = new PersonRepository().SetDbTransaction(unitOfWork.DbTransaction);
                 if (!unitOfWork.TryLockEntityObject<Person>(3, id1, id2))

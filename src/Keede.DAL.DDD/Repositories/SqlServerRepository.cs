@@ -44,22 +44,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
-        public IDbTransaction BeginTransaction()
-        {
-            if (DbTransaction != null)
-                return DbTransaction;
-
-            var conn = Databases.GetDbConnection(false);
-            conn.Open();
-            DbTransaction = conn.BeginTransaction();
-
-            return DbTransaction;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         public override bool Add(TEntity data)
