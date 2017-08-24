@@ -74,7 +74,6 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
-                var tran=repository.BeginTransaction();
                 IList<News> list = new List<News>();
 
                 var news1 = new News();
@@ -89,7 +88,6 @@ namespace Keede.RepositoriesTests
                 list.Add(news2);
 
                 var result = repository.BatchAdd(list);
-                tran.Commit();
                 
                 //IList<NewsCustom> list2 = new List<NewsCustom>();
 
