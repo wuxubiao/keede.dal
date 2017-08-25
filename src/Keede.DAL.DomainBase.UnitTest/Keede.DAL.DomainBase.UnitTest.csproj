@@ -72,6 +72,7 @@
     <Compile Include="UnitTest_Repository.Async.cs" />
     <Compile Include="UnitTest_Repository.cs" />
     <Compile Include="UnitTest_UnitWork.cs" />
+    <Compile Include="UnitTest_WMS.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

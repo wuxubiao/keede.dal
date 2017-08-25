@@ -257,6 +257,7 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             return conn.QueryList<TEntity>(condition, table, "*", false, null, new int?()).ToList();
@@ -342,6 +343,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
         {
+            TypeMapper.SetTypeMap(typeof(TEntity));
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             return conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, null, new int?());

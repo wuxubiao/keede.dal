@@ -86,11 +86,6 @@ namespace Dapper.Extension
         /// <returns>Entity of T</returns>
         public static T Get<T>(this IDbConnection connection, dynamic id, bool isUpdateLock, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            //var allProperties = TypePropertiesCache(type);
-            //var keyProperties = KeyPropertiesCache(type);
-            //var computedProperties = ComputedPropertiesCache(type);
-            //var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
-
             var type = typeof(T);
             string sql;
             if (!GetQueries.TryGetValue(type.TypeHandle, out sql))
@@ -165,8 +160,6 @@ namespace Dapper.Extension
         }
 
         /// <summary>
-        /// ！@#有改动，select按IsReadable取出
-        /// 阮哥
         /// Returns a list of entites from table "Ts".  
         /// Id of T must be marked with [Key] attribute.
         /// Entities created from interfaces are tracked/intercepted for changes and used by the Update() extension
