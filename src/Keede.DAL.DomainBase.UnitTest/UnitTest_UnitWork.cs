@@ -104,12 +104,13 @@ namespace Keede.DAL.DDD.UnitTest
 
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
             {
+                unitOfWork.BeginTransaction();
                 NewsRepository repository = new NewsRepository();//.SetDbTransaction(unitOfWork.DbTransaction);
-                
-                if (!unitOfWork.TryLockEntityObject<News>(3, 1))
-                {
-                    return;
-                }
+                repository.SetDbTransaction(unitOfWork.DbTransaction);
+                //if (!unitOfWork.TryLockEntityObject<News>(3, 1))
+                //{
+                //    return;
+                //}
 
 #if DEBUG
                 Trace.WriteLine($"Connection > {unitOfWork.DbConnection.GetHashCode()}");

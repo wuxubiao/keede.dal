@@ -177,7 +177,7 @@ namespace Keede.RepositoriesTests
 
                 var news1 = repository.Get<News>("select * from news where Gid=@id", dynParms1);
 
-                var news3 = repository.GetById(2,true,false);
+                var news3 = repository.GetById(2);
 
                 var custom = new NewsCustomRepository();
                 var cust = custom.GetById(1);

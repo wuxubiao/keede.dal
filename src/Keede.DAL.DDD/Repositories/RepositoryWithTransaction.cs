@@ -13,10 +13,17 @@ namespace Keede.DAL.DDD.Repositories
     {
         private bool _isEnableTransaction;
 
+        [ThreadStatic]
+        static IDbTransaction _dbTransaction;
+
         /// <summary>
         /// DB事务对象
         /// </summary>
-        public IDbTransaction DbTransaction { get; protected set; }
+        public IDbTransaction DbTransaction
+        {
+            get => _dbTransaction;
+            protected set => _dbTransaction = value;
+        }
 
         /// <summary>
         /// 设置DB事务对象，设置后ConnectionString会为空
