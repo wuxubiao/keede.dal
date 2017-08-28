@@ -214,7 +214,7 @@ namespace Keede.DAL.DDD.Repositories
         }
 
         /// <summary>
-        /// isUpdateLock使用WITH (UPDLOCK)，其他事务可读取，不可更新
+        /// 
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
@@ -314,12 +314,13 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="sql">排序的字段必须select出来且不能带别名，如ORDER by XX.CreateTime将会报错，ORDER by CreateTime正常
-        /// sql语句须确保没有多余的空格</param>
+        /// <param name="sql"></param>
         /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
-        /// <param name="orderBy"></param>
+        /// <param name="orderBy">
+        /// orderBy为空则去sql语句中的order by，sql语句无order by则默认ORDER BY getdate()
+        /// </param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         public override IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true)
