@@ -216,18 +216,16 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// isUpdateLock使用WITH (UPDLOCK)，其他事务可读取，不可更新
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="isUpdateLock"></param>
-        /// <param name="isReadDb"></param>
+        /// <param name="condition"></param>
         /// <returns></returns>
-        public override TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb)
+        public override TEntity GetAndUpdateLock(object condition)
         {
-            if (id == null) throw new ArgumentNullException(nameof(id));
+            if (condition == null)
+                throw new ArgumentNullException(nameof(condition));
             TypeMapper.SetTypeMap(typeof(TEntity));
-            var conn = OpenDbConnection(isReadDb);
-            var value = SqlMapperExtensions.Get<TEntity>(conn, id, isUpdateLock, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var conn = OpenDbConnection(false);
+            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+            return conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
         }
 
         /// <summary>
@@ -260,7 +258,7 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            return conn.QueryList<TEntity>(condition, table, "*", false, null, new int?()).ToList();
+            return conn.QueryList<TEntity>(condition, table, "*", false, DbTransaction, 3).ToList();
         }
 
         /// <summary>
@@ -271,7 +269,7 @@ namespace Keede.DAL.DDD.Repositories
         {
             TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            var list = conn.GetAll<TEntity>().ToList();
+            var list = conn.GetAll<TEntity>(DbTransaction).ToList();
             CloseConnection(conn);
             return list;
         }
@@ -321,13 +319,14 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
+        public override IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true)
         {
             TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
-            var pagedList = conn.QueryPaged<T>(sql, pageIndex, pageSize, parameterObjects, DbTransaction);
+            var pagedList = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
             CloseConnection(conn);
             return pagedList;
         }
@@ -346,7 +345,7 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(TEntity));
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            return conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, null, new int?());
+            return conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
         }
     }
 }

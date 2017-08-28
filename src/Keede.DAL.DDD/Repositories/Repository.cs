@@ -67,10 +67,9 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="isUpdateLock"></param>
+        /// <param name="condition"></param>
         /// <returns></returns>
-        public abstract TEntity GetById(dynamic id, bool isUpdateLock, bool isReadDb = true);
+        public abstract TEntity GetAndUpdateLock(object condition);
 
         /// <summary>
         /// 
@@ -127,7 +126,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
+        public abstract IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
         #region IDisposable Members
 
         /// <summary>

@@ -743,6 +743,11 @@ namespace Dapper.Extension
             return connection.Query<T>(BuildQuerySQL(condition, table, columns, isOr), condition, transaction, true, commandTimeout);
         }
 
+        public static T GetAndUpdateLock<T>(this IDbConnection connection, object condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return connection.QueryFirstOrDefault<T>(BuildQuerySQL(condition, table, columns, isOr, true), condition, transaction, commandTimeout);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -902,8 +907,9 @@ namespace Dapper.Extension
         /// <param name="table"></param>
         /// <param name="selectPart"></param>
         /// <param name="isOr"></param>
+        /// <param name="isUpdateLock"></param>
         /// <returns></returns>
-        private static string BuildQuerySQL(dynamic condition, string table, string selectPart = "*", bool isOr = false)
+        private static string BuildQuerySQL(dynamic condition, string table, string selectPart = "*", bool isOr = false, bool isUpdateLock = false)
         {
             var conditionObj = condition as object;
             var properties = GetFieldNames(conditionObj);
@@ -915,7 +921,14 @@ namespace Dapper.Extension
             var separator = isOr ? " OR " : " AND ";
             var wherePart = string.Join(separator, properties.Select(p => HandleKeyword(p) + " = @" + p));
 
-            return string.Format("SELECT {2} FROM [{0}] WHERE {1}", table, wherePart, selectPart);
+            if (isUpdateLock)
+            {
+                return string.Format("SELECT {2} FROM [{0}] WITH (UPDLOCK) WHERE {1}", table, wherePart, selectPart);
+            }
+            else
+            {
+                return string.Format("SELECT {2} FROM [{0}] WHERE {1}", table, wherePart, selectPart);
+            }
         }
 
         /// <summary>

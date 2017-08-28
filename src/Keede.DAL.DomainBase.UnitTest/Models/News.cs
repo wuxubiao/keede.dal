@@ -15,6 +15,7 @@ namespace Keede.DAL.DDD.UnitTest.Models
         [ExplicitKey]
         public int GId { get; set; }
 
+        [ExplicitKey]
         [Column("Title")]
         public string Title { get; set; }
 

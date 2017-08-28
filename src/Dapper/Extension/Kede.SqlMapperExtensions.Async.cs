@@ -95,7 +95,7 @@ namespace Dapper.Extension
             }
             else
             {
-                obj = connection.QueryAsync<T>(sql, dynParms, transaction, commandTimeout: commandTimeout).Result.FirstOrDefault();
+                obj = await connection.QueryFirstOrDefaultAsync<T>(sql, dynParms, transaction, commandTimeout);
             }
             return obj;
         }
@@ -345,7 +345,7 @@ namespace Dapper.Extension
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<int> DeleteAsync<T>(this IDbConnection connection, string whereSql, object parameterObject = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static async Task<int> DeleteAsync<T>(this IDbConnection connection, string whereSql, object parameterObject = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
 
             whereSql = whereSql.Trim();
@@ -356,7 +356,7 @@ namespace Dapper.Extension
             var name = GetTableName(type);
             var statement = $"delete from {name}" + whereSql;
 
-            return connection.ExecuteAsync(statement, parameterObject, transaction, commandTimeout);
+            return await connection.ExecuteAsync(statement, parameterObject, transaction, commandTimeout);
         }
 
         /// <summary>Query paged data from a single table.
@@ -377,10 +377,10 @@ namespace Dapper.Extension
             string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
             var table = GetTableName(type);
             var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, pagedList.OrderBy, table, pagedList.WhereSql, (pagedList.PageIndex - 1) * pagedList.PageSize + 1, pagedList.PageIndex * pagedList.PageSize);
-            var datas = connection.QueryAsync<T>(sql, paramterObjects, transaction, commandTimeout).Result.ToList();
+            var datas =  await connection.QueryAsync<T>(sql, paramterObjects, transaction, commandTimeout);
             var countSql = $"SELECT COUNT(0) FROM {table} {pagedList.WhereSql} ";
-            var total =  connection.QueryFirstOrDefaultAsync<int>(countSql, paramterObjects, transaction).Result;
-            pagedList.FillQueryData(total, datas);
+            var total = await connection.QueryFirstOrDefaultAsync<int>(countSql, paramterObjects, transaction);
+            pagedList.FillQueryData(total, datas.ToList());
             return pagedList;
         }
 
@@ -392,15 +392,16 @@ namespace Dapper.Extension
         /// <param name="sql"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
+        /// <param name="orderBy"></param>
         /// <param name="paramterObjects"></param>
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static async Task<List<T>> QueryPagedAsync<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static async Task<IEnumerable<T>> QueryPagedAsync<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, string orderBy, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            var commandText = ProcessCommandSqlServer(sql.Trim(), pageIndex, pageSize);
-
-            return  connection.QueryAsync<T>(commandText, paramterObjects, transaction, commandTimeout).Result.ToList();
+            var commandText = ProcessCommandSqlServer(sql.Trim(), pageIndex, pageSize, orderBy);
+            
+            return await connection.QueryAsync<T>(commandText, paramterObjects, transaction, commandTimeout);
         }
 
         /// <summary>Query a list of data from table with specified condition.
@@ -415,6 +416,11 @@ namespace Dapper.Extension
         public static async Task<IEnumerable<T>> QueryListAsync<T>(this IDbConnection connection, object condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             return await connection.QueryAsync<T>(BuildQuerySQL(condition, table, columns, isOr), condition, transaction, commandTimeout);
+        }
+
+        public static async Task<T> GetAndUpdateLockAsync<T>(this IDbConnection connection, object condition, string table, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            return await connection.QueryFirstOrDefaultAsync<T>(BuildQuerySQL(condition, table, columns, isOr, true), condition, transaction, commandTimeout);
         }
 
         /// <summary>

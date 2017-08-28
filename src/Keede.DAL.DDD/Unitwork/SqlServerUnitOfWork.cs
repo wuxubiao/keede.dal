@@ -229,7 +229,6 @@ namespace Keede.DAL.DDD.Unitwork
                             var method = GetCustomMethod(repository, customOperate.Value.OperateName);
                             method.Invoke(repository, new[] { customOperate.Value.Data });
                         }
-                        _openedTransaction.Rollback();
                         _openedTransaction.Commit();
                         Committed = true;
                         return true;

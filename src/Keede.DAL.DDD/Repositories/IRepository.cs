@@ -73,16 +73,16 @@ namespace Keede.DAL.DDD.Repositories
         /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         TEntity GetById(dynamic id, bool isReadDb = true);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果要求附带UPDLOCK更新锁，就能防止脏读数据
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="isUpdateLock"></param>
+        /// <param name="condition"></param>
         /// <returns></returns>
-        TEntity GetById(dynamic id,bool isUpdateLock, bool isReadDb = true);
+        TEntity GetAndUpdateLock(object condition);
 
         /// <summary>
         /// 
@@ -112,29 +112,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="whereSql"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="parameterObjects"></param>
-        /// <param name="pageIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        PagedList<TEntity> GetPagedList(string whereSql, string orderBy,object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="parameterObjects"></param>
-        /// <param name="pageIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="isReadDb"></param>
-        /// <returns></returns>
-        List<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
@@ -147,6 +124,30 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         IList<TEntity> GetList(object condition, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereSql"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="parameterObjects"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameterObjects"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
 
         /// <summary>
         /// 

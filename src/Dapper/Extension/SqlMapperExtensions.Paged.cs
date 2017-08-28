@@ -13,21 +13,23 @@ namespace Dapper.Extension
     public static partial class SqlMapperExtensions
     {
         #region 新增分页方法
+
         /// <summary>
         /// 目前只有针对sql server的实现
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
         /// <param name="sql"></param>
+        /// <param name="orderBy"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="paramterObjects"></param>
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static List<T> QueryPaged<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static IList<T> QueryPaged<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, string orderBy, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            var commandText = ProcessCommandSqlServer(sql.Trim(),pageIndex,pageSize);
+            var commandText = ProcessCommandSqlServer(sql.Trim(),pageIndex,pageSize, orderBy);
 
             return connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
         }
@@ -59,18 +61,25 @@ namespace Dapper.Extension
         /// <param name="pageIndex">从 1 开始的页码。</param>
         /// <param name="pageSize">页的大小。</param>
         /// <param name="commandText">数据源查询命令。</param>
-        private static string ProcessCommandSqlServer(string commandText,int pageIndex, int pageSize)
+        /// <param name="orderBy"></param>
+        private static string ProcessCommandSqlServer(string commandText,int pageIndex, int pageSize, string orderBy)
         {
             var start = (pageIndex - 1) * pageSize;
             var end = pageIndex * pageSize;
-            var match = GetOrderByMatch(commandText);
-            var orderBy = "ORDER BY getdate()";
-            if (match.Success)
+            if (string.IsNullOrEmpty(orderBy))
             {
-                commandText = commandText.Remove(match.Index);
-                orderBy = match.Value.Trim();
+                var match = GetOrderByMatch(commandText);
+                if (match.Success)
+                {
+                    commandText = commandText.Remove(match.Index);
+                    orderBy = match.Value.Trim();
+                }
+                else
+                {
+                    orderBy = "ORDER BY getdate()";
+                }
             }
-
+            
             return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},* FROM ({0}) ____t1____) ____t2____ WHERE {1}>{2} AND {1}<={3}", 
                 commandText
                 , "RowNumber"

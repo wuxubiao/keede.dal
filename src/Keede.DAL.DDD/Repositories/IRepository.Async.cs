@@ -74,16 +74,16 @@ namespace Keede.DAL.DDD.Repositories
         /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
         Task<TEntity> GetByIdAsync(dynamic id, bool isReadDb = true);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果要求附带UPDLOCK更新锁，就能防止脏读数据
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="isUpdateLock"></param>
+        /// <param name="condition"></param>
         /// <returns></returns>
-        Task<TEntity> GetByIdAsync(dynamic id,bool isUpdateLock, bool isReadDb = true);
+        Task<TEntity> GetAndUpdateLockAsync(object condition);
 
         /// <summary>
         /// 
@@ -131,7 +131,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        Task<List<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true) where T : class;
+        Task<IList<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
 
         /// <summary>
         /// 

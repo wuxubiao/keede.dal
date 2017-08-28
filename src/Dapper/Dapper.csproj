@@ -52,6 +52,7 @@
     <Compile Include="Extension\Mapping\TypeMapper.cs" />
     <Compile Include="Extension\SqlMapperExtensions.Async.cs" />
     <Compile Include="Extension\SqlMapperExtensions.cs" />
+    <Compile Include="Extension\SqlMapperExtensions.Paged.Async.cs" />
     <Compile Include="Extension\SqlMapperExtensions.Paged.cs" />
     <Compile Include="DataTableHandler.cs" />
     <Compile Include="DbString.cs" />

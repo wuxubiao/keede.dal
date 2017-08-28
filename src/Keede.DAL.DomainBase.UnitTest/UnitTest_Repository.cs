@@ -170,6 +170,13 @@ namespace Keede.RepositoriesTests
 
             using (var repository = new NewsRepository())
             {
+                var news11 = new News();
+                news11.GId = 2;
+                news11.Title = "321";
+                var new5 = repository.Get(news11);
+
+
+                var new4 = repository.Get(new {Gid = 2,Title="321"});
 
                 var dynParms1 = new DynamicParameters();
                 dynParms1.Add("@id", 2);
