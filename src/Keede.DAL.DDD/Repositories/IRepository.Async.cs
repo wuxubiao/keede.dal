@@ -13,8 +13,7 @@ namespace Keede.DAL.DDD.Repositories
     /// </summary>
     /// <typeparam name="TEntity">The type of the aggregate root on which the repository operations
     /// should be performed.</typeparam>
-    public partial interface IRepository<TEntity>: IDisposable
-        where TEntity : IEntity
+    public partial interface IRepository<TEntity> where TEntity : IEntity
     {
         /// <summary>
         /// Add a new item into the repository

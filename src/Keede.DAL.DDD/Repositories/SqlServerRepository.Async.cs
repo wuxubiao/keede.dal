@@ -14,8 +14,7 @@ namespace Keede.DAL.DDD.Repositories
     /// 
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public partial class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
-        where TEntity : class, IEntity
+    public partial class SqlServerRepository<TEntity> where TEntity : class, IEntity
     {
         /// <summary>
         /// 
@@ -202,23 +201,6 @@ namespace Keede.DAL.DDD.Repositories
             return await conn.GetAndUpdateLockAsync<TEntity>(condition, table, "*", false, DbTransaction, 3);
         }
 
-        ///// <summary>
-        ///// isUpdateLock使用WITH (UPDLOCK)，其他事务可读取，不可更新
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="isUpdateLock"></param>
-        ///// <param name="isReadDb"></param>
-        ///// <returns></returns>
-        //public override async Task<TEntity> GetByIdAsync(dynamic id, bool isUpdateLock, bool isReadDb = true)
-        //{
-        //    if (id == null) throw new ArgumentNullException(nameof(id));
-        //    TypeMapper.SetTypeMap(typeof(TEntity));
-        //    var conn = OpenDbConnection(isReadDb);
-        //    var value = await SqlMapperExtensions.GetAsync<TEntity>(conn, id, isUpdateLock, DbTransaction);
-        //    CloseConnection(conn);
-        //    return value;
-        //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -332,12 +314,12 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override Task<PagedList<TEntity>> GetPagedListAsync(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
+        public override async Task<PagedList<TEntity>> GetPagedListAsync(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
         {
             TypeMapper.SetTypeMap(typeof(TEntity));
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            return conn.QueryPagedAsync<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            return await conn.QueryPagedAsync<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
         }
     }
 }

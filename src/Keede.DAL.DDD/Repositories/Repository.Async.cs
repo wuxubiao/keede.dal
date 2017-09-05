@@ -13,8 +13,7 @@ namespace Keede.DAL.DDD.Repositories
     /// </summary>
     /// <typeparam name="TEntity">The type of the aggregate root on which the repository operations
     /// should be performed.</typeparam>
-    public abstract partial class Repository<TEntity> : IRepository<TEntity>
-        where TEntity : IEntity
+    public abstract partial class Repository<TEntity> where TEntity : IEntity
     {
         /// <param name="data"></param>
         /// <returns></returns>
