@@ -23,7 +23,7 @@ namespace Keede.DAL.DDD.Repositories
         {
             get
             {
-                if (_dbTransaction != null && DbTransaction.Connection == null)
+                if (_dbTransaction != null && _dbTransaction.Connection == null)
                     _dbTransaction = null;
                 return _dbTransaction;
             }
