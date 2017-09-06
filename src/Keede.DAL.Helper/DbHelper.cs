@@ -187,7 +187,7 @@ namespace Keede.DAL.Helper
             var result = new DynamicParameters();
             foreach (var item in parameters)
             {
-                result.Add(item.Name, item.Value);
+                result.Add(item.Name, item.Value == DBNull.Value ? null : item.Value);
             }
 
             return result;
@@ -308,9 +308,9 @@ namespace Keede.DAL.Helper
         {
             if (connection != null && connection.State != ConnectionState.Closed)
             {
-                connection.Close();
-                Command.Dispose();
-                connection.Dispose();
+                connection?.Close();
+                Command?.Dispose();
+                connection?.Dispose();
             }
         }
 
