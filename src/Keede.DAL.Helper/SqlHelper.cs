@@ -69,7 +69,7 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                trans.Connection.Execute(cmdText, ConvertParameter(commandParameters));
+                trans.Connection.Execute(cmdText, ConvertParameter(commandParameters), trans);
             }
             catch (SqlException exp)
             {
