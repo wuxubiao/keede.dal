@@ -154,7 +154,7 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
-                var result = repository.Remove("  Gid=11");
+                var result = repository.RemoveSql("  Gid=11");
 
                 Assert.IsTrue(result>0);
             }

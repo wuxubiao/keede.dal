@@ -47,7 +47,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="where"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract int Remove(string whereSql, object parameterObject = null);
+        public abstract int RemoveSql(string whereSql, object parameterObject = null);
 
         /// <summary>
         /// 

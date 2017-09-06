@@ -142,7 +142,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="whereSql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public override int Remove(string whereSql, object parameterObject = null)
+        public override int RemoveSql(string whereSql, object parameterObject = null)
         {
             TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);

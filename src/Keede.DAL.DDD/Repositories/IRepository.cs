@@ -49,7 +49,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="where"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        int Remove(string whereSql, object parameterObject = null);
+        int RemoveSql(string whereSql, object parameterObject = null);
 
         /// <summary>
         /// Get single item from the repository by custom condition
