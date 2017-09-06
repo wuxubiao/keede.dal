@@ -21,7 +21,12 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         public IDbTransaction DbTransaction
         {
-            get => _dbTransaction;
+            get
+            {
+                if (_dbTransaction != null && DbTransaction.Connection == null)
+                    _dbTransaction = null;
+                return _dbTransaction;
+            }
             protected set => _dbTransaction = value;
         }
 
