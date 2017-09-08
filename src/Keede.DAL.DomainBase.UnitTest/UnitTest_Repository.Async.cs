@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Dapper;
+using Dapper.Extension;
 using Keede.DAL.DDD.Repositories;
 using Keede.DAL.DDD.UnitTest;
 using Keede.DAL.DDD.UnitTest.Models;
@@ -21,6 +22,7 @@ namespace Keede.RepositoriesTests
             string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB02", writeConnction, readConnctions, EnumStrategyType.Loop);
+            TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
         }
 
         [TestMethod]

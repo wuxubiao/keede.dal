@@ -12,20 +12,32 @@ namespace Dapper.Extension
     {
         private static readonly Hashtable _typeMaps = new Hashtable();
 
+        public static void Initialize(Assembly assembly)
+        {
+            foreach (var type in assembly.GetTypes().Where(type => type.IsClass &&
+                type.GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "TypeMapperAttribute") != null))
+            {
+                var map = new CustomTypeMap(type,
+                    (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));
+                SqlMapper.SetTypeMap(type, map);
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="namespace"></param>
         public static void Initialize(string @namespace)
         {
-            var types = from type in Assembly.GetCallingAssembly().GetTypes()//GetExecutingAssembly
-                        where type.IsClass && type.Namespace == @namespace
+            var types = from type in Assembly.GetCallingAssembly().GetTypes()
+                        where type.IsClass && type.Namespace == @namespace && 
+                            type.GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "TypeMapperAttribute") != null
                         select type;
 
             types.ToList().ForEach(type =>
             {
-                var map = new CustomPropertyTypeMap(type,
-                          (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));//GetDescriptionFromAttribute(prop) == columnName));
+                var map = new CustomTypeMap(type,
+                          (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));
                 SqlMapper.SetTypeMap(type, map);
             });
         }
@@ -35,19 +47,19 @@ namespace Dapper.Extension
         /// </summary>
         /// <param name="type"></param>
         /// <param name="overWrite"></param>
-        public static void SetTypeMap(Type type, bool overWrite=false)
+        public static void SetTypeMap(Type type, bool overWrite = false)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
 
-            var tableAttr = type .GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "TypeMapperAttribute");
+            var tableAttr = type.GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "TypeMapperAttribute");
             if (tableAttr != null)
             {
-                var map = (CustomPropertyTypeMap)_typeMaps[type];
+                var map = (CustomTypeMap)_typeMaps[type];
 
                 //string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));//
                 if (overWrite || map == null)
                 {
-                    map = new CustomPropertyTypeMap(type,
+                    map = new CustomTypeMap(type,
                                   (type_, columnName) => type_.GetProperties().FirstOrDefault(prop => string.Equals(GetDescriptionFromAttribute(prop), columnName, StringComparison.OrdinalIgnoreCase)));//GetDescriptionFromAttribute(prop) == columnName));
                     SqlMapper.SetTypeMap(type, map);
                     lock (_typeMaps)

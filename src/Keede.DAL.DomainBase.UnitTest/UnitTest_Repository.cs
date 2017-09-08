@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Dapper;
+using Dapper.Extension;
 using Keede.DAL.DDD.Repositories;
 using Keede.DAL.DDD.UnitTest;
 using Keede.DAL.DDD.UnitTest.Models;
@@ -23,10 +24,10 @@ namespace Keede.RepositoriesTests
             string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
-            //TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
+            TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
             //TypeMapper.SetTypeMap(typeof(News));
             //TypeMapper.SetTypeMap(typeof(NewsCustom));
-            
+
             //SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
         }
 

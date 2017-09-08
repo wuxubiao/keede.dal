@@ -57,7 +57,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Extension\Mapping\TypeMapperTests.cs" />
     <Compile Include="Models\NewCustom.cs" />
+    <Compile Include="Models\NewsConstructor.cs" />
     <Compile Include="Models\NewsMultiId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\News.cs" />

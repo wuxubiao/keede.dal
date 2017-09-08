@@ -49,6 +49,7 @@
     <Compile Include="Extension\Attribute\TypeMapperAttribute.cs" />
     <Compile Include="Extension\Kede.SqlMapperExtensions.cs" />
     <Compile Include="Extension\Attribute\ColumnAttribute.cs" />
+    <Compile Include="Extension\Mapping\CustomTypeMap.cs" />
     <Compile Include="Extension\Mapping\TypeMapper.cs" />
     <Compile Include="Extension\SqlMapperExtensions.Async.cs" />
     <Compile Include="Extension\SqlMapperExtensions.cs" />
