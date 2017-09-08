@@ -38,6 +38,7 @@ namespace Keede.DAL.DDD.Repositories
             if (conn.State == ConnectionState.Open)
             {
                 conn.Close();
+                conn.Dispose();
             }
         }
 
