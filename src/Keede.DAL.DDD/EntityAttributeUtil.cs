@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Dapper.Extension;
 
 namespace Keede.DAL.DDD
 {
@@ -17,6 +18,10 @@ namespace Keede.DAL.DDD
         {
             var type = entity.GetType();
             StringBuilder idBuilder =new StringBuilder();
+
+            var tableName = SqlMapperExtensions.GetTableName(type);
+            idBuilder.Append(tableName+"_");
+
             foreach (var propertyInfo in type.GetProperties())
             {
                 var attr = Utility.AttributeUtility.GetAttribute<Dapper.Extension.ExplicitKeyAttribute>(propertyInfo,true);
