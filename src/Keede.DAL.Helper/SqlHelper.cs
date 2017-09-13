@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Transactions;
 using Keede.DAL.RWSplitting;
 using Dapper;
 
@@ -43,9 +44,22 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName,false))
+                if (isReadDb)
                 {
-                    return conn.Execute(cmdText, ConvertParameter(commandParameters));
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        {
+                            return conn.Execute(cmdText, ConvertParameter(commandParameters));
+                        }
+                    }
+                }
+                else
+                {
+                    using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    {
+                        return conn.Execute(cmdText, ConvertParameter(commandParameters));
+                    }
                 }
             }
             catch (SqlException exp)
@@ -94,9 +108,22 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                if (isReadDb)
                 {
-                    return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        {
+                            return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
+                        }
+                    }
+                }
+                else
+                {
+                    using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    {
+                        return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
+                    }
                 }
             }
             catch (SqlException exp)
@@ -145,8 +172,19 @@ namespace Keede.DAL.Helper
             //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
             try
             {
-                rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut);
-                return rdr;
+                if (isReadDb)
+                {
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut);
+                        return rdr;
+                    }
+                }
+                else
+                {
+                    rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut);
+                    return rdr;
+                }
             }
             catch (SqlException exp)
             {
@@ -209,8 +247,19 @@ namespace Keede.DAL.Helper
             //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
             try
             {
-                rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
-                return rdr;
+                if (isReadDb)
+                {
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
+                        return rdr;
+                    }
+                }
+                else
+                {
+                    rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
+                    return rdr;
+                }
             }
             catch (SqlException exp)
             {
@@ -269,10 +318,24 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName,false))
+                if (isReadDb)
                 {
-                    object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
-                    return val;
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        {
+                            object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
+                            return val;
+                        }
+                    }
+                }
+                else
+                {
+                    using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    {
+                        object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
+                        return val;
+                    }
                 }
             }
             catch (SqlException exp)
@@ -314,10 +377,24 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                if (isReadDb)
                 {
-                    object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
-                    return val;
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        {
+                            object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
+                            return val;
+                        }
+                    }
+                }
+                else
+                {
+                    using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    {
+                        object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
+                        return val;
+                    }
                 }
             }
             catch (SqlException exp)
