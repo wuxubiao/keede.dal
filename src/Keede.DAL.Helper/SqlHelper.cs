@@ -48,7 +48,7 @@ namespace Keede.DAL.Helper
                 {
                     using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
                     {
-                        using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        using (var conn = Databases.GetSqlConnection(dbName))
                         {
                             return conn.Execute(cmdText, ConvertParameter(commandParameters));
                         }
@@ -56,7 +56,7 @@ namespace Keede.DAL.Helper
                 }
                 else
                 {
-                    using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    using (var conn = Databases.GetSqlConnection(dbName, false))
                     {
                         return conn.Execute(cmdText, ConvertParameter(commandParameters));
                     }
@@ -112,7 +112,7 @@ namespace Keede.DAL.Helper
                 {
                     using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
                     {
-                        using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        using (var conn = Databases.GetSqlConnection(dbName))
                         {
                             return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
                         }
@@ -120,7 +120,7 @@ namespace Keede.DAL.Helper
                 }
                 else
                 {
-                    using (var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    using (var conn = Databases.GetSqlConnection(dbName, false))
                     {
                         return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
                     }
@@ -322,7 +322,7 @@ namespace Keede.DAL.Helper
                 {
                     using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
                     {
-                        using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        using (var connection = Databases.GetSqlConnection(dbName))
                         {
                             object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
                             return val;
@@ -331,7 +331,7 @@ namespace Keede.DAL.Helper
                 }
                 else
                 {
-                    using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    using (var connection = Databases.GetSqlConnection(dbName, false))
                     {
                         object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
                         return val;
@@ -381,7 +381,7 @@ namespace Keede.DAL.Helper
                 {
                     using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
                     {
-                        using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                        using (var connection = Databases.GetSqlConnection(dbName))
                         {
                             object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
                             return val;
@@ -390,7 +390,7 @@ namespace Keede.DAL.Helper
                 }
                 else
                 {
-                    using (var connection = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
+                    using (var connection = Databases.GetSqlConnection(dbName, false))
                     {
                         object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
                         return val;
