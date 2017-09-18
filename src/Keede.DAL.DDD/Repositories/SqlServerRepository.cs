@@ -226,7 +226,9 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            return conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            var result = conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            CloseConnection(conn);
+            return result;
         }
 
         /// <summary>
@@ -259,7 +261,9 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            return conn.QueryList<TEntity>(condition, table, "*", false, DbTransaction, 3).ToList();
+            var list =conn.QueryList<TEntity>(condition, table, "*", false, DbTransaction, 3).ToList();
+            CloseConnection(conn);
+            return list;
         }
 
         /// <summary>
@@ -347,7 +351,9 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(TEntity));
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            return conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            var result= conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            CloseConnection(conn);
+            return result;
         }
     }
 }

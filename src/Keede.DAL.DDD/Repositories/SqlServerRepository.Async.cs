@@ -28,7 +28,6 @@ namespace Keede.DAL.DDD.Repositories
             var conn = OpenDbConnection(false);
             var value = await conn.InsertAsync(data, DbTransaction) > 0;
             CloseConnection(conn);
-
             return value;
         }
 
@@ -198,7 +197,9 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            return await conn.GetAndUpdateLockAsync<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            var result = await conn.GetAndUpdateLockAsync<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            CloseConnection(conn);
+            return result;
         }
 
         /// <summary>
@@ -232,6 +233,7 @@ namespace Keede.DAL.DDD.Repositories
             var conn = OpenDbConnection(isReadDb);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var list = await conn.QueryListAsync<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            CloseConnection(conn);
             return list.ToList();
         }
 
@@ -319,7 +321,10 @@ namespace Keede.DAL.DDD.Repositories
             TypeMapper.SetTypeMap(typeof(TEntity));
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            return await conn.QueryPagedAsync<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            var result = await conn.QueryPagedAsync<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false,
+                DbTransaction, 3);
+            CloseConnection(conn);
+            return result;
         }
     }
 }
