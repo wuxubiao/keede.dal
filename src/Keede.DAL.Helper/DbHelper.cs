@@ -4,8 +4,10 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Transactions;
 using Dapper;
 using Keede.DAL.RWSplitting;
+using IsolationLevel = System.Data.IsolationLevel;
 
 namespace Keede.DAL.Helper
 {
@@ -88,11 +90,21 @@ namespace Keede.DAL.Helper
             IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
             try
             {
-                //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
                 MakeCommandTextLog(cmdText);
-                int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction); //cmd.ExecuteNonQuery();
-                //cmd.Parameters.Clear();
-                return val;
+
+                if (isReadDb && !IsOpenTransaction)
+                {
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction);
+                        return val;
+                    }
+                }
+                else
+                {
+                    int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction);
+                    return val;
+                }
             }
             catch (SqlException exp)
             {
@@ -126,12 +138,19 @@ namespace Keede.DAL.Helper
             {
                 IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName, false));
                 MakeCommandTextLog(cmdText);
-                var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
-
-                //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
-                //var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-                //cmd.Parameters.Clear();
-                return reader;
+                if (isReadDb && !IsOpenTransaction)
+                {
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
+                        return reader;
+                    }
+                }
+                else
+                {
+                    var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
+                    return reader;
+                }
             }
             catch (SqlException exp)
             {
@@ -154,12 +173,21 @@ namespace Keede.DAL.Helper
             try
             {
                 MakeCommandTextLog(cmdText);
-                object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
+                if (isReadDb && !IsOpenTransaction)
+                {
+                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
+                    {
+                        object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
 
-                //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
-                //object val = cmd.ExecuteScalar();
-                //cmd.Parameters.Clear();
-                return val;
+                        return val;
+                    }
+                }
+                else
+                {
+                    object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
+
+                    return val;
+                }
             }
             catch (SqlException exp)
             {
