@@ -94,19 +94,8 @@ namespace Keede.DAL.Helper
             {
                 MakeCommandTextLog(cmdText);
 
-                if (isReadDb && !IsOpenTransaction)
-                {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction);
-                        return val;
-                    }
-                }
-                else
-                {
-                    int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction);
-                    return val;
-                }
+                int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction);
+                return val;
             }
             catch (SqlException exp)
             {
@@ -142,19 +131,9 @@ namespace Keede.DAL.Helper
                     (isReadDb && System.Transactions.Transaction.Current == null ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName, false));
 
                 MakeCommandTextLog(cmdText);
-                if (isReadDb && !IsOpenTransaction)
-                {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
-                        return reader;
-                    }
-                }
-                else
-                {
-                    var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
-                    return reader;
-                }
+
+                var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
+                return reader;
             }
             catch (SqlException exp)
             {
@@ -177,21 +156,9 @@ namespace Keede.DAL.Helper
             try
             {
                 MakeCommandTextLog(cmdText);
-                if (isReadDb && !IsOpenTransaction)
-                {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
 
-                        return val;
-                    }
-                }
-                else
-                {
-                    object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
-
-                    return val;
-                }
+                object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
+                return val;
             }
             catch (SqlException exp)
             {
