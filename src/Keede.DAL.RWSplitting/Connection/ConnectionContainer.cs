@@ -25,6 +25,7 @@ namespace Keede.DAL.RWSplitting
             if (readConnctions == null)
             {
                 _lists.Add(new ConnectionWrapper(dbName.ToLower(), writeConnction));
+                log4net.LogManager.GetLogger(typeof(ConnectionContainer)).Warn($"警告：配置的从库节点数为0，读写分离功能失效，所有的查询都会分配到写节点：{writeConnction}");
             }
             else
             {
