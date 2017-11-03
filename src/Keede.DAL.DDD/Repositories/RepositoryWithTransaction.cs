@@ -24,7 +24,10 @@ namespace Keede.DAL.DDD.Repositories
             get
             {
                 if (_dbTransaction != null && _dbTransaction.Connection == null)
+                {
+                    _dbTransaction.Dispose();
                     _dbTransaction = null;
+                }
                 return _dbTransaction;
             }
             protected set => _dbTransaction = value;

@@ -24,7 +24,6 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> AddAsync(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = await conn.InsertAsync(data, DbTransaction) > 0;
             CloseConnection(conn);
@@ -40,7 +39,6 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> BatchAddAsync<T>(IList<T> list)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
-            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(false);
             var dt = conn.GetTableSchema(list);
             var value = await BulkToDbAsync(conn, dt, DbTransaction);
@@ -86,7 +84,6 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> SaveAsync(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = await conn.UpdateAsync(data, DbTransaction);
             CloseConnection(conn);
@@ -101,7 +98,6 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> RemoveAsync(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = await conn.DeleteAsync(data, DbTransaction);
             CloseConnection(conn);
@@ -116,7 +112,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<int> RemoveAsync(string whereSql, object parameterObject = null)
         {
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var value = await conn.DeleteAsync<TEntity>(whereSql, parameterObject, DbTransaction);
             CloseConnection(conn);
@@ -133,7 +128,6 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<TEntity> GetAsync(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var value = await conn.QueryFirstOrDefaultAsync<TEntity>(sql, parameterObject, DbTransaction);
             CloseConnection(conn);
@@ -151,7 +145,6 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<T> GetAsync<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
             var value = await conn.QueryFirstOrDefaultAsync<T>(sql, parameterObject, DbTransaction);
             CloseConnection(conn);
@@ -178,7 +171,6 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<TEntity> GetByIdAsync(dynamic id, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var value = await SqlMapperExtensions.GetAsync<TEntity>(conn, id, DbTransaction);
             CloseConnection(conn);
@@ -194,7 +186,6 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var result = await conn.GetAndUpdateLockAsync<TEntity>(condition, table, "*", false, DbTransaction, 3);
@@ -211,7 +202,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(T));
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
             var values = await conn.QueryAsync<T>(sql, parameterObject, DbTransaction);
@@ -229,7 +219,6 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var list = await conn.QueryListAsync<TEntity>(condition, table, "*", false, DbTransaction, 3);
@@ -243,7 +232,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<IList<TEntity>> GetAllAsync(bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var list = await conn.GetAllAsync<TEntity>(DbTransaction);
             CloseConnection(conn);
@@ -278,7 +266,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<PagedList<TEntity>> GetPagedListAsync(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             PagedList<TEntity> pagedList = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
             pagedList = await conn.QueryPagedAsync(pagedList, parameterObjects, DbTransaction);
@@ -300,7 +287,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<IList<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
             var pagedList = await conn.QueryPagedAsync<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
             CloseConnection(conn);
@@ -318,7 +304,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<PagedList<TEntity>> GetPagedListAsync(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
             var result = await conn.QueryPagedAsync<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false,
