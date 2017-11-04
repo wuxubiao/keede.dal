@@ -58,6 +58,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Extension\Mapping\TypeMapperTests.cs" />
+    <Compile Include="Models\Box.cs" />
     <Compile Include="Models\NewCustom.cs" />
     <Compile Include="Models\NewsConstructor.cs" />
     <Compile Include="Models\NewsMultiId.cs" />

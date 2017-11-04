@@ -16,6 +16,8 @@ namespace Keede.DAL.DDD.Repositories
     public partial class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
+        private static readonly log4net.ILog _logger = log4net.LogManager.GetLogger("SqlServerRepository");
+
         /// <summary>
         /// 
         /// </summary>
@@ -35,11 +37,12 @@ namespace Keede.DAL.DDD.Repositories
         public void CloseConnection(IDbConnection conn)
         {
             if (DbTransaction != null) return;
-            if (conn.State == ConnectionState.Open)
+
+            if (conn?.State == ConnectionState.Open)
             {
                 conn.Close();
-                conn.Dispose();
             }
+            conn?.Dispose();
         }
 
         /// <summary>
@@ -51,10 +54,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false);
-            var value = conn.Insert(data, DbTransaction) > 0;
-            CloseConnection(conn);
+            var result = false;
 
-            return value;
+            try
+            {
+                result = conn.Insert(data, DbTransaction) > 0;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -68,11 +84,25 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             var conn = OpenDbConnection(false);
-            var dt = conn.GetTableSchema(list);
-            if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
-            var value = BulkToDb(conn, dt, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = false;
+
+            try
+            {
+                var dt = conn.GetTableSchema(list);
+                if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
+                result = BulkToDb(conn, dt, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -95,10 +125,6 @@ namespace Keede.DAL.DDD.Repositories
                     bulkCopy.WriteToServer(dt);
                 return true;
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
             finally
             {
                 bulkCopy.Close();
@@ -114,9 +140,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false);
-            var value = conn.Update(data, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = false;
+
+            try
+            {
+                result = conn.Update(data, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -128,9 +168,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false);
-            var value = conn.Delete(data, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = false;
+
+            try
+            {
+                result = conn.Delete(data, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -142,9 +196,23 @@ namespace Keede.DAL.DDD.Repositories
         public override int RemoveSql(string whereSql, object parameterObject = null)
         {
             var conn = OpenDbConnection(false);
-            var value = conn.Delete<TEntity>(whereSql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = 0;
+
+            try
+            {
+                result = conn.Delete<TEntity>(whereSql, parameterObject, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -158,9 +226,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
-            var value = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = default(TEntity);
+
+            try
+            {
+                result = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -175,9 +257,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
-            var value = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = default(T);
+
+            try
+            {
+                result = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -201,9 +297,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
             var conn = OpenDbConnection(isReadDb);
-            var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = default(TEntity);
+
+            try
+            {
+                result = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -213,12 +323,25 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override TEntity GetAndUpdateLock(object condition)
         {
-            if (condition == null)
-                throw new ArgumentNullException(nameof(condition));
+            if (condition == null) throw new ArgumentNullException(nameof(condition));
             var conn = OpenDbConnection(false);
-            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            var result = conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
-            CloseConnection(conn);
+            var result = default(TEntity);
+
+            try
+            {
+                var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+                result = conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
             return result;
         }
 
@@ -233,9 +356,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
-            var values = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
-            CloseConnection(conn);
-            return values;
+            var result = default(IList<T>);
+
+            try
+            {
+                result = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -246,13 +383,26 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override IList<TEntity> GetList(object condition, bool isReadDb = true)
         {
-            if (condition == null)
-                throw new ArgumentNullException(nameof(condition));
+            if (condition == null) throw new ArgumentNullException(nameof(condition));
             var conn = OpenDbConnection(isReadDb);
-            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            var list =conn.QueryList<TEntity>(condition, table, "*", false, DbTransaction, 3).ToList();
-            CloseConnection(conn);
-            return list;
+            var result = default(IList<TEntity>);
+
+            try
+            {
+                var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+                result = conn.QueryList<TEntity>(condition, table, "*", false, DbTransaction, 3).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -262,9 +412,23 @@ namespace Keede.DAL.DDD.Repositories
         public override IList<TEntity> GetAll(bool isReadDb = true)
         {
             var conn = OpenDbConnection(isReadDb);
-            var list = conn.GetAll<TEntity>(DbTransaction).ToList();
-            CloseConnection(conn);
-            return list;
+            var result = default(IList<TEntity>);
+
+            try
+            {
+                result = conn.GetAll<TEntity>(DbTransaction).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -278,9 +442,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
-            var values = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return values;
+            var result = 0;
+
+            try
+            {
+                result = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -295,11 +473,24 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {
+            var result = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
             var conn = OpenDbConnection(isReadDb);
-            PagedList<TEntity> pagedList = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
-            conn.QueryPaged(ref pagedList, parameterObjects, DbTransaction);
-            CloseConnection(conn);
-            return pagedList;
+
+            try
+            {
+                conn.QueryPaged(ref result, parameterObjects, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -318,9 +509,23 @@ namespace Keede.DAL.DDD.Repositories
         public override IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true)
         {
             var conn = OpenDbConnection(isReadDb);
-            var pagedList = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
-            CloseConnection(conn);
-            return pagedList;
+            var result = default(IList<T>);
+
+            try
+            {
+                result = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -336,8 +541,22 @@ namespace Keede.DAL.DDD.Repositories
         {
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            var result= conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
-            CloseConnection(conn);
+            var result = default(PagedList<TEntity>);
+
+            try
+            {
+                result = conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
             return result;
         }
     }
