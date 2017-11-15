@@ -24,7 +24,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public abstract Task<bool> BatchAddAsync<T>(IList<T> list);
+        public abstract Task<bool> BatchAddAsync<T>(IList<T> list, string destinationTableName = null);
 
         /// <summary>
         /// 

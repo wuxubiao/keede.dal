@@ -27,7 +27,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        Task<bool> BatchAddAsync<T>(IList<T> list);
+        Task<bool> BatchAddAsync<T>(IList<T> list, string destinationTableName = null);
 
         /// <summary>
         /// Save the modified item to the repository
