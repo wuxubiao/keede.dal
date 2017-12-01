@@ -6,6 +6,7 @@ using Dapper;
 using Dapper.Extension;
 using Keede.DAL.RWSplitting;
 using System.Data.SqlClient;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.Repositories
 {
@@ -145,6 +146,52 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 result = conn.Update(data, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        public bool Save(Expression<Func<TEntity, bool>> whereExpression, dynamic condition)
+        {
+            var conn = OpenDbConnection(false);
+            var result = false;
+
+            try
+            {
+                 SqlMapperExtensions.Update(conn, condition, whereExpression);
+
+
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        public bool Remove(Expression<Func<TEntity, bool>> whereExpression)
+        {
+            var conn = OpenDbConnection(false);
+            var result = false;
+
+            try
+            {
+                result = conn.Delete(whereExpression, DbTransaction);
             }
             catch (Exception e)
             {

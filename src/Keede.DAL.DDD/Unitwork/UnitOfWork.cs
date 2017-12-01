@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using Dapper.Extension;
 
@@ -209,6 +210,18 @@ namespace Keede.DAL.DDD.Unitwork
             if (_localDeletedCollection.Value.ContainsKey(objId)) throw new InvalidOperationException("The object cannot be registered as a modified object since it was marked as deleted.");
             if (!_localCustomOperateCollection.Value.ContainsKey(objId) && !_localNewCollection.Value.ContainsKey(objId)) _localCustomOperateCollection.Value.Add(objId, new CustomOperate<IEntity>(obj, repositoryItemType, operateName));
             _localCommitted.Value = false;
+        }
+
+        public void RegisterModified<TEntity>(Expression<Func<TEntity, bool>> whereExpression, dynamic condition)
+        {
+            
+
+        }
+
+        public void RegisterRemoved<TEntity>(Expression<Func<TEntity, bool>> whereExpression)
+        {
+
+
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using Dapper;
 using Dapper.Extension;
@@ -20,8 +21,8 @@ namespace Keede.RepositoriesTests
         public UnitTestRepository()
         {
             //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
-            string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
-            string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
+            string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+            string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
@@ -29,6 +30,16 @@ namespace Keede.RepositoriesTests
             //TypeMapper.SetTypeMap(typeof(NewsCustom));
 
             //SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
+        }
+
+        [TestMethod]
+        public void TestRemoveExpression()
+        {
+            Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 50 && ct.Title == "B-City";
+
+            var repository = new NewsRepository();
+            repository.Remove(queryExp1);
+
         }
 
         [TestMethod]

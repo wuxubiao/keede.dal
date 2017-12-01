@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -936,7 +937,7 @@ namespace Dapper.Extension
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static List<string> GetFieldNames(object obj)
+        public static List<string> GetFieldNames(object obj)
         {
             if (obj == null)
             {
@@ -978,7 +979,7 @@ namespace Dapper.Extension
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static Dictionary<PropertyInfo, string> GetPropertyAndFieldName(object obj)
+        public static Dictionary<PropertyInfo, string> GetPropertyAndFieldName(object obj)
         {
             if (obj == null)
             {
@@ -1018,6 +1019,46 @@ namespace Dapper.Extension
             return propertyAndField;
         }
         #endregion SqlMapper_Extensions
+
+        public static bool Delete<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExpression, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            var translate = new SqlTranslateFormater();
+            string whereSql = " where " + translate.Translate(whereExpression);
+
+            if (string.IsNullOrEmpty(whereSql)) throw new ArgumentNullException("whereExpression is not match");
+
+            var type = typeof(T);
+            var name = GetTableName(type);
+            var statement = $"delete from {name}" + whereSql;
+
+            var deleted = connection.Execute(statement, null, transaction, commandTimeout);
+            return deleted > 0;
+
+        }
+
+        public static int Update<T>(this IDbConnection connection, dynamic data, Expression<Func<T, bool>> whereExpression,  IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var type = typeof(T);
+            var tableName = GetTableName(type);
+
+            var translate = new SqlTranslateFormater();
+            string whereSql = " where " + translate.Translate(whereExpression);
+
+            var obj = data as object;
+
+            var updateProperties = GetFieldNames(obj);
+
+            var updateFields = string.Join(",", updateProperties.Select(p => HandleKeyword(p) + " = @" + p));
+
+            var sql = string.Format("update [{0}] set {1}{2}", tableName, updateFields, whereSql);
+
+            var parameters = new DynamicParameters(data);
+            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+
+            parameters.AddDynamicParams(expandoObject);
+
+            return connection.Execute(sql, parameters, transaction, commandTimeout);
+        }
 
         #endregion 新增方法
     }

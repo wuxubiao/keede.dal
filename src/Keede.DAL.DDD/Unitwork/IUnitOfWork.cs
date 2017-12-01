@@ -93,5 +93,9 @@ namespace Keede.DAL.DDD.Unitwork
         /// <param name="operateName"></param>
         void RegisterCustomOperate<TEntity>(TEntity obj, Type repositoryItemType, string operateName)
             where TEntity : IEntity;
+
+        //void RegisterModified(string tableName, dynamic condition);
+
+        //void RegisterRemoved(string tableName);
     }
 }
