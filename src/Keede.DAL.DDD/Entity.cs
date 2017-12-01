@@ -1,4 +1,5 @@
 ﻿using System;
+using Dapper.Extension;
 
 namespace Keede.DAL.DDD
 {
@@ -22,6 +23,7 @@ namespace Keede.DAL.DDD
         /// <summary>
         /// Unique identifier for this entity.
         /// </summary>
+        [ExplicitKey]
         public virtual TPrimaryKey Id { get; set; }
 
         /// <inheritdoc/>

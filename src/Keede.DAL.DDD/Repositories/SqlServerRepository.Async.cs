@@ -114,9 +114,23 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false);
-            var value = await conn.UpdateAsync(data, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = false;
+
+            try
+            {
+                result = await conn.UpdateAsync(data, DbTransaction);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Reflection;
 using System.Text;
 using Dapper;
@@ -18,12 +19,29 @@ namespace Keede.RepositoriesTests
     {
         public UnitTest_WMS()
         {
-            string[] readConnctions = { "server=192.168.117.126;database=Group.WMS;user id=test;password=t#@!$%;" };
-            string writeConnction = "server=192.168.117.126;database=Group.WMS;user id=test;password=t#@!$%;";
+            string[] readConnctions = { "server=192.168.117.189;database=Group.WMSNew;user id=test;password=t#@!$%;min pool size=20;max pool size=2000;" };
+            string writeConnction = "server=192.168.117.189;database=Group.WMSNew;user id=test;password=t#@!$%;min pool size=20;max pool size=2000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
         }
 
+        [TestMethod]
+        public void TestDapper()
+        {
+            const string SQL =
+                @"UPDATE AdminNo SET RealName=@RealName                                  
+                                    WHERE AccountNo=@AccountNo";
+
+            using (SqlConnection conn = Databases.GetSqlConnection(false))
+            {
+                string ss = null;
+                 conn.Execute(SQL, new
+                {
+                    RealName = ss,
+                    AccountNo="test"
+                 });
+            }
+        }
         [TestMethod]
         public void TestAdd()
         {
