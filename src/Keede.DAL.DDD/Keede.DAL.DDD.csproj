@@ -62,6 +62,7 @@
     <Compile Include="Repositories\SqlServerRepository.cs" />
     <Compile Include="Unitwork\CustomOperate.cs" />
     <Compile Include="Unitwork\DisposableObject.cs" />
+    <Compile Include="Unitwork\ExpressionData.cs" />
     <Compile Include="Unitwork\IUnitOfWork.cs" />
     <Compile Include="Unitwork\SqlServerUnitOfWork.cs" />
     <Compile Include="Unitwork\UnitOfWork.cs" />
@@ -91,8 +92,6 @@
     <Content Include="log4net.Ext.Json.LICENSE.txt" />
     <Content Include="log4net.Ext.Json.README.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Unitwork\CustomOperate\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using Dapper.Extension;
 using Keede.DAL.RWSplitting;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.Repositories
 {
@@ -127,6 +128,21 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         public abstract IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public abstract bool SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <returns></returns>
+        public abstract bool RemoveExpression(Expression<Func<TEntity, bool>> whereExpression);
         #region IDisposable Members
 
         /// <summary>

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Dapper;
 using Dapper.Extension;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD
 {
@@ -36,6 +37,36 @@ namespace Keede.DAL.DDD
                     idBuilder.Append(propertyInfo.GetValue(entity, null));
                 }
             }
+            return idBuilder.ToString();
+        }
+
+        public static string GetId<TEntity>(Expression<Func<TEntity, bool>> whereExpression, dynamic data=null) where TEntity : IEntity
+        {
+            var type = whereExpression.Parameters[0].Type;
+            StringBuilder idBuilder = new StringBuilder();
+
+            var tableName = SqlMapperExtensions.GetTableName(type);
+            idBuilder.Append(tableName + "_");
+
+            var translate = new SqlTranslateFormater();
+            string whereSql = translate.Translate(whereExpression);
+            if(!string.IsNullOrEmpty(whereSql))
+            {
+                idBuilder.Append(whereSql);
+            }
+
+            if(data!=null)
+            {
+                var conditionObj = data as object;
+
+                var wherePropertyInfos = SqlMapperExtensions.GetPropertyAndFieldName(conditionObj);
+
+                foreach (var item in wherePropertyInfos)
+                {
+                    idBuilder.Append(item.Key.GetValue(conditionObj, null));
+                }
+            }
+
             return idBuilder.ToString();
         }
 

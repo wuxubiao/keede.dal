@@ -35,10 +35,32 @@ namespace Keede.RepositoriesTests
         [TestMethod]
         public void TestRemoveExpression()
         {
-            Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 50 && ct.Title == "B-City";
+            Dictionary<string, Expression> _localExpressionDeletedCollection = new Dictionary<string, Expression>();
 
             var repository = new NewsRepository();
-            repository.Remove(queryExp1);
+
+            Expression<Func<News, bool>> queryExp2 = ct => ct.GId == 10000 && ct.Title == "removeTitle";
+            var tttt = queryExp2.Parameters[0].Type;
+            _localExpressionDeletedCollection.Add("s", queryExp2);
+
+            foreach (var modifiedData in _localExpressionDeletedCollection)
+            {
+                var e = modifiedData.Value;
+                
+                var type = typeof(News);
+                repository.RemoveExpression((Expression<Func<News, bool>>)e);
+
+            }
+
+
+            Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 10000 && ct.Title == "updateTitle";
+
+            var tt=queryExp1.Parameters[0].Type;
+
+            repository.SaveExpression(queryExp1, new { Title = "afterUpdateTitle" });
+
+
+            repository.RemoveExpression(queryExp2);
 
         }
 

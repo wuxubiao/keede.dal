@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.Unitwork
 {
@@ -94,8 +95,21 @@ namespace Keede.DAL.DDD.Unitwork
         void RegisterCustomOperate<TEntity>(TEntity obj, Type repositoryItemType, string operateName)
             where TEntity : IEntity;
 
-        //void RegisterModified(string tableName, dynamic condition);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="whereExpression"></param>
+        /// <param name="data"></param>
+        void RegisterModified<TEntity>(Expression<Func<TEntity, bool>> whereExpression, dynamic data)
+            where TEntity : IEntity;
 
-        //void RegisterRemoved(string tableName);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="whereExpression"></param>
+        void RegisterRemoved<TEntity>(Expression<Func<TEntity, bool>> whereExpression)
+            where TEntity : IEntity;
     }
 }

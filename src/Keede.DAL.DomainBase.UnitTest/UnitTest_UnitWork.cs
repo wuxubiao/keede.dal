@@ -9,6 +9,7 @@ using Keede.DAL.RWSplitting;
 using Keede.DAL.DDD.UnitTest.Models;
 using Dapper;
 using Dapper.Extension;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.UnitTest
 {
@@ -26,6 +27,23 @@ namespace Keede.DAL.DDD.UnitTest
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
+        }
+
+        [TestMethod]
+        public void TestExpression()
+        {
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
+            {
+                Expression<Func<News, bool>> modifyQueryExpression = ct => ct.GId == 10000 && ct.Title == "updateTitle";
+                unitOfWork.RegisterModified(modifyQueryExpression, new { Title = "afterUpdateTitle" });
+                //update News set Title = 'afterUpdateTitle' where GID=10000 and Title='updateTitle'
+
+                Expression<Func<News, bool>> removeQueryExpression = ct => ct.GId == 10000 && ct.Title == "removeTitle";
+                unitOfWork.RegisterRemoved(removeQueryExpression);
+                //delete News where GID=10000 and Title='removeTitle'
+
+                unitOfWork.Commit();
+            }
         }
 
         [TestMethod]

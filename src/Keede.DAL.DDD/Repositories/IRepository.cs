@@ -3,6 +3,7 @@ using System.Data;
 using Dapper;
 using Dapper.Extension;
 using System;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.Repositories
 {
@@ -160,5 +161,20 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize,
             bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        bool SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <returns></returns>
+        bool RemoveExpression(Expression<Func<TEntity, bool>> whereExpression);
     }
 }

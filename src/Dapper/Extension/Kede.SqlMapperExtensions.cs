@@ -1033,7 +1033,6 @@ namespace Dapper.Extension
 
             var deleted = connection.Execute(statement, null, transaction, commandTimeout);
             return deleted > 0;
-
         }
 
         public static int Update<T>(this IDbConnection connection, dynamic data, Expression<Func<T, bool>> whereExpression,  IDbTransaction transaction = null, int? commandTimeout = null)
@@ -1053,9 +1052,9 @@ namespace Dapper.Extension
             var sql = string.Format("update [{0}] set {1}{2}", tableName, updateFields, whereSql);
 
             var parameters = new DynamicParameters(data);
-            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+            //var expandoObject = new ExpandoObject() as IDictionary<string, object>;
 
-            parameters.AddDynamicParams(expandoObject);
+            //parameters.AddDynamicParams(expandoObject);
 
             return connection.Execute(sql, parameters, transaction, commandTimeout);
         }

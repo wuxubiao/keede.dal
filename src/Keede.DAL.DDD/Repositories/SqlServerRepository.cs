@@ -160,14 +160,14 @@ namespace Keede.DAL.DDD.Repositories
             return result;
         }
 
-        public bool Save(Expression<Func<TEntity, bool>> whereExpression, dynamic condition)
+        public override bool SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data)
         {
             var conn = OpenDbConnection(false);
             var result = false;
 
             try
             {
-                 SqlMapperExtensions.Update(conn, condition, whereExpression);
+                 SqlMapperExtensions.Update(conn, data, whereExpression);
 
 
             }
@@ -184,7 +184,7 @@ namespace Keede.DAL.DDD.Repositories
             return result;
         }
 
-        public bool Remove(Expression<Func<TEntity, bool>> whereExpression)
+        public override bool RemoveExpression(Expression<Func<TEntity, bool>> whereExpression)
         {
             var conn = OpenDbConnection(false);
             var result = false;
