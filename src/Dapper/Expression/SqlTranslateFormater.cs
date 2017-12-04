@@ -420,7 +420,7 @@ namespace Dapper.Extension
 #if COREFX
             if (methodInfo.DeclaringType.GetTypeInfo().GetInterface("IEnumerable", false) != null)
 #else
-            if (methodInfo.DeclaringType?.GetInterface("IEnumerable", false) != null)
+            if (methodInfo.DeclaringType?.GetInterface("IEnumerable", false) != null && methodInfo.DeclaringType != typeof(string))
 #endif
             {
                 this.Visit(node.Arguments[0]);

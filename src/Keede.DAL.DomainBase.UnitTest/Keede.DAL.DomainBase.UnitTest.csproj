@@ -76,6 +76,8 @@
     <Compile Include="UnitTest_Repository.cs" />
     <Compile Include="UnitTest_UnitWork.cs" />
     <Compile Include="UnitTest_WMS.cs" />
+    <Compile Include="WhereExpression\Entitys.cs" />
+    <Compile Include="WhereExpression\WhereExpressionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -101,6 +103,7 @@
   <ItemGroup>
     <Content Include="Test_Master.sql" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

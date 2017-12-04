@@ -33,6 +33,19 @@ namespace Keede.RepositoriesTests
         }
 
         [TestMethod]
+        public void LikeTest()
+        {
+            Expression<Func<News, bool>> queryExp1 = ct => ct.Title.Contains("X");
+            Expression<Func<News, bool>> queryExp2 = ct => ct.Title.StartsWith("X");
+            Expression<Func<News, bool>> queryExp3 = ct => ct.Title.EndsWith("X");
+            var translate = new SqlTranslateFormater();
+            string sql1 = translate.Translate(queryExp1);
+            string sql2 = translate.Translate(queryExp2);
+            string sql3 = translate.Translate(queryExp3);
+
+        }
+
+        [TestMethod]
         public void TestRemoveExpression()
         {
             Dictionary<string, Expression> _localExpressionDeletedCollection = new Dictionary<string, Expression>();
@@ -51,7 +64,6 @@ namespace Keede.RepositoriesTests
                 repository.RemoveExpression((Expression<Func<News, bool>>)e);
 
             }
-
 
             Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 10000 && ct.Title == "updateTitle";
 

@@ -116,9 +116,9 @@ namespace Dapper.Extensions.Tests
             Expression<Func<CustomersEntity, bool>> queryExp2 = ct => ct.CustomerName.StartsWith("X");
             Expression<Func<CustomersEntity, bool>> queryExp3 = ct => ct.CustomerName.EndsWith("X");
             var translate = new SqlTranslateFormater();
-            string sql1 = translate.Translate(queryExp1);
-            string sql2 = translate.Translate(queryExp2);
-            string sql3 = translate.Translate(queryExp3);
+            string sql1 = translate.Translate(queryExp1);//"CustomerName like '%X%"
+            string sql2 = translate.Translate(queryExp2);//"CustomerName like 'X%"
+            string sql3 = translate.Translate(queryExp3);//"CustomerName like '%X"
 
         }
     }
