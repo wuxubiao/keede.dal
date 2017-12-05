@@ -1020,7 +1020,7 @@ namespace Dapper.Extension
         }
         #endregion SqlMapper_Extensions
 
-        public static bool Delete<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExpression, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static int Delete<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExpression, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             var translate = new SqlTranslateFormater();
             string whereSql = " where " + translate.Translate(whereExpression);
@@ -1032,10 +1032,10 @@ namespace Dapper.Extension
             var statement = $"delete from {name}" + whereSql;
 
             var deleted = connection.Execute(statement, null, transaction, commandTimeout);
-            return deleted > 0;
+            return deleted;
         }
 
-        public static int Update<T>(this IDbConnection connection, dynamic data, Expression<Func<T, bool>> whereExpression,  IDbTransaction transaction = null, int? commandTimeout = null)
+        public static int Update<T>(this IDbConnection connection, dynamic data, Expression<Func<T, bool>> whereExpression, string expandFieldsSql = "", dynamic expandData = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var type = typeof(T);
             var tableName = GetTableName(type);

@@ -92,6 +92,7 @@ namespace Keede.DAL.DDD.Unitwork
         /// <param name="obj"></param>
         /// <param name="repositoryItemType"></param>
         /// <param name="operateName"></param>
+        [Obsolete("改为调用RegisterModified<TEntity>(Expression<Func<TEntity, bool>> whereExpression, dynamic data)、RegisterRemoved<TEntity>(Expression<Func<TEntity, bool>> whereExpression) ")]
         void RegisterCustomOperate<TEntity>(TEntity obj, Type repositoryItemType, string operateName)
             where TEntity : IEntity;
 

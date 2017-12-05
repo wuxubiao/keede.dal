@@ -190,11 +190,9 @@ namespace Keede.DAL.DDD.UnitTest
                 //var list1 = repository.GetAll();//GetAll不允许使用
 
                 var list3 = repository.GetList<News>("select * from news where id>5");
-                var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
 
                 Assert.IsNotNull(news2);
                 Assert.IsTrue(list3.Count > 0);
-                Assert.IsTrue(list4.Items.Count > 0);
             }
         }
 

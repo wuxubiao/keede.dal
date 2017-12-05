@@ -38,12 +38,12 @@ namespace Dapper.Extensions.Tests
         [TestMethod]
         public void SimpleWhereMethodTest1()
         {
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID <= 50 && (SQLMethod.IsNull(ct.CustomerCity));
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID <= 50 && (SQLMethod.IsNotNull(ct.CustomerCity));
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is Not NULL");
 
         }
 
@@ -119,7 +119,6 @@ namespace Dapper.Extensions.Tests
             string sql1 = translate.Translate(queryExp1);//"CustomerName like '%X%"
             string sql2 = translate.Translate(queryExp2);//"CustomerName like 'X%"
             string sql3 = translate.Translate(queryExp3);//"CustomerName like '%X"
-
         }
     }
 

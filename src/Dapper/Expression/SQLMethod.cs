@@ -12,10 +12,11 @@ namespace Dapper.Extension
         /// 服务器当前时间
         /// </summary>
         /// <returns></returns>
-        static public DateTime GetDate()
+        public static DateTime GetDate()
         {
             return new DateTime();
         }
+
         /// <summary>
         /// 字段为空
         /// </summary>
@@ -25,6 +26,7 @@ namespace Dapper.Extension
         {
             return obj == null;
         }
+
         /// <summary>
         /// 字段不为空
         /// </summary>
@@ -34,6 +36,5 @@ namespace Dapper.Extension
         {
             return obj != null;
         }
-
     }
 }

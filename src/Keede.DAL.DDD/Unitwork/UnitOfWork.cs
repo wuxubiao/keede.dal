@@ -115,18 +115,6 @@ namespace Keede.DAL.DDD.Unitwork
             return objs.Select(obj=> DbConnection.UpdateId(obj, DbTransaction, timeout)).All(result => result);
         }
 
-        //public TEntity TryLockEntityObjectAndReturn<TEntity>(int timeout, object id) where TEntity : IEntity
-        //{
-        //    DbConnection.UpdateId<TEntity>(id, DbTransaction, timeout);
-        //    return default(TEntity);
-        //}
-
-        //public TEntity TryLockEntityObjectAndReturn<TEntity>(int timeout, TEntity objs) where TEntity : IEntity
-        //{
-        //    DbConnection.UpdateId(objs, DbTransaction, timeout);
-        //    return default(TEntity);
-        //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -212,6 +200,7 @@ namespace Keede.DAL.DDD.Unitwork
         /// <param name="obj"></param>
         /// <param name="repositoryItemType"></param>
         /// <param name="operateName"></param>
+        [Obsolete("改为调用RegisterModified<TEntity>(Expression<Func<TEntity, bool>> whereExpression, dynamic data)、RegisterRemoved<TEntity>(Expression<Func<TEntity, bool>> whereExpression) ")]
         public void RegisterCustomOperate<TEntity>(TEntity obj, Type repositoryItemType, string operateName)
             where TEntity : IEntity
         {

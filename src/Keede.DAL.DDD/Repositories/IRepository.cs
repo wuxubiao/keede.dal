@@ -45,14 +45,6 @@ namespace Keede.DAL.DDD.Repositories
         bool Remove(TEntity condition);
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="where"></param>
-        /// <param name="parameterObject"></param>
-        /// <returns></returns>
-        int RemoveSql(string whereSql, object parameterObject = null);
-
-        /// <summary>
         /// Get single item from the repository by custom condition
         /// </summary>
         /// <param name="sql"></param>
@@ -68,7 +60,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-         T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        T Get<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
@@ -92,6 +84,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
@@ -102,7 +95,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// Get all items from the repository by custom condition
@@ -129,14 +122,13 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="whereSql"></param>
+        /// <param name="whereExpression"></param>
         /// <param name="orderBy"></param>
-        /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
+        PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -168,13 +160,37 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="whereExpression"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        bool SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data);
+        int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="whereExpression"></param>
         /// <returns></returns>
-        bool RemoveExpression(Expression<Func<TEntity, bool>> whereExpression);
+        int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression);
+
+        bool IsExistById(object condition, bool isReadDb = true);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        bool IsExist(object condition, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        bool IsExist(string sql, object condition = null, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true);
     }
 }

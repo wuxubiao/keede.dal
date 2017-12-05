@@ -196,17 +196,6 @@ namespace Keede.RepositoriesTests
         }
 
         [TestMethod]
-        public void TestRepoRemoveWhereSql()
-        {
-            using (var repository = new NewsRepository())
-            {
-                var result = repository.RemoveSql("  Gid=11");
-
-                Assert.IsTrue(result>0);
-            }
-        }
-
-        [TestMethod]
         public void TestGet()
         {
             //var map = new CustomPropertyTypeMap(typeof(News),
@@ -262,16 +251,10 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
-                var list4 = repository.GetPagedList("where Gid<=6", " order by Gid desc ", null, 2, 3);
-                var dynParms3 = new DynamicParameters();
-                dynParms3.Add("@num", 6);
-                var list5 = repository.GetPagedList("where Gid<=@num", " Gid desc ", dynParms3, 2, 3);
 
                 var sql = "select * from News where Gid>2 order by Gid desc ";
                 var list6 = repository.GetPagedList<News>(sql, null, 1, 2);
 
-                Assert.IsTrue(list4.Items.Count > 0);
-                Assert.IsTrue(list5.Items.Count > 0);
                 Assert.IsTrue(list6.Count > 0);
             }
         }
@@ -347,10 +330,8 @@ namespace Keede.RepositoriesTests
                 var list2=repository.GetList<News>("select * from news where id>@num", dynParms2);
                 var list3= repository.GetList<News>("select * from news where id>5");
 
-                var list4 = repository.GetPagedList("where id<=6"," order by id desc ",null,2,3);
                 var dynParms3 = new DynamicParameters();
                 dynParms3.Add("@num", 6);
-                var list5 = repository.GetPagedList("where id<=@num", " id desc ", dynParms3, 2, 3);
 
                 var sql = "select * from News where id>2 order by id desc ";
                 var list6= repository.GetPagedList<News>(sql, null, 1, 2);
@@ -361,8 +342,6 @@ namespace Keede.RepositoriesTests
                 Assert.IsTrue(list1.Count > 0);
                 Assert.IsTrue(list2.Count > 0);
                 Assert.IsTrue(list3.Count > 0);
-                Assert.IsTrue(list4.Items.Count > 0);
-                Assert.IsTrue(list5.Items.Count > 0);
                 Assert.IsTrue(list6.Count > 0);
             }
         }
