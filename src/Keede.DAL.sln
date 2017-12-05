@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper", "Dapper\Dapper.csproj", "{C872A7D5-567A-4320-B805-FC32DB20B8E1}"
 EndProject
@@ -170,5 +170,8 @@ Global
 		{9B765F2D-63DE-4714-A4D5-0C8890604665} = {09E18B60-E5D9-4B34-BA5D-45658B8DE7DD}
 		{E0A6437B-3B58-4BF0-AB17-ED2887CF0E70} = {09E18B60-E5D9-4B34-BA5D-45658B8DE7DD}
 		{293CB415-0F6B-4E10-B0AA-79E66A0B28A4} = {09E18B60-E5D9-4B34-BA5D-45658B8DE7DD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DACC6E50-CC28-4678-A092-5A939F03AED5}
 	EndGlobalSection
 EndGlobal

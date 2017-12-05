@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using Dapper.Extension;
 using Keede.DAL.RWSplitting;
 using System.Linq.Expressions;
@@ -213,5 +214,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         public abstract int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true);
+
+        public abstract int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters);
     }
 }

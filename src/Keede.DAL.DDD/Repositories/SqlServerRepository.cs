@@ -109,6 +109,54 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="updateCommandText"></param>
+        /// <param name="destinationTableName"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public override int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            var conn = OpenDbConnection(false);
+            int result;
+
+            try
+            {
+                var cmd = new SqlCommand(updateCommandText, (SqlConnection)conn, (SqlTransaction)DbTransaction)
+                    { CommandTimeout = int.MaxValue };
+                cmd.Parameters.AddRange(parameters);
+
+                var dt = conn.GetTableSchema(list);
+                if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
+
+                using (var adapter = new SqlDataAdapter { UpdateCommand = cmd })
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        if (dr.RowState == DataRowState.Unchanged)
+                            dr.SetModified();
+                    }
+                    result = adapter.Update(dt);
+                    dt.AcceptChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="conn"></param>
         /// <param name="dt"></param>
         /// <param name="dbTransaction"></param>
