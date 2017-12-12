@@ -1,19 +1,9 @@
-namespace Keede.DAL.DDD
+﻿namespace Keede.DAL.DDD
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IAggregateRoot : IAggregateRoot<int>, IEntity
+    public interface IAggregateRoot : IEntity
     {
-
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TPrimaryKey"></typeparam>
-    public interface IAggregateRoot<TPrimaryKey> : IEntity<TPrimaryKey>
-    {
-
     }
 }

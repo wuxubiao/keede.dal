@@ -1,9 +1,11 @@
+using System;
+
 namespace Keede.DAL.DDD
 {
     /// <summary>
     /// 
     /// </summary>
-    public class AggregateRoot : AggregateRoot<int>, IAggregateRoot
+    public class AggregateRoot : AggregateRoot<int>
     {
 
     }
@@ -12,7 +14,8 @@ namespace Keede.DAL.DDD
     /// 
     /// </summary>
     /// <typeparam name="TPrimaryKey"></typeparam>
-    public class AggregateRoot<TPrimaryKey> : Entity<TPrimaryKey>, IAggregateRoot<TPrimaryKey>
+    [Serializable]
+    public abstract class AggregateRoot<TPrimaryKey> : Entity<TPrimaryKey>, IAggregateRoot<TPrimaryKey>
     {
     }
 }

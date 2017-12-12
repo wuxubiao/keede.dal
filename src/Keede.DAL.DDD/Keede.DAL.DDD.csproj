@@ -49,8 +49,9 @@
   <ItemGroup>
     <Compile Include="AggregateRoot.cs" />
     <Compile Include="Entity.cs" />
-    <Compile Include="EntityAttributeUtil.cs" />
     <Compile Include="IAggregateRoot.cs" />
+    <Compile Include="Utility\EntityAttributeUtil.cs" />
+    <Compile Include="IAggregateRootOfTPrimaryKey.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEntityOfTPrimaryKey.cs" />
     <Compile Include="Repositories\IRepository.cs" />
