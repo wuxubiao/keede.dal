@@ -65,7 +65,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Repositories\BookRepository.cs" />
     <Compile Include="Repositories\DapperRepositoryBase.cs" />
+    <Compile Include="Repositories\IBookRepository.cs" />
     <Compile Include="Repositories\INewCustomRepository.cs" />
     <Compile Include="Repositories\INewsRepository.cs" />
     <Compile Include="Repositories\IPersonRepository.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="UnitTest_Repository.cs" />
     <Compile Include="UnitTest_UnitWork.cs" />
     <Compile Include="UnitTest_WMS.cs" />
+    <Compile Include="ValueObject\Book.cs" />
     <Compile Include="WhereExpression\Entitys.cs" />
     <Compile Include="WhereExpression\WhereExpressionTest.cs" />
   </ItemGroup>
