@@ -49,6 +49,7 @@
     <Compile Include="Expression\SqlMethodNameCallBack.cs" />
     <Compile Include="Expression\SqlTranslateFormater.cs" />
     <Compile Include="Extension\Attribute\IgnoreReadAttribute.cs" />
+    <Compile Include="Extension\Attribute\IgnoreWriteAttribute.cs" />
     <Compile Include="Extension\Attribute\TypeMapperAttribute.cs" />
     <Compile Include="Extension\Kede.SqlMapperExtensions.cs" />
     <Compile Include="Extension\Attribute\ColumnAttribute.cs" />

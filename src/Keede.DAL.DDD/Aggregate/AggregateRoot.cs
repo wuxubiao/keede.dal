@@ -6,7 +6,7 @@ namespace Keede.DAL.DDD
     /// 
     /// </summary>
     [Serializable]
-    public abstract class AggregateRoot : IAggregateRoot
+    public abstract class AggregateRoot : Entity, IAggregateRoot
     {
 
     }
