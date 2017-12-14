@@ -991,7 +991,7 @@ namespace Dapper.Extension
                 return propertyAndField;
 
             propertyAndField = new Dictionary<PropertyInfo, string>();
-            var properties = obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public).ToList();
+            var properties = obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public).Where(IsWriteable).ToList();
 
             foreach (var property in properties)
             {

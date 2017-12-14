@@ -22,7 +22,7 @@ namespace Keede.DAL.DDD.UnitTest.Models
         //[Column("Content")]
         public string Content { get; set; }
 
-        [IgnoreRead, Computed]
+        [IgnoreRead,Write(false)]
         public string ContentTest { get; set; }
     }
 }

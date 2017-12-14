@@ -108,7 +108,7 @@ namespace Dapper.Extension
 
             if (keyProperties.Count == 0)
             {
-                var idProp = allProperties.FirstOrDefault(p => p.Name.ToLower() == "id");
+                var idProp = allProperties.FirstOrDefault(p => GetCustomColumnName(p).ToLower() == "id");
                 if (idProp != null && !idProp.GetCustomAttributes(true).Any(a => a is ExplicitKeyAttribute))
                 {
                     keyProperties.Add(idProp);
