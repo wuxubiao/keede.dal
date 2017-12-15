@@ -51,6 +51,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
+        [Obsolete]
         TEntity Get(string sql,object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
@@ -61,6 +62,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         T Get<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
@@ -96,6 +98,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
@@ -141,6 +144,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
 
         /// <summary>
@@ -184,6 +188,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         bool IsExist(string sql, object condition = null, bool isReadDb = true);
 
         /// <summary>
