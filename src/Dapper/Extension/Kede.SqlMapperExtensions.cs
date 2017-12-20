@@ -697,15 +697,19 @@ namespace Dapper.Extension
 
             foreach (var item in list)
             {
-                DataRow rs = dt.NewRow();
-                int i = keyProperties.Count > 0 ? 1 : 0;
-                foreach (var propertie in allPropertiesExceptKeyAndComputed)
-                {
-                    rs[i] = type.GetProperty(propertie.Name).GetValue(item, null);
-                    i++;
-                }
+                //DataRow rs = dt.NewRow();
+                //int i = keyProperties.Count > 0 ? 1 : 0;
+                //foreach (var propertie in allPropertiesExceptKeyAndComputed)
+                //{
+                //    rs[i] = type.GetProperty(propertie.Name).GetValue(item, null);
+                //    i++;
+                //}
 
-                dt.Rows.Add(rs);
+                //dt.Rows.Add(rs);
+
+                object temp = item;
+                var values = allPropertiesExceptKeyAndComputed.Select(propertyInfo => propertyInfo.GetValue(item, null)).ToArray();
+                dt.LoadDataRow(values, true);
             }
 
             return dt;

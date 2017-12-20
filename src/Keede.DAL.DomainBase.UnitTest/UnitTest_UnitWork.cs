@@ -39,8 +39,8 @@ namespace Keede.DAL.DDD.UnitTest
                 //update News set Title = 'afterUpdateTitle' where GID=10000 and Title='updateTitle'
 
                 Expression<Func<News, bool>> removeQueryExpression = ct => ct.GId == 10000 && ct.Title == "removeTitle";
-                unitOfWork.RegisterRemoved(removeQueryExpression);
-                //delete News where GID=10000 and Title='removeTitle'
+                //unitOfWork.RegisterRemoved(removeQueryExpression);
+                ////delete News where GID=10000 and Title='removeTitle'
 
                 unitOfWork.Commit();
             }

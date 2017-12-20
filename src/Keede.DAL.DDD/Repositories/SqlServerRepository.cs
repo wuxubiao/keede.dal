@@ -215,7 +215,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                 result=SqlMapperExtensions.Update(conn, data, whereExpression);
+                 result=SqlMapperExtensions.Update(conn, data, whereExpression, "", null, DbTransaction);
             }
             catch (Exception e)
             {

@@ -322,7 +322,7 @@ namespace Keede.DAL.DDD.Unitwork
                         Committed = true;
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         trans.Rollback();
                         Committed = false;

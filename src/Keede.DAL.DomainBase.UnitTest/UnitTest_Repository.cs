@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq.Expressions;
 using System.Text;
 using Dapper;
@@ -124,13 +126,13 @@ namespace Keede.RepositoriesTests
 
                 var news1 = new News();
                 news1.GId = 220;
-                news1.Title = "title220";
+                news1.Title = "title22120";
 
                 list.Add(news1);
 
                 var news2 = new News();
                 news2.GId = 221;
-                news2.Title = "title221";
+                news2.Title = "title22121";
                 list.Add(news2);
 
                 var result = repository.BatchAdd(list);
@@ -151,6 +153,51 @@ namespace Keede.RepositoriesTests
                 //var result1=customRepository.BatchAdd(list2);
 
                 Assert.IsTrue(result);
+                //Assert.IsTrue(result1);
+            }
+
+        }
+
+        [TestMethod]
+        public void TestBatchUpdate()
+        {
+            using (var repository = new NewsRepository())
+            {
+                IList<News> list = new List<News>();
+
+                var news1 = new News();
+                news1.Title = "title2111";
+                news1.GId = 10000;
+                list.Add(news1);
+
+                //var news2 = new News();
+                //news2.Title = "title221";
+                //list.Add(news2);
+
+                var parameters = new[]
+                {
+                    new SqlParameter("@Gid", SqlDbType.Int, 4, "Gid"),
+                    new SqlParameter("@Title", SqlDbType.NVarChar, 50, "Title"),
+                };
+
+                var result = repository.BatchUpdate(list,"update news set title=@Title where Gid=@Gid", parameters:parameters);
+
+                //IList<NewsCustom> list2 = new List<NewsCustom>();
+
+                //var customRepository = new NewsCustomRepository();
+                //var newsCustom = new NewsCustom();
+                //newsCustom.Title = "title21";
+                //newsCustom.Content = "ss";
+                //list2.Add(newsCustom);
+
+                //var newsCustom2 = new NewsCustom();
+                //newsCustom2.Title = "title21";
+                //newsCustom2.Content = "ss";
+                //list2.Add(newsCustom2);
+
+                //var result1=customRepository.BatchAdd(list2);
+
+                //Assert.IsTrue(result);
                 //Assert.IsTrue(result1);
             }
 
