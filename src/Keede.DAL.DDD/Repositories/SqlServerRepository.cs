@@ -716,7 +716,10 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = (int)conn.ExecuteScalar(sql, condition, DbTransaction)>0;
+                var count=conn.ExecuteScalar(sql, condition, DbTransaction);
+                if (count == null)
+                    return false;
+                result = (int)count > 0;
             }
             catch (Exception e)
             {

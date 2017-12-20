@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using Dapper;
 using Dapper.Extension;
@@ -201,6 +202,17 @@ namespace Keede.RepositoriesTests
                 //Assert.IsTrue(result1);
             }
 
+        }
+
+        [TestMethod]
+        public void IsExistTest()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var result1=repository.IsExist(new {GId = 100001, Title = "title2111" });
+                var result2 = repository.IsExist("select top 1 1 from news where Gid=@Gid", new { GId = 100001});
+
+            }
         }
 
         [TestMethod]
