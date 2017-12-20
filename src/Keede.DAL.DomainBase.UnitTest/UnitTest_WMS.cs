@@ -47,9 +47,27 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
-                var sql = @"select OB.[No], OB.WarehouseId, OB.StorageType, OB.HostingFilialeId, OB.SaleFilialeId, OB.CreateTime, 
-OB.SourceNo, OB.SourceType, OB.[State], OB.FinishedTime, OB.ExpressId, OB.ExpressNo, OB.ApplyCancelTime, OB.IsExistCancelPool from OutGoodsBill OB WITH(NOLOCK) where  
-WarehouseId = 'b5bcdf6e-95d5-4aee-9b19-6ee218255c05' AND IsExistCancelPool = 1 AND[State] IN('7', '8') ORDER by OB.CreateTime desc";
+//                var sql = @"select OB.[No], OB.WarehouseId, OB.StorageType, OB.HostingFilialeId, OB.SaleFilialeId, OB.CreateTime, 
+//OB.SourceNo, OB.SourceType, OB.[State], OB.FinishedTime, OB.ExpressId, OB.ExpressNo, OB.ApplyCancelTime, OB.IsExistCancelPool from OutGoodsBill OB WITH(NOLOCK) where  
+//WarehouseId = 'b5bcdf6e-95d5-4aee-9b19-6ee218255c05' AND IsExistCancelPool = 1 AND[State] IN('7', '8') ORDER by OB.CreateTime desc";
+                var sql = @"SELECT *
+  FROM [Promotion] t1 WITH(NOLOCK)
+ 
+ WHERE [ApplyFilialeID]='7ae62af0-eb1f-49c6-8fd1-128d77c84698'
+ AND [PromotionType]=3
+ AND [PromotionState]=4
+ ORDER BY (
+CASE
+    WHEN   t1.PromotionState=1 THEN 1
+    WHEN   t1.PromotionState=2 THEN 2
+    WHEN   t1.PromotionState=3 THEN 3
+    WHEN   t1.PromotionState=4 THEN 4
+    WHEN   t1.PromotionState=6 THEN 5
+    WHEN   t1.PromotionState=5 THEN 6
+END) ASC,t1.StartTime DESC";
+
+                var sql2 = "select * from news where id=1";
+
                 repository.GetPagedList<News>(sql, null, 1, 10);
 
             }

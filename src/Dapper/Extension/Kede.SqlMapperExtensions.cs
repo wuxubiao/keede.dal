@@ -154,7 +154,16 @@ namespace Dapper.Extension
             string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
             var table = GetTableName(type);
             var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, pagedList.OrderBy, table, pagedList.WhereSql, (pagedList.PageIndex - 1) * pagedList.PageSize + 1, pagedList.PageIndex * pagedList.PageSize);
-            var datas = connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+            List<T> datas;
+
+            try
+            {
+                datas = connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+            }
+            catch (Exception e)
+            {
+                throw new SqlException(sql, e);
+            }
             var countSql = $"SELECT COUNT(0) FROM {table} {pagedList.WhereSql} ";
             var total = connection.QueryFirstOrDefault<int>(countSql, paramterObjects, transaction);
             pagedList.FillQueryData(total, datas);
@@ -794,9 +803,19 @@ namespace Dapper.Extension
                 whereFields = " WHERE " + string.Join(separator, properties.Select(p => HandleKeyword(p) + " = @" + p));
             }
             var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER (ORDER BY {1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, whereFields, (pageIndex - 1) * pageSize + 1, pageIndex * pageSize);
+            List<T> datas;
+            int total = 0;
 
-            var datas = connection.Query<T>(sql, conditionObj, transaction, true, commandTimeout).ToList();
-            var total = GetCount(connection, condition, table, isOr, transaction, commandTimeout);
+            try
+            {
+                datas = connection.Query<T>(sql, conditionObj, transaction, true, commandTimeout).ToList();
+                total = GetCount(connection, condition, table, isOr, transaction, commandTimeout);
+            }
+            catch (Exception e)
+            {
+                throw new SqlException(sql, e);
+            }
+
             return new PagedList<T>(pageIndex, pageSize, total, datas);
         }
 

@@ -51,6 +51,7 @@
     <Compile Include="Extension\Attribute\IgnoreReadAttribute.cs" />
     <Compile Include="Extension\Attribute\IgnoreWriteAttribute.cs" />
     <Compile Include="Extension\Attribute\TypeMapperAttribute.cs" />
+    <Compile Include="Extension\Exception\SqlException.cs" />
     <Compile Include="Extension\Kede.SqlMapperExtensions.cs" />
     <Compile Include="Extension\Attribute\ColumnAttribute.cs" />
     <Compile Include="Extension\Mapping\CustomTypeMap.cs" />
