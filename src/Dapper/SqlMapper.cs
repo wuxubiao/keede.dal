@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
+using Dapper.Extension;
 
 #if COREFX
 using DataException = System.InvalidOperationException;
@@ -537,7 +538,8 @@ namespace Dapper
                             {
                                 masterSql = cmd.CommandText;
                                 isFirst = false;
-                                identity = new Identity(command.CommandText, cmd.CommandType, cnn, null, obj.GetType(), null);
+                                identity = new Identity(command.CommandText, cmd.CommandType, cnn, null, obj.GetType(),
+                                    null);
                                 info = GetCacheInfo(identity, obj, command.AddToCache);
                             }
                             else
@@ -550,7 +552,12 @@ namespace Dapper
                         }
                     }
                     command.OnCompleted();
-                } finally
+                }
+                catch (Exception e)
+                {
+                    throw new SqlStatementException(command.CommandText, command.Parameters, e);
+                }
+                finally
                 {
                     if (wasClosed) cnn.Close();
                 }
@@ -905,7 +912,7 @@ namespace Dapper
                 // in the connection closing itself
                 return result;
             }
-            catch
+            catch (Exception e)
             {
                 if (reader != null)
                 {
@@ -915,7 +922,7 @@ namespace Dapper
                 }
                 cmd?.Dispose();
                 if (wasClosed) cnn.Close();
-                throw;
+                throw new SqlStatementException(command.CommandText, command.Parameters, e);
             }
         }
         private static IDataReader ExecuteReaderWithFlagsFallback(IDbCommand cmd, bool wasClosed, CommandBehavior behavior)
@@ -939,6 +946,7 @@ namespace Dapper
             object param = command.Parameters;
             var identity = new Identity(command.CommandText, command.CommandType, cnn, effectiveType, param?.GetType(), null);
             var info = GetCacheInfo(identity, param, command.AddToCache);
+            var tuple = info.Deserializer;
 
             IDbCommand cmd = null;
             IDataReader reader = null;
@@ -946,26 +954,34 @@ namespace Dapper
             bool wasClosed = cnn.State == ConnectionState.Closed;
             try
             {
-                cmd = command.SetupCommand(cnn, info.ParamReader);
-
-                if (wasClosed) cnn.Open();
-                reader = ExecuteReaderWithFlagsFallback(cmd, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
-                wasClosed = false; // *if* the connection was closed and we got this far, then we now have a reader
-                // with the CloseConnection flag, so the reader will deal with the connection; we
-                // still need something in the "finally" to ensure that broken SQL still results
-                // in the connection closing itself
-                var tuple = info.Deserializer;
-                int hash = GetColumnHash(reader);
-                if (tuple.Func == null || tuple.Hash != hash)
+                try
                 {
-                    if (reader.FieldCount == 0) //https://code.google.com/p/dapper-dot-net/issues/detail?id=57
-                        yield break;
-                    tuple = info.Deserializer = new DeserializerState(hash, GetDeserializer(effectiveType, reader, 0, -1, false));
-                    if(command.AddToCache) SetQueryCache(identity, info);
+                    cmd = command.SetupCommand(cnn, info.ParamReader);
+
+                    if (wasClosed) cnn.Open();
+                    reader = ExecuteReaderWithFlagsFallback(cmd, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
+                    wasClosed = false; // *if* the connection was closed and we got this far, then we now have a reader
+                                       // with the CloseConnection flag, so the reader will deal with the connection; we
+                                       // still need something in the "finally" to ensure that broken SQL still results
+                                       // in the connection closing itself
+                    tuple = info.Deserializer;
+                    int hash = GetColumnHash(reader);
+                    if (tuple.Func == null || tuple.Hash != hash)
+                    {
+                        if (reader.FieldCount == 0) //https://code.google.com/p/dapper-dot-net/issues/detail?id=57
+                            yield break;
+                        tuple = info.Deserializer = new DeserializerState(hash, GetDeserializer(effectiveType, reader, 0, -1, false));
+                        if (command.AddToCache) SetQueryCache(identity, info);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new SqlStatementException(command.CommandText, command.Parameters, e);
                 }
 
                 var func = tuple.Func;
                 var convertToType = Nullable.GetUnderlyingType(effectiveType) ?? effectiveType;
+
                 while (reader.Read())
                 {
                     object val = func(reader);
@@ -1083,6 +1099,10 @@ namespace Dapper
 
                 command.OnCompleted();
                 return result;
+            }
+            catch (Exception e)
+            {
+                throw new SqlStatementException(command.CommandText, command.Parameters, e);
             }
             finally
             {
@@ -1293,10 +1313,17 @@ namespace Dapper
             {
                 if (reader == null)
                 {
-                    ownedCommand = command.SetupCommand(cnn, cinfo.ParamReader);
-                    if (wasClosed) cnn.Open();
-                    ownedReader = ExecuteReaderWithFlagsFallback(ownedCommand, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
-                    reader = ownedReader;
+                    try
+                    {
+                        ownedCommand = command.SetupCommand(cnn, cinfo.ParamReader);
+                        if (wasClosed) cnn.Open();
+                        ownedReader = ExecuteReaderWithFlagsFallback(ownedCommand, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
+                        reader = ownedReader;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new SqlStatementException(command.CommandText, command.Parameters, e);
+                    }
                 }
                 DeserializerState deserializer = default(DeserializerState);
                 Func<IDataReader, object>[] otherDeserializers;
@@ -1362,10 +1389,17 @@ namespace Dapper
             {
                 if (reader == null)
                 {
-                    ownedCommand = command.SetupCommand(cnn, cinfo.ParamReader);
-                    if (wasClosed) cnn.Open();
-                    ownedReader = ExecuteReaderWithFlagsFallback(ownedCommand, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
-                    reader = ownedReader;
+                    try
+                    {
+                        ownedCommand = command.SetupCommand(cnn, cinfo.ParamReader);
+                        if (wasClosed) cnn.Open();
+                        ownedReader = ExecuteReaderWithFlagsFallback(ownedCommand, wasClosed, CommandBehavior.SequentialAccess | CommandBehavior.SingleResult);
+                        reader = ownedReader;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new SqlStatementException(command.CommandText, command.Parameters, e);
+                    }
                 }
                 DeserializerState deserializer;
                 Func<IDataReader, object>[] otherDeserializers;
@@ -2650,6 +2684,10 @@ namespace Dapper
                 command.OnCompleted();
                 return result;
             }
+            catch (Exception e)
+            {
+                throw new SqlStatementException(command.CommandText, command.Parameters, e);
+            }
             finally
             {
                 if (wasClosed) cnn.Close();
@@ -2677,6 +2715,10 @@ namespace Dapper
                 result =cmd.ExecuteScalar();
                 command.OnCompleted();
             }
+            catch (Exception e)
+            {
+                throw new SqlStatementException(command.CommandText, command.Parameters, e);
+            }
             finally
             {
                 if (wasClosed) cnn.Close();
@@ -2699,6 +2741,10 @@ namespace Dapper
                 disposeCommand = false;
                 // note: command.FireOutputCallbacks(); would be useless here; parameters come at the **end** of the TDS stream
                 return reader;
+            }
+            catch (Exception e)
+            {
+                throw new SqlStatementException(command.CommandText, command.Parameters, e);
             }
             finally
             {

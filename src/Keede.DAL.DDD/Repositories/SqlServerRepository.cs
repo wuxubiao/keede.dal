@@ -61,6 +61,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = conn.Insert(data, DbTransaction) > 0;
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -92,6 +97,11 @@ namespace Keede.DAL.DDD.Repositories
                 var dt = conn.GetTableSchema(list);
                 if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
                 result = BulkToDb(conn, dt, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -140,6 +150,11 @@ namespace Keede.DAL.DDD.Repositories
                     result = adapter.Update(dt);
                     dt.AcceptChanges();
                 }
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -195,6 +210,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = conn.Update(data, DbTransaction);
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -217,6 +237,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                  result=SqlMapperExtensions.Update(conn, data, whereExpression, "", null, DbTransaction);
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -238,6 +263,11 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 result = conn.Delete(whereExpression, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -266,6 +296,11 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 result = conn.Delete(data, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -298,6 +333,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -329,6 +369,11 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 result = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -370,6 +415,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -398,6 +448,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
                 result = conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -430,6 +485,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -460,6 +520,11 @@ namespace Keede.DAL.DDD.Repositories
                 var tableName = SqlMapperExtensions.GetTableName(typeof(TEntity));
                 result = conn.QueryList<TEntity>(condition, tableName, "*", false, DbTransaction, 3).ToList();
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -485,6 +550,11 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 result = conn.GetAll<TEntity>(DbTransaction).ToList();
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -517,6 +587,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -545,6 +620,11 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 result = (int)conn.ExecuteScalar(sql, null, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -578,6 +658,11 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 conn.QueryPaged(ref result, null, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -615,6 +700,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -646,6 +736,11 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 result = conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
@@ -687,6 +782,11 @@ namespace Keede.DAL.DDD.Repositories
             {
                 result = conn.GetCount(condition, tableName, false, DbTransaction) > 0;
             }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
             catch (Exception e)
             {
                 _logger.Error(e);
@@ -720,6 +820,11 @@ namespace Keede.DAL.DDD.Repositories
                 if (count == null)
                     return false;
                 result = (int)count > 0;
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
             }
             catch (Exception e)
             {
