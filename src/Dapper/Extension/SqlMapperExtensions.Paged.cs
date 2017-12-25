@@ -33,14 +33,14 @@ namespace Dapper.Extension
 
             IList<T> result;
 
-            try
-            {
+            //try
+            //{
                 result= connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
-            }
-            catch (Exception e)
-            {
-                throw new SqlException(commandText, e);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new SqlException(commandText, e);
+            //}
 
             return result;
         }

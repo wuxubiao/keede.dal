@@ -14,7 +14,7 @@ namespace Dapper.Extension
             : base(message) { }
 
         public SqlException(string commandText, Exception inner)
-            : base(inner.Message + "SQL语句:" + commandText, inner)
+            : base(inner.Message + " SQL语句:" + commandText, inner)
         {
             CommandText = commandText;
         }

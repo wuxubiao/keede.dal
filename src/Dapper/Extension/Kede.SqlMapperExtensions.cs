@@ -156,14 +156,14 @@ namespace Dapper.Extension
             var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, pagedList.OrderBy, table, pagedList.WhereSql, (pagedList.PageIndex - 1) * pagedList.PageSize + 1, pagedList.PageIndex * pagedList.PageSize);
             List<T> datas;
 
-            try
-            {
+            //try
+            //{
                 datas = connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
-            }
-            catch (Exception e)
-            {
-                throw new SqlException(sql, e);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new SqlException(sql, e);
+            //}
             var countSql = $"SELECT COUNT(0) FROM {table} {pagedList.WhereSql} ";
             var total = connection.QueryFirstOrDefault<int>(countSql, paramterObjects, transaction);
             pagedList.FillQueryData(total, datas);
@@ -810,15 +810,15 @@ namespace Dapper.Extension
             List<T> datas;
             int total = 0;
 
-            try
-            {
+            //try
+            //{
                 datas = connection.Query<T>(sql, conditionObj, transaction, true, commandTimeout).ToList();
                 total = GetCount(connection, condition, table, isOr, transaction, commandTimeout);
-            }
-            catch (Exception e)
-            {
-                throw new SqlException(sql, e);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new SqlException(sql, e);
+            //}
 
             return new PagedList<T>(pageIndex, pageSize, total, datas);
         }
