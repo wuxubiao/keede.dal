@@ -10,7 +10,7 @@ namespace Keede.DAL.DDD.UnitTest.Models
     [Table("Box")]
     public class Box : IEntity
     {
-        [ExplicitKey]
+        [Key]
         public Guid BoxId { get;  set; }
 
         public string BoxName { get;  set; }

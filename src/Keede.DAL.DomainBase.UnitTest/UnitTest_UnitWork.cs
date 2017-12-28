@@ -253,6 +253,28 @@ namespace Keede.DAL.DDD.UnitTest
             }
         }
 
+        [TestMethod]
+        public void GetIdTest()
+        {
+            var box1=new Box();
+            box1.BoxName = "1";
+            var box2=new Box();
+            box2.BoxName = "1";
+
+            var id1 = EntityAttributeUtil.GetId(box1);
+            var id2= EntityAttributeUtil.GetId(box1);
+
+            var new1=new News();
+            new1.GId = 1;
+            new1.Title = "1";
+
+            var new2=new News();
+            new2.GId = 1;
+            new2.Title = "1";
+            var id3 = EntityAttributeUtil.GetId(new1);
+            var id4 = EntityAttributeUtil.GetId(new2);
+        }
+
         private TestContext testContextInstance;
 
         /// <summary>

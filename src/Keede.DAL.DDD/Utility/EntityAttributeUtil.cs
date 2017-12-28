@@ -26,17 +26,32 @@ namespace Keede.DAL.DDD
             StringBuilder idBuilder =new StringBuilder();
 
             var tableName = SqlMapperExtensions.GetTableName(type);
-            idBuilder.Append(tableName+"_");
+            if (string.IsNullOrEmpty(tableName))
+                return "";
 
-            foreach (var propertyInfo in type.GetProperties())
+            if (SqlMapperExtensions.KeyPropertiesCache(type).Count > 0)
             {
-                var attr = Utility.AttributeUtility.GetAttribute<Dapper.Extension.ExplicitKeyAttribute>(propertyInfo,true);
-                if (attr != null)
+                if (idBuilder.Length > 0) idBuilder.Append("_");
+                idBuilder.Append(entity.GetHashCode());
+            }
+            else
+            {
+                foreach (var propertyInfo in type.GetProperties())
                 {
-                    if (idBuilder.Length > 0) idBuilder.Append("_");
-                    idBuilder.Append(propertyInfo.GetValue(entity, null));
+                    var attr = Utility.AttributeUtility.GetAttribute<ExplicitKeyAttribute>(propertyInfo, true);
+                    if (attr != null)
+                    {
+                        if (idBuilder.Length > 0) idBuilder.Append("_");
+                        idBuilder.Append(propertyInfo.GetValue(entity, null));
+                    }
                 }
             }
+
+            if (idBuilder.Length > 0)
+            {
+                idBuilder.Insert(0, tableName + "_");
+            }
+
             return idBuilder.ToString();
         }
 

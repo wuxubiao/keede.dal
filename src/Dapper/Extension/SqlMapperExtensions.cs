@@ -91,7 +91,7 @@ namespace Dapper.Extension
             return explicitKeyProperties;
         }
 
-        private static List<PropertyInfo> KeyPropertiesCache(Type type)
+        public static List<PropertyInfo> KeyPropertiesCache(Type type)
         {
 
             IEnumerable<PropertyInfo> pi;
