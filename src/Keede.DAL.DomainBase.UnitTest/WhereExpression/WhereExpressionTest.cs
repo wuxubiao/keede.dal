@@ -60,6 +60,22 @@ namespace Dapper.Extensions.Tests
 
         }
 
+        [TestMethod]
+        public void WhereMethodForParametersTest1()
+        {
+            TestValueTypeParam1(new Guid());
+        }
+
+        private void TestValueTypeParam1(Guid id)
+        {
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.DD == id && (SQLMethod.IsNull(ct.CustomerCity));
+
+            var translate = new SqlTranslateFormater();
+            string sql = translate.Translate(queryExp1);
+
+            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+        }
+
 
         [TestMethod]
         public void WhereMethodForParametersTest()
@@ -69,7 +85,7 @@ namespace Dapper.Extensions.Tests
 
         private void TestValueTypeParam(int id)
         {
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID <= id && (SQLMethod.IsNull(ct.CustomerCity));
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID <= id ;
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
@@ -86,6 +102,22 @@ namespace Dapper.Extensions.Tests
         private void TestEntityParam(TestValue v)
         {
             Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID <= v.Id && (SQLMethod.IsNull(ct.CustomerCity));
+
+            var translate = new SqlTranslateFormater();
+            string sql = translate.Translate(queryExp1);
+
+            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+        }
+
+        [TestMethod]
+        public void WhereMethodForParametersTest21()
+        {
+            TestEntityParam1(new TestValue { DD = new Guid() });
+        }
+
+        private void TestEntityParam1(TestValue v)
+        {
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.DD == v.DD && (SQLMethod.IsNull(ct.CustomerCity));
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
@@ -125,6 +157,8 @@ namespace Dapper.Extensions.Tests
     public class TestValue
     {
         public int Id { set; get; }
+        public Guid DD { set; get; }
+
     }
 
 

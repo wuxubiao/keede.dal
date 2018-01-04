@@ -10,6 +10,7 @@ using Keede.DAL.DDD.UnitTest.Models;
 using Dapper;
 using Dapper.Extension;
 using System.Linq.Expressions;
+using Dapper.Extensions.Tests;
 
 namespace Keede.DAL.DDD.UnitTest
 {
@@ -34,11 +35,15 @@ namespace Keede.DAL.DDD.UnitTest
         {
             using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
             {
-                Expression<Func<News, bool>> modifyQueryExpression = ct => ct.GId == 10000 && ct.Title == "updateTitle";
-                unitOfWork.RegisterModified(modifyQueryExpression, new { Title = "afterUpdateTitle" });
+                CustomersEntity ce=new CustomersEntity();
+                ce.DD=new Guid();
+                unitOfWork.RegisterModified<News>(ct => ct.IDD == ce.DD, new { Title = "afterUpdateTitle1112" });
+
+                ////Expression<Func<News, bool>> modifyQueryExpression = ct => ct.GId == 10000 && ct.Title == "updateTitle";
+                ////unitOfWork.RegisterModified(modifyQueryExpression, new { Title = "afterUpdateTitle" });
                 //update News set Title = 'afterUpdateTitle' where GID=10000 and Title='updateTitle'
 
-                Expression<Func<News, bool>> removeQueryExpression = ct => ct.GId == 10000 && ct.Title == "removeTitle";
+                //Expression<Func<News, bool>> removeQueryExpression = ct => ct.GId == 10000 && ct.Title == "removeTitle";
                 //unitOfWork.RegisterRemoved(removeQueryExpression);
                 ////delete News where GID=10000 and Title='removeTitle'
 

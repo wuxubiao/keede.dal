@@ -100,9 +100,11 @@ namespace Dapper.Extension
                 this.VisitBinaryWithParent(node, bnode.Left);
             else
             {
-                isleft = true;
                 if (bnode != null)
+                {
+                    isleft = true;
                     this.Visit(bnode.Left);
+                }
                 else
                     this.Visit(node);
                 isleft = left;

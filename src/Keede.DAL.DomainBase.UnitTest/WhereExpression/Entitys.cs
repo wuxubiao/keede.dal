@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 
 namespace Dapper.Extensions.Tests
 {
-    public partial class CustomersEntity
+    public class CustomersEntity
     {
         ///<summary>
         ///
         ///</summary>               
         public Int32 CustomerID { set; get; }
 
+        public Guid DD { set; get; }
         ///<summary>
         ///
         ///</summary>               
