@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 namespace Keede.DAL.DDD.UnitTest.Models
 {
     [Table("NewsCustom")]
-    public class NewsCustom : Entity<int>
+    public class NewsCustom : Entity
     {
         [Key]
-        public override int Id { get; set; }
+        public int Id { get; set; }
 
         public string Title { get; set; }
 
         public string Content { get; set; }
 
-        [IgnoreRead, Computed]
+        [IgnoreRead, IgnoreWrite]
         public string ContentTest { get; set; }
     }
 }

@@ -9,6 +9,8 @@ using Keede.DAL.RWSplitting;
 using Keede.DAL.DDD.UnitTest.Models;
 using Dapper;
 using Dapper.Extension;
+using System.Linq.Expressions;
+using Dapper.Extensions.Tests;
 
 namespace Keede.DAL.DDD.UnitTest
 {
@@ -21,11 +23,32 @@ namespace Keede.DAL.DDD.UnitTest
         public UnitTest_UnitWork()
         {
             //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
-            string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
-            string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
+            string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+            string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
+        }
+
+        [TestMethod]
+        public void TestExpression()
+        {
+            using (IUnitOfWork unitOfWork = new SqlServerUnitOfWork())
+            {
+                CustomersEntity ce=new CustomersEntity();
+                ce.DD=new Guid();
+                unitOfWork.RegisterModified<News>(ct => ct.IDD == ce.DD, new { Title = "afterUpdateTitle1112" });
+
+                ////Expression<Func<News, bool>> modifyQueryExpression = ct => ct.GId == 10000 && ct.Title == "updateTitle";
+                ////unitOfWork.RegisterModified(modifyQueryExpression, new { Title = "afterUpdateTitle" });
+                //update News set Title = 'afterUpdateTitle' where GID=10000 and Title='updateTitle'
+
+                //Expression<Func<News, bool>> removeQueryExpression = ct => ct.GId == 10000 && ct.Title == "removeTitle";
+                //unitOfWork.RegisterRemoved(removeQueryExpression);
+                ////delete News where GID=10000 and Title='removeTitle'
+
+                unitOfWork.Commit();
+            }
         }
 
         [TestMethod]
@@ -172,11 +195,9 @@ namespace Keede.DAL.DDD.UnitTest
                 //var list1 = repository.GetAll();//GetAll不允许使用
 
                 var list3 = repository.GetList<News>("select * from news where id>5");
-                var list4 = repository.GetPagedList("where id<=6", " order by id desc ", null, 2, 3);
 
                 Assert.IsNotNull(news2);
                 Assert.IsTrue(list3.Count > 0);
-                Assert.IsTrue(list4.Items.Count > 0);
             }
         }
 
@@ -235,6 +256,28 @@ namespace Keede.DAL.DDD.UnitTest
 
                 unitOfWork.Commit();
             }
+        }
+
+        [TestMethod]
+        public void GetIdTest()
+        {
+            var box1=new Box();
+            box1.BoxName = "1";
+            var box2=new Box();
+            box2.BoxName = "1";
+
+            var id1 = EntityAttributeUtil.GetId(box1);
+            var id2= EntityAttributeUtil.GetId(box1);
+
+            var new1=new News();
+            new1.GId = 1;
+            new1.Title = "1";
+
+            var new2=new News();
+            new2.GId = 1;
+            new2.Title = "1";
+            var id3 = EntityAttributeUtil.GetId(new1);
+            var id4 = EntityAttributeUtil.GetId(new2);
         }
 
         private TestContext testContextInstance;

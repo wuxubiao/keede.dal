@@ -4,8 +4,10 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Transactions;
 using Dapper;
 using Keede.DAL.RWSplitting;
+using IsolationLevel = System.Data.IsolationLevel;
 
 namespace Keede.DAL.Helper
 {
@@ -85,13 +87,14 @@ namespace Keede.DAL.Helper
         [Obsolete("This function is obsolete,don't use it in new project")]
         internal int ExecuteNonQuery(bool isReadDb, string cmdText, params Parameter[] parameters)
         {
-            IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
+            IDbConnection conn = IsOpenTransaction ? CurrentConnection : 
+                (isReadDb && System.Transactions.Transaction.Current == null ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
+
             try
             {
-                //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
                 MakeCommandTextLog(cmdText);
-                int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction); //cmd.ExecuteNonQuery();
-                //cmd.Parameters.Clear();
+
+                int val = conn.Execute(cmdText, ConvertParameter(parameters), Transaction);
                 return val;
             }
             catch (SqlException exp)
@@ -124,13 +127,12 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName, false));
-                MakeCommandTextLog(cmdText);
-                var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
+                IDbConnection conn = IsOpenTransaction ? CurrentConnection : 
+                    (isReadDb && System.Transactions.Transaction.Current == null ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName, false));
 
-                //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
-                //var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-                //cmd.Parameters.Clear();
+                MakeCommandTextLog(cmdText);
+
+                var reader = conn.ExecuteReader(cmdText, ConvertParameter(parameters), Transaction);
                 return reader;
             }
             catch (SqlException exp)
@@ -150,15 +152,12 @@ namespace Keede.DAL.Helper
         [Obsolete("This function is obsolete,don't use it in new project")]
         internal object ExecuteScalar(bool isReadDb, string cmdText, params Parameter[] parameters)
         {
-            IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
+            IDbConnection conn = IsOpenTransaction ? CurrentConnection : (isReadDb && System.Transactions.Transaction.Current == null ? Databases.GetSqlConnection(DbName) : Databases.GetSqlConnection(DbName,false));
             try
             {
                 MakeCommandTextLog(cmdText);
-                object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
 
-                //var cmd = CreateCommand(conn, cmdType, cmdText, parameters);
-                //object val = cmd.ExecuteScalar();
-                //cmd.Parameters.Clear();
+                object val = conn.ExecuteScalar(cmdText, ConvertParameter(parameters), Transaction);
                 return val;
             }
             catch (SqlException exp)

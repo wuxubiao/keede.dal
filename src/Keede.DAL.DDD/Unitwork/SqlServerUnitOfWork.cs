@@ -10,6 +10,8 @@ using System.Threading;
 using Keede.DAL.DDD.Repositories;
 using Keede.DAL.Utility;
 using Keede.DAL.RWSplitting;
+using System.Linq.Expressions;
+using Dapper.Extension;
 
 namespace Keede.DAL.DDD.Unitwork
 {
@@ -45,6 +47,9 @@ namespace Keede.DAL.DDD.Unitwork
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _saveMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _removeMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _customMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
+
+        private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _removeExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
+        private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _saveExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
 
         /// <summary>
         /// 
@@ -229,6 +234,21 @@ namespace Keede.DAL.DDD.Unitwork
                             var method = GetCustomMethod(repository, customOperate.Value.OperateName);
                             method.Invoke(repository, new[] { customOperate.Value.Data });
                         }
+
+                        foreach (var modifiedData in ExpressionModifiedCollection)
+                        {
+                            var repository = GetRepostiroy(modifiedData.Value.EntityType, _openedTransaction);
+                            var modifiedExpressionMethod = GetModifiedExpressionMethod(repository);
+                            ((FastMethodUtility.FastInvokeHandler)modifiedExpressionMethod).Invoke(repository, new object[] { modifiedData.Value.WhereExpression, modifiedData.Value.Data });
+                        }
+
+                        foreach (var deletedData in ExpressionDeletedCollection)
+                        {
+                            var repository = GetRepostiroy(deletedData.Value.EntityType, _openedTransaction);
+                            var removeExpressionMethod = GetRemoveExpressionMethod(repository);
+                            ((FastMethodUtility.FastInvokeHandler)removeExpressionMethod).Invoke(repository, new object[] { deletedData.Value.WhereExpression });
+                        }
+
                         _openedTransaction.Commit();
                         Committed = true;
                         return true;
@@ -283,12 +303,26 @@ namespace Keede.DAL.DDD.Unitwork
                             var saveMethod = GetSaveMethod(repository);
                             ((FastMethodUtility.FastInvokeHandler)saveMethod).Invoke(repository, new object[] { modifiedData.Value });
                         }
+                        
+                        foreach (var modifiedData in ExpressionModifiedCollection)
+                        {
+                            var repository = GetRepostiroy(modifiedData.Value.EntityType, trans);
+                            var modifiedExpressionMethod = GetModifiedExpressionMethod(repository);
+                            ((FastMethodUtility.FastInvokeHandler)modifiedExpressionMethod).Invoke(repository, new object[] { modifiedData.Value.WhereExpression, modifiedData.Value.Data });
+                        }
+
+                        foreach (var deletedData in ExpressionDeletedCollection)
+                        {
+                            var repository = GetRepostiroy(deletedData.Value.EntityType, trans);
+                            var removeExpressionMethod = GetRemoveExpressionMethod(repository);
+                            ((FastMethodUtility.FastInvokeHandler)removeExpressionMethod).Invoke(repository, new object[] { deletedData.Value.WhereExpression });
+                        }
 
                         trans.Commit();
                         Committed = true;
                         return true;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         trans.Rollback();
                         Committed = false;
@@ -389,7 +423,32 @@ namespace Keede.DAL.DDD.Unitwork
             _customMethodDic.AddOrUpdate(repositoryType.FullName + methodName, method, (key, existed) => method);
             return method;
         }
+        
+        private FastMethodUtility.FastInvokeHandler GetModifiedExpressionMethod(dynamic repository)
+        {
+            Type repositoryType = repository.GetType();
+            FastMethodUtility.FastInvokeHandler method;
+            if (_saveExpressionMethodDic.TryGetValue(repositoryType.FullName, out method))
+                return method;
 
+            MethodInfo saveMethod = repositoryType.GetMethod("SaveExpression", BindingFlags.Public | BindingFlags.Instance);
+            method = FastMethodUtility.GetMethodInvoker(saveMethod);
+            _saveExpressionMethodDic.AddOrUpdate(repositoryType.FullName, method, (key, existed) => method);
+            return method;
+        }
+
+        private FastMethodUtility.FastInvokeHandler GetRemoveExpressionMethod(dynamic repository)
+        {
+            Type repositoryType = repository.GetType();
+            FastMethodUtility.FastInvokeHandler method;
+            if (_removeExpressionMethodDic.TryGetValue(repositoryType.FullName, out method))
+                return method;
+
+            MethodInfo removeMethod = repositoryType.GetMethod("RemoveExpression", BindingFlags.Public | BindingFlags.Instance);
+            method = FastMethodUtility.GetMethodInvoker(removeMethod);
+            _removeExpressionMethodDic.AddOrUpdate(repositoryType.FullName, method, (key, existed) => method);
+            return method;
+        }
         /// <summary>
         /// 
         /// </summary>

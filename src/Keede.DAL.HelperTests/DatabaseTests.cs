@@ -17,10 +17,24 @@ namespace Keede.DAL.Helper.Tests
         public DatabaseTests()
         {
             string[] readConnctions =
-                {"Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;"};
+                {"server=192.168.117.189;database=Group.ERP;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;"};
             string writeConnction =
-                "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
+                "server=192.168.117.189;database=Group.ERP;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
+        }
+
+        [TestMethod()]
+        public void ExecuteScalarSPTest()
+        {
+            DateTime startTime=new DateTime(2016,02,24);
+            DateTime endTime = new DateTime(2016,02,25);
+            var parms = new[] {
+                new SqlParameter("@OrderState",9),
+                new SqlParameter("@ConsignTimeStart", startTime),
+                new SqlParameter("@ConsignTimeEnd",endTime)
+            };
+
+            var result = SqlHelper.ExecuteScalarSP("DB01", false, CommandType.StoredProcedure, "P_CompanyGrossProfitForEveryDay_GoodsOrder", parms);
         }
 
         [TestMethod()]

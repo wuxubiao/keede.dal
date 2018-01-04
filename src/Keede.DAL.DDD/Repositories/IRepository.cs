@@ -3,6 +3,8 @@ using System.Data;
 using Dapper;
 using Dapper.Extension;
 using System;
+using System.Data.SqlClient;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.Repositories
 {
@@ -44,19 +46,12 @@ namespace Keede.DAL.DDD.Repositories
         bool Remove(TEntity condition);
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="where"></param>
-        /// <param name="parameterObject"></param>
-        /// <returns></returns>
-        int RemoveSql(string whereSql, object parameterObject = null);
-
-        /// <summary>
         /// Get single item from the repository by custom condition
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
+        [Obsolete]
         TEntity Get(string sql,object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
@@ -67,7 +62,8 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-         T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        [Obsolete]
+        T Get<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
@@ -91,6 +87,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
@@ -101,7 +98,8 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        [Obsolete]
+        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// Get all items from the repository by custom condition
@@ -128,14 +126,13 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="whereSql"></param>
+        /// <param name="whereExpression"></param>
         /// <param name="orderBy"></param>
-        /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
+        PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -147,6 +144,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
 
         /// <summary>
@@ -160,5 +158,47 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize,
             bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <returns></returns>
+        int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression);
+
+        bool IsExistById(object condition, bool isReadDb = true);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        bool IsExist(object condition, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameterObject"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        [Obsolete]
+        bool IsExist(string sql, object condition = null, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true);
+
+        int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters);
     }
 }

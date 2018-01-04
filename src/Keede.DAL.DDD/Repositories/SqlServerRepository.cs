@@ -6,6 +6,7 @@ using Dapper;
 using Dapper.Extension;
 using Keede.DAL.RWSplitting;
 using System.Data.SqlClient;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.Repositories
 {
@@ -16,6 +17,8 @@ namespace Keede.DAL.DDD.Repositories
     public partial class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
+        private static readonly log4net.ILog _logger = log4net.LogManager.GetLogger("SqlServerRepository");
+
         /// <summary>
         /// 
         /// </summary>
@@ -35,11 +38,12 @@ namespace Keede.DAL.DDD.Repositories
         public void CloseConnection(IDbConnection conn)
         {
             if (DbTransaction != null) return;
-            if (conn.State == ConnectionState.Open)
+
+            if (conn?.State == ConnectionState.Open)
             {
                 conn.Close();
-                conn.Dispose();
             }
+            conn?.Dispose();
         }
 
         /// <summary>
@@ -50,12 +54,29 @@ namespace Keede.DAL.DDD.Repositories
         public override bool Add(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
-            var value = conn.Insert(data, DbTransaction) > 0;
-            CloseConnection(conn);
+            var result = false;
 
-            return value;
+            try
+            {
+                result = conn.Insert(data, DbTransaction) > 0;
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -68,13 +89,84 @@ namespace Keede.DAL.DDD.Repositories
         public override bool BatchAdd<T>(IList<T> list, string destinationTableName = null)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
-            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(false);
-            var dt = conn.GetTableSchema(list);
-            if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
-            var value = BulkToDb(conn, dt, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = false;
+
+            try
+            {
+                var dt = conn.GetTableSchema(list);
+                if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
+                result = BulkToDb(conn, dt, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="updateCommandText"></param>
+        /// <param name="destinationTableName"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public override int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            var conn = OpenDbConnection(false);
+            int result;
+
+            try
+            {
+                var cmd = new SqlCommand(updateCommandText, (SqlConnection)conn, (SqlTransaction)DbTransaction)
+                    { CommandTimeout = int.MaxValue };
+                cmd.Parameters.AddRange(parameters);
+
+                var dt = conn.GetTableSchema(list);
+                if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
+
+                using (var adapter = new SqlDataAdapter { UpdateCommand = cmd })
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        if (dr.RowState == DataRowState.Unchanged)
+                            dr.SetModified();
+                    }
+                    result = adapter.Update(dt);
+                    dt.AcceptChanges();
+                }
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -97,10 +189,6 @@ namespace Keede.DAL.DDD.Repositories
                     bulkCopy.WriteToServer(dt);
                 return true;
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
             finally
             {
                 bulkCopy.Close();
@@ -115,11 +203,83 @@ namespace Keede.DAL.DDD.Repositories
         public override bool Save(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
-            var value = conn.Update(data, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = false;
+
+            try
+            {
+                result = conn.Update(data, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        public override int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data)
+        {
+            var conn = OpenDbConnection(false);
+            var result = 0;
+
+            try
+            {
+                 result=SqlMapperExtensions.Update(conn, data, whereExpression, "", null, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        public override int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression)
+        {
+            var conn = OpenDbConnection(false);
+            var result = 0;
+
+            try
+            {
+                result = conn.Delete(whereExpression, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -130,26 +290,29 @@ namespace Keede.DAL.DDD.Repositories
         public override bool Remove(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(false);
-            var value = conn.Delete(data, DbTransaction);
-            CloseConnection(conn);
-            return value;
-        }
+            var result = false;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="whereSql"></param>
-        /// <param name="parameterObject"></param>
-        /// <returns></returns>
-        public override int RemoveSql(string whereSql, object parameterObject = null)
-        {
-            TypeMapper.SetTypeMap(typeof(TEntity));
-            var conn = OpenDbConnection(false);
-            var value = conn.Delete<TEntity>(whereSql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            try
+            {
+                result = conn.Delete(data, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -159,14 +322,33 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public override TEntity Get(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            var value = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = default(TEntity);
+
+            try
+            {
+                result = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -177,14 +359,33 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public override T Get<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
-            var value = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = default(T);
+
+            try
+            {
+                result = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -207,11 +408,29 @@ namespace Keede.DAL.DDD.Repositories
         public override TEntity GetById(dynamic id, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            var value = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
-            CloseConnection(conn);
-            return value;
+            var result = default(TEntity);
+
+            try
+            {
+                result = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -221,12 +440,31 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override TEntity GetAndUpdateLock(object condition)
         {
-            if (condition == null)
-                throw new ArgumentNullException(nameof(condition));
-            TypeMapper.SetTypeMap(typeof(TEntity));
+            if (condition == null) throw new ArgumentNullException(nameof(condition));
             var conn = OpenDbConnection(false);
-            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            return conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            var result = default(TEntity);
+
+            try
+            {
+                var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
+                result = conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -236,14 +474,33 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(T));
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
-            var values = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
-            CloseConnection(conn);
-            return values;
+            var result = default(IList<T>);
+
+            try
+            {
+                result = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -254,12 +511,31 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override IList<TEntity> GetList(object condition, bool isReadDb = true)
         {
-            if (condition == null)
-                throw new ArgumentNullException(nameof(condition));
-            TypeMapper.SetTypeMap(typeof(TEntity));
+            if (condition == null) throw new ArgumentNullException(nameof(condition));
             var conn = OpenDbConnection(isReadDb);
-            var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            return conn.QueryList<TEntity>(condition, table, "*", false, DbTransaction, 3).ToList();
+            var result = default(IList<TEntity>);
+
+            try
+            {
+                var tableName = SqlMapperExtensions.GetTableName(typeof(TEntity));
+                result = conn.QueryList<TEntity>(condition, tableName, "*", false, DbTransaction, 3).ToList();
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -268,11 +544,29 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override IList<TEntity> GetAll(bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            var list = conn.GetAll<TEntity>(DbTransaction).ToList();
-            CloseConnection(conn);
-            return list;
+            var result = default(IList<TEntity>);
+
+            try
+            {
+                result = conn.GetAll<TEntity>(DbTransaction).ToList();
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -282,33 +576,105 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb);
-            var values = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
-            CloseConnection(conn);
-            return values;
+            var result = 0;
+
+            try
+            {
+                result = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
+        public override int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true)
+        {
+            var translate = new SqlTranslateFormater();
+            string whereSql = translate.Translate(whereExpression);
+
+            var entityType = whereExpression.Parameters[0].Type;
+            var tableName = SqlMapperExtensions.GetTableName(entityType);
+            string sql = "select count(*) from "+ tableName+ " where " + whereSql;
+
+            var conn = OpenDbConnection(isReadDb);
+            var result = 0;
+
+            try
+            {
+                result = (int)conn.ExecuteScalar(sql, null, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="whereSql"></param>
+        /// <param name="whereExpression"></param>
         /// <param name="orderBy"></param>
-        /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override PagedList<TEntity> GetPagedList(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
+        public override PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(TEntity));
+            var translate = new SqlTranslateFormater();
+            string whereSql = translate.Translate(whereExpression);
+
+            var result = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
             var conn = OpenDbConnection(isReadDb);
-            PagedList<TEntity> pagedList = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
-            conn.QueryPaged(ref pagedList, parameterObjects, DbTransaction);
-            CloseConnection(conn);
-            return pagedList;
+
+            try
+            {
+                conn.QueryPaged(ref result, null, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -324,13 +690,32 @@ namespace Keede.DAL.DDD.Repositories
         /// </param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public override IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(T));
             var conn = OpenDbConnection(isReadDb);
-            var pagedList = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
-            CloseConnection(conn);
-            return pagedList;
+            var result = default(IList<T>);
+
+            try
+            {
+                result = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -344,10 +729,114 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
         {
-            TypeMapper.SetTypeMap(typeof(TEntity));
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb);
-            return conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            var result = default(PagedList<TEntity>);
+
+            try
+            {
+                result = conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override bool IsExistById(object id, bool isReadDb = true)
+        {
+            return GetById(id, isReadDb) != null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public override bool IsExist(object condition, bool isReadDb = true)
+        {
+            var tableName = SqlMapperExtensions.GetTableName(typeof(TEntity));
+            var conn = OpenDbConnection(isReadDb);
+            var result = false;
+
+            try
+            {
+                result = conn.GetCount(condition, tableName, false, DbTransaction) > 0;
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        [Obsolete]
+        public override bool IsExist(string sql, object condition = null, bool isReadDb = true)
+        {
+            if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
+            var conn = OpenDbConnection(isReadDb);
+            var result = false;
+
+            try
+            {
+                var count=conn.ExecuteScalar(sql, condition, DbTransaction);
+                if (count == null)
+                    return false;
+                result = (int)count > 0;
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
         }
     }
 }

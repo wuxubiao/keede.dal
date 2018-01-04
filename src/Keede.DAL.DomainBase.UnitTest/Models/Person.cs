@@ -5,10 +5,10 @@ using Keede.DAL.DDD;
 namespace Keede.DAL.DDD.UnitTest.Models
 {
     [Table("Person")]
-    public class Person:Entity<Guid>
+    public class Person:Entity
     {
         [ExplicitKey]
-        public override Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 

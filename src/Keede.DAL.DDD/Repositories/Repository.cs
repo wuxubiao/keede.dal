@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using Dapper.Extension;
 using Keede.DAL.RWSplitting;
+using System.Linq.Expressions;
 
 namespace Keede.DAL.DDD.Repositories
 {
@@ -14,10 +16,12 @@ namespace Keede.DAL.DDD.Repositories
     public abstract partial class Repository<TEntity> : IRepository<TEntity>
         where TEntity : IEntity
     {
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         public abstract bool Add(TEntity data);
-
 
         /// <summary>
         /// 
@@ -40,14 +44,6 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="condition"></param>
         /// <returns></returns>
         public abstract bool Remove(TEntity condition);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="where"></param>
-        /// <param name="parameterObject"></param>
-        /// <returns></returns>
-        public abstract int RemoveSql(string whereSql, object parameterObject = null);
 
         /// <summary>
         /// 
@@ -77,7 +73,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        public abstract IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         //public abstract IList<TEntity> GetList(string where, object parameterObject = null);
 
@@ -89,7 +85,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract T Get<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        public abstract T Get<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -98,6 +94,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public abstract int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
         /// <summary>
         /// 
@@ -108,13 +105,13 @@ namespace Keede.DAL.DDD.Repositories
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="whereSql"></param>
+        /// <param name="whereExpression"></param>
         /// <param name="orderBy"></param>
-        /// <param name="parameterObjects"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
+        /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract PagedList<TEntity> GetPagedList(string where, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true);
+        public abstract PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -127,6 +124,21 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         public abstract IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <returns></returns>
+        public abstract int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression);
         #region IDisposable Members
 
         /// <summary>
@@ -167,5 +179,42 @@ namespace Keede.DAL.DDD.Repositories
             Dispose();
         }
         #endregion
+
+        public abstract int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract bool IsExistById(object condition, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract bool IsExist(object condition, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="condition"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract bool IsExist(string sql, object condition = null, bool isReadDb = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="whereExpression"></param>
+        /// <param name="isReadDb"></param>
+        /// <returns></returns>
+        public abstract int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true);
+
+        public abstract int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters);
     }
 }

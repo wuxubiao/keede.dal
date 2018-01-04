@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using Dapper.Extension;
 
@@ -20,6 +21,11 @@ namespace Keede.DAL.DDD.Unitwork
         private readonly ThreadLocal<Dictionary<string, IEntity>> _localDeletedCollection = new ThreadLocal<Dictionary<string, IEntity>>(() => new Dictionary<string, IEntity>());
 
         private readonly ThreadLocal<Dictionary<string, CustomOperate<IEntity>>> _localCustomOperateCollection = new ThreadLocal<Dictionary<string, CustomOperate<IEntity>>>(() => new Dictionary<string, CustomOperate<IEntity>>());
+
+
+        private readonly ThreadLocal<Dictionary<string, ExpressionData>> _localExpressionModifiedCollection = new ThreadLocal<Dictionary<string, ExpressionData>>(() => new Dictionary<string, ExpressionData>());
+
+        private readonly ThreadLocal<Dictionary<string, ExpressionData>> _localExpressionDeletedCollection = new ThreadLocal<Dictionary<string, ExpressionData>>(() => new Dictionary<string, ExpressionData>());
 
         private readonly ThreadLocal<bool> _localCommitted = new ThreadLocal<bool>(() => false);
         #endregion
@@ -74,6 +80,10 @@ namespace Keede.DAL.DDD.Unitwork
         /// </summary>
         protected IEnumerable<KeyValuePair<string, CustomOperate<IEntity>>> CustomOperateCollection => _localCustomOperateCollection.Value;
 
+        protected IEnumerable<KeyValuePair<string, ExpressionData>> ExpressionModifiedCollection => _localExpressionModifiedCollection.Value;
+
+        protected IEnumerable<KeyValuePair<string, ExpressionData>> ExpressionDeletedCollection => _localExpressionDeletedCollection.Value;
+
         #endregion
 
         /// <summary>
@@ -104,18 +114,6 @@ namespace Keede.DAL.DDD.Unitwork
         {
             return objs.Select(obj=> DbConnection.UpdateId(obj, DbTransaction, timeout)).All(result => result);
         }
-
-        //public TEntity TryLockEntityObjectAndReturn<TEntity>(int timeout, object id) where TEntity : IEntity
-        //{
-        //    DbConnection.UpdateId<TEntity>(id, DbTransaction, timeout);
-        //    return default(TEntity);
-        //}
-
-        //public TEntity TryLockEntityObjectAndReturn<TEntity>(int timeout, TEntity objs) where TEntity : IEntity
-        //{
-        //    DbConnection.UpdateId(objs, DbTransaction, timeout);
-        //    return default(TEntity);
-        //}
 
         /// <summary>
         /// 
@@ -202,13 +200,62 @@ namespace Keede.DAL.DDD.Unitwork
         /// <param name="obj"></param>
         /// <param name="repositoryItemType"></param>
         /// <param name="operateName"></param>
-        public void RegisterCustomOperate<TEntity>(TEntity obj, Type repositoryItemType, string operateName) where TEntity : IEntity
+        [Obsolete("改为调用RegisterModified<TEntity>(Expression<Func<TEntity, bool>> whereExpression, dynamic data)、RegisterRemoved<TEntity>(Expression<Func<TEntity, bool>> whereExpression) ")]
+        public void RegisterCustomOperate<TEntity>(TEntity obj, Type repositoryItemType, string operateName)
+            where TEntity : IEntity
         {
             var objId = EntityAttributeUtil.GetId(obj);
             if (string.IsNullOrEmpty(objId)) throw new ArgumentException("The UniqueIdentifier of the object is empty.", nameof(obj));
             if (_localDeletedCollection.Value.ContainsKey(objId)) throw new InvalidOperationException("The object cannot be registered as a modified object since it was marked as deleted.");
             if (!_localCustomOperateCollection.Value.ContainsKey(objId) && !_localNewCollection.Value.ContainsKey(objId)) _localCustomOperateCollection.Value.Add(objId, new CustomOperate<IEntity>(obj, repositoryItemType, operateName));
             _localCommitted.Value = false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="whereExpression"></param>
+        /// <param name="data"></param>
+        public void RegisterModified<TEntity>(Expression<Func<TEntity, bool>> whereExpression, dynamic data)
+            where TEntity : IEntity
+        {
+            var objId = EntityAttributeUtil.GetId(whereExpression, data);
+            var entityType = whereExpression.Parameters[0].Type;
+            if (objId.Equals(string.Empty))
+                throw new ArgumentException("The UniqueIdentifier of the object is empty.", nameof(whereExpression));
+
+            bool addedToModified = false;
+            if (!_localExpressionModifiedCollection.Value.ContainsKey(objId))
+            {
+                _localExpressionModifiedCollection.Value.Add(objId, new ExpressionData(entityType, whereExpression, data));
+                addedToModified = true;
+            }
+
+            _localCommitted.Value = !addedToModified;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="whereExpression"></param>
+        public void RegisterRemoved<TEntity>(Expression<Func<TEntity, bool>> whereExpression) 
+            where TEntity : IEntity
+        {
+            var objId = EntityAttributeUtil.GetId(whereExpression, null);
+            var entityType = whereExpression.Parameters[0].Type;
+            if (objId.Equals(string.Empty))
+                throw new ArgumentException("The UniqueIdentifier of the object is empty.", nameof(whereExpression));
+
+            bool addedToDeleted = false;
+            if (!_localExpressionDeletedCollection.Value.ContainsKey(objId))
+            {
+                _localExpressionDeletedCollection.Value.Add(objId, new ExpressionData(entityType, whereExpression, null));
+                addedToDeleted = true;
+            }
+
+            _localCommitted.Value = !addedToDeleted;
         }
 
         /// <summary>

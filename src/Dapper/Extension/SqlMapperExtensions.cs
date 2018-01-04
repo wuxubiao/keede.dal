@@ -91,7 +91,7 @@ namespace Dapper.Extension
             return explicitKeyProperties;
         }
 
-        private static List<PropertyInfo> KeyPropertiesCache(Type type)
+        public static List<PropertyInfo> KeyPropertiesCache(Type type)
         {
 
             IEnumerable<PropertyInfo> pi;
@@ -108,7 +108,7 @@ namespace Dapper.Extension
 
             if (keyProperties.Count == 0)
             {
-                var idProp = allProperties.FirstOrDefault(p => p.Name.ToLower() == "id");
+                var idProp = allProperties.FirstOrDefault(p => GetCustomColumnName(p).ToLower() == "id");
                 if (idProp != null && !idProp.GetCustomAttributes(true).Any(a => a is ExplicitKeyAttribute))
                 {
                     keyProperties.Add(idProp);
@@ -134,10 +134,12 @@ namespace Dapper.Extension
 
         private static bool IsWriteable(PropertyInfo pi)
         {
-            var attributes = pi.GetCustomAttributes(typeof(WriteAttribute), false).AsList();
-            if (attributes.Count != 1) return true;
-            var writeAttribute = (WriteAttribute)attributes[0];
-            return writeAttribute.Write;
+            return pi.GetCustomAttributes(typeof(IgnoreWriteAttribute), false).AsList().Count == 0;
+
+            //var attributes = pi.GetCustomAttributes(typeof(WriteAttribute), false).AsList();
+            //if (attributes.Count != 1) return true;
+            //var writeAttribute = (WriteAttribute)attributes[0];
+            //return writeAttribute.Write;
         }
 
         private static bool IsReadable(PropertyInfo pi)
@@ -432,6 +434,7 @@ namespace Dapper.Extension
     /// <summary>
     /// 标识写入，传递false无法Insert和Update
     /// </summary>
+    [Obsolete("改属性弃用，改用IgnoreWriteAttribute")]
     [AttributeUsage(AttributeTargets.Property)]
     public class WriteAttribute : Attribute
     {

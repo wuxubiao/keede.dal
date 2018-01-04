@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using Dapper;
 using Dapper.Extension;
@@ -20,8 +24,8 @@ namespace Keede.RepositoriesTests
         public UnitTestRepository()
         {
             //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
-            string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;" };
-            string writeConnction = "Data Source=192.168.117.155;Initial Catalog=Test_Master;User Id = sa;Password = !QAZ2wsx;";
+            string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+            string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
@@ -29,6 +33,50 @@ namespace Keede.RepositoriesTests
             //TypeMapper.SetTypeMap(typeof(NewsCustom));
 
             //SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
+        }
+
+        [TestMethod]
+        public void LikeTest()
+        {
+            Expression<Func<News, bool>> queryExp1 = ct => ct.Title.Contains("X");
+            Expression<Func<News, bool>> queryExp2 = ct => ct.Title.StartsWith("X");
+            Expression<Func<News, bool>> queryExp3 = ct => ct.Title.EndsWith("X");
+            var translate = new SqlTranslateFormater();
+            string sql1 = translate.Translate(queryExp1);
+            string sql2 = translate.Translate(queryExp2);
+            string sql3 = translate.Translate(queryExp3);
+
+        }
+
+        [TestMethod]
+        public void TestRemoveExpression()
+        {
+            Dictionary<string, Expression> _localExpressionDeletedCollection = new Dictionary<string, Expression>();
+
+            var repository = new NewsRepository();
+
+            Expression<Func<News, bool>> queryExp2 = ct => ct.GId == 10000 && ct.Title == "removeTitle";
+            var tttt = queryExp2.Parameters[0].Type;
+            _localExpressionDeletedCollection.Add("s", queryExp2);
+
+            foreach (var modifiedData in _localExpressionDeletedCollection)
+            {
+                var e = modifiedData.Value;
+                
+                var type = typeof(News);
+                repository.RemoveExpression((Expression<Func<News, bool>>)e);
+
+            }
+
+            Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 10000 && ct.Title == "updateTitle";
+
+            var tt=queryExp1.Parameters[0].Type;
+
+            repository.SaveExpression(queryExp1, new { Title = "afterUpdateTitle" });
+
+
+            repository.RemoveExpression(queryExp2);
+
         }
 
         [TestMethod]
@@ -79,13 +127,13 @@ namespace Keede.RepositoriesTests
 
                 var news1 = new News();
                 news1.GId = 220;
-                news1.Title = "title220";
+                news1.Title = "title22120";
 
                 list.Add(news1);
 
                 var news2 = new News();
                 news2.GId = 221;
-                news2.Title = "title221";
+                news2.Title = "title22121";
                 list.Add(news2);
 
                 var result = repository.BatchAdd(list);
@@ -109,6 +157,62 @@ namespace Keede.RepositoriesTests
                 //Assert.IsTrue(result1);
             }
 
+        }
+
+        [TestMethod]
+        public void TestBatchUpdate()
+        {
+            using (var repository = new NewsRepository())
+            {
+                IList<News> list = new List<News>();
+
+                var news1 = new News();
+                news1.Title = "title2111";
+                news1.GId = 10000;
+                list.Add(news1);
+
+                //var news2 = new News();
+                //news2.Title = "title221";
+                //list.Add(news2);
+
+                var parameters = new[]
+                {
+                    new SqlParameter("@Gid", SqlDbType.Int, 4, "Gid"),
+                    new SqlParameter("@Title", SqlDbType.NVarChar, 50, "Title"),
+                };
+
+                var result = repository.BatchUpdate(list,"update news set title=@Title where Gid=@Gid", parameters:parameters);
+
+                //IList<NewsCustom> list2 = new List<NewsCustom>();
+
+                //var customRepository = new NewsCustomRepository();
+                //var newsCustom = new NewsCustom();
+                //newsCustom.Title = "title21";
+                //newsCustom.Content = "ss";
+                //list2.Add(newsCustom);
+
+                //var newsCustom2 = new NewsCustom();
+                //newsCustom2.Title = "title21";
+                //newsCustom2.Content = "ss";
+                //list2.Add(newsCustom2);
+
+                //var result1=customRepository.BatchAdd(list2);
+
+                //Assert.IsTrue(result);
+                //Assert.IsTrue(result1);
+            }
+
+        }
+
+        [TestMethod]
+        public void IsExistTest()
+        {
+            using (var repository = new NewsRepository())
+            {
+                var result1=repository.IsExist(new {GId = 100001, Title = "title2111" });
+                var result2 = repository.IsExist("select top 1 1 from news where Gid=@Gid", new { GId = 100001});
+
+            }
         }
 
         [TestMethod]
@@ -147,17 +251,6 @@ namespace Keede.RepositoriesTests
                 var result = repository.Remove(news1);
 
                 Assert.IsTrue(result);
-            }
-        }
-
-        [TestMethod]
-        public void TestRepoRemoveWhereSql()
-        {
-            using (var repository = new NewsRepository())
-            {
-                var result = repository.RemoveSql("  Gid=11");
-
-                Assert.IsTrue(result>0);
             }
         }
 
@@ -217,16 +310,10 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
-                var list4 = repository.GetPagedList("where Gid<=6", " order by Gid desc ", null, 2, 3);
-                var dynParms3 = new DynamicParameters();
-                dynParms3.Add("@num", 6);
-                var list5 = repository.GetPagedList("where Gid<=@num", " Gid desc ", dynParms3, 2, 3);
 
                 var sql = "select * from News where Gid>2 order by Gid desc ";
                 var list6 = repository.GetPagedList<News>(sql, null, 1, 2);
 
-                Assert.IsTrue(list4.Items.Count > 0);
-                Assert.IsTrue(list5.Items.Count > 0);
                 Assert.IsTrue(list6.Count > 0);
             }
         }
@@ -302,10 +389,8 @@ namespace Keede.RepositoriesTests
                 var list2=repository.GetList<News>("select * from news where id>@num", dynParms2);
                 var list3= repository.GetList<News>("select * from news where id>5");
 
-                var list4 = repository.GetPagedList("where id<=6"," order by id desc ",null,2,3);
                 var dynParms3 = new DynamicParameters();
                 dynParms3.Add("@num", 6);
-                var list5 = repository.GetPagedList("where id<=@num", " id desc ", dynParms3, 2, 3);
 
                 var sql = "select * from News where id>2 order by id desc ";
                 var list6= repository.GetPagedList<News>(sql, null, 1, 2);
@@ -316,8 +401,6 @@ namespace Keede.RepositoriesTests
                 Assert.IsTrue(list1.Count > 0);
                 Assert.IsTrue(list2.Count > 0);
                 Assert.IsTrue(list3.Count > 0);
-                Assert.IsTrue(list4.Items.Count > 0);
-                Assert.IsTrue(list5.Items.Count > 0);
                 Assert.IsTrue(list6.Count > 0);
             }
         }

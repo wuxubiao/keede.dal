@@ -44,22 +44,9 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                if (isReadDb)
+                using (var conn = isReadDb && Transaction.Current == null ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
                 {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        using (var conn = Databases.GetSqlConnection(dbName))
-                        {
-                            return conn.Execute(cmdText, ConvertParameter(commandParameters));
-                        }
-                    }
-                }
-                else
-                {
-                    using (var conn = Databases.GetSqlConnection(dbName, false))
-                    {
-                        return conn.Execute(cmdText, ConvertParameter(commandParameters));
-                    }
+                    return conn.Execute(cmdText, ConvertParameter(commandParameters));
                 }
             }
             catch (SqlException exp)
@@ -108,22 +95,9 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                if (isReadDb)
+                using (var conn = isReadDb && Transaction.Current == null ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
                 {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        using (var conn = Databases.GetSqlConnection(dbName))
-                        {
-                            return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
-                        }
-                    }
-                }
-                else
-                {
-                    using (var conn = Databases.GetSqlConnection(dbName, false))
-                    {
-                        return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
-                    }
+                    return conn.Execute(cmdText, ConvertParameter(commandParameters), null, 15, cmdType);
                 }
             }
             catch (SqlException exp)
@@ -166,25 +140,14 @@ namespace Keede.DAL.Helper
         public static IDataReader ExecuteReader(string dbName, bool isReadDb, int timeOut, string cmdText, params SqlParameter[] commandParameters)
         {
             IDataReader rdr = null;
-            var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false);
+            var conn = isReadDb && Transaction.Current == null ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false);
 
             //返回SqlDataReader结果需要开启SqlConnection
             //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
             try
             {
-                if (isReadDb)
-                {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut);
-                        return rdr;
-                    }
-                }
-                else
-                {
-                    rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut);
-                    return rdr;
-                }
+                rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut);
+                return rdr;
             }
             catch (SqlException exp)
             {
@@ -241,25 +204,14 @@ namespace Keede.DAL.Helper
         public static IDataReader ExecuteReaderSP(string dbName, bool isReadDb, int timeOut, CommandType cmdType, string cmdText, params SqlParameter[] commandParameters)
         {
             IDataReader rdr = null;
-            var conn = isReadDb ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false);
+            var conn = isReadDb && Transaction.Current == null ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false);
 
             //返回SqlDataReader结果需要开启SqlConnection
             //使用CommandBehavior返回结果，关闭SqlDataReader对象时同时关闭相关联的SqlConnection对象
             try
             {
-                if (isReadDb)
-                {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
-                        return rdr;
-                    }
-                }
-                else
-                {
-                    rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
-                    return rdr;
-                }
+                rdr = conn.ExecuteReader(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
+                return rdr;
             }
             catch (SqlException exp)
             {
@@ -318,24 +270,10 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                if (isReadDb)
+                using (var conn = isReadDb && Transaction.Current == null ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
                 {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        using (var connection = Databases.GetSqlConnection(dbName))
-                        {
-                            object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
-                            return val;
-                        }
-                    }
-                }
-                else
-                {
-                    using (var connection = Databases.GetSqlConnection(dbName, false))
-                    {
-                        object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
-                        return val;
-                    }
+                    object val = conn.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut);
+                    return val;
                 }
             }
             catch (SqlException exp)
@@ -377,24 +315,10 @@ namespace Keede.DAL.Helper
         {
             try
             {
-                if (isReadDb)
+                using (var conn = isReadDb && Transaction.Current == null ? Databases.GetSqlConnection(dbName) : Databases.GetSqlConnection(dbName, false))
                 {
-                    using (var ts = new TransactionScope(TransactionScopeOption.Suppress))
-                    {
-                        using (var connection = Databases.GetSqlConnection(dbName))
-                        {
-                            object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
-                            return val;
-                        }
-                    }
-                }
-                else
-                {
-                    using (var connection = Databases.GetSqlConnection(dbName, false))
-                    {
-                        object val = connection.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
-                        return val;
-                    }
+                    object val = conn.ExecuteScalar(cmdText, ConvertParameter(commandParameters), null, timeOut, cmdType);
+                    return val;
                 }
             }
             catch (SqlException exp)

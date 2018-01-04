@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -153,7 +154,16 @@ namespace Dapper.Extension
             string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
             var table = GetTableName(type);
             var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER ({1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, pagedList.OrderBy, table, pagedList.WhereSql, (pagedList.PageIndex - 1) * pagedList.PageSize + 1, pagedList.PageIndex * pagedList.PageSize);
-            var datas = connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+            List<T> datas;
+
+            //try
+            //{
+                datas = connection.Query<T>(sql, paramterObjects, transaction, true, commandTimeout).ToList();
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new SqlStatementException(sql, e);
+            //}
             var countSql = $"SELECT COUNT(0) FROM {table} {pagedList.WhereSql} ";
             var total = connection.QueryFirstOrDefault<int>(countSql, paramterObjects, transaction);
             pagedList.FillQueryData(total, datas);
@@ -687,15 +697,19 @@ namespace Dapper.Extension
 
             foreach (var item in list)
             {
-                DataRow rs = dt.NewRow();
-                int i = keyProperties.Count > 0 ? 1 : 0;
-                foreach (var propertie in allPropertiesExceptKeyAndComputed)
-                {
-                    rs[i] = type.GetProperty(propertie.Name).GetValue(item, null);
-                    i++;
-                }
+                //DataRow rs = dt.NewRow();
+                //int i = keyProperties.Count > 0 ? 1 : 0;
+                //foreach (var propertie in allPropertiesExceptKeyAndComputed)
+                //{
+                //    rs[i] = type.GetProperty(propertie.Name).GetValue(item, null);
+                //    i++;
+                //}
 
-                dt.Rows.Add(rs);
+                //dt.Rows.Add(rs);
+
+                object temp = item;
+                var values = allPropertiesExceptKeyAndComputed.Select(propertyInfo => propertyInfo.GetValue(item, null)).ToArray();
+                dt.LoadDataRow(values, true);
             }
 
             return dt;
@@ -793,9 +807,19 @@ namespace Dapper.Extension
                 whereFields = " WHERE " + string.Join(separator, properties.Select(p => HandleKeyword(p) + " = @" + p));
             }
             var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER (ORDER BY {1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, whereFields, (pageIndex - 1) * pageSize + 1, pageIndex * pageSize);
+            List<T> datas;
+            int total = 0;
 
-            var datas = connection.Query<T>(sql, conditionObj, transaction, true, commandTimeout).ToList();
-            var total = GetCount(connection, condition, table, isOr, transaction, commandTimeout);
+            //try
+            //{
+                datas = connection.Query<T>(sql, conditionObj, transaction, true, commandTimeout).ToList();
+                total = GetCount(connection, condition, table, isOr, transaction, commandTimeout);
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new SqlStatementException(sql, e);
+            //}
+
             return new PagedList<T>(pageIndex, pageSize, total, datas);
         }
 
@@ -936,7 +960,7 @@ namespace Dapper.Extension
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static List<string> GetFieldNames(object obj)
+        public static List<string> GetFieldNames(object obj)
         {
             if (obj == null)
             {
@@ -978,7 +1002,7 @@ namespace Dapper.Extension
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static Dictionary<PropertyInfo, string> GetPropertyAndFieldName(object obj)
+        public static Dictionary<PropertyInfo, string> GetPropertyAndFieldName(object obj)
         {
             if (obj == null)
             {
@@ -990,7 +1014,7 @@ namespace Dapper.Extension
                 return propertyAndField;
 
             propertyAndField = new Dictionary<PropertyInfo, string>();
-            var properties = obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public).ToList();
+            var properties = obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public).Where(IsWriteable).ToList();
 
             foreach (var property in properties)
             {
@@ -1018,6 +1042,45 @@ namespace Dapper.Extension
             return propertyAndField;
         }
         #endregion SqlMapper_Extensions
+
+        public static int Delete<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExpression, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            var translate = new SqlTranslateFormater();
+            string whereSql = " where " + translate.Translate(whereExpression);
+
+            if (string.IsNullOrEmpty(whereSql)) throw new ArgumentNullException("whereExpression is not match");
+
+            var type = typeof(T);
+            var name = GetTableName(type);
+            var statement = $"delete from {name}" + whereSql;
+
+            var deleted = connection.Execute(statement, null, transaction, commandTimeout);
+            return deleted;
+        }
+
+        public static int Update<T>(this IDbConnection connection, dynamic data, Expression<Func<T, bool>> whereExpression, string expandFieldsSql = "", dynamic expandData = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var type = typeof(T);
+            var tableName = GetTableName(type);
+
+            var translate = new SqlTranslateFormater();
+            string whereSql = " where " + translate.Translate(whereExpression);
+
+            var obj = data as object;
+
+            var updateProperties = GetFieldNames(obj);
+
+            var updateFields = string.Join(",", updateProperties.Select(p => HandleKeyword(p) + " = @" + p));
+
+            var sql = string.Format("update [{0}] set {1}{2}", tableName, updateFields, whereSql);
+
+            var parameters = new DynamicParameters(data);
+            //var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+
+            //parameters.AddDynamicParams(expandoObject);
+
+            return connection.Execute(sql, parameters, transaction, commandTimeout);
+        }
 
         #endregion 新增方法
     }

@@ -31,15 +31,31 @@ namespace Dapper.Extension
         {
             var commandText = ProcessCommandSqlServer(sql.Trim(),pageIndex,pageSize, orderBy);
 
-            return connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
+            IList<T> result;
+
+            //try
+            //{
+                result= connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new SqlStatementException(commandText, e);
+            //}
+
+            return result;
         }
 
         /// <summary>
         /// order by 正则
         /// </summary>
         private static readonly Regex _orderByRegexSqlServer = new Regex(@"\s*order\s+by\s+[^\s,\)\(]+(?:\s+(?:asc|desc))?(?:\s*,\s*[^\s,\)\(]+(?:\s+(?:asc|desc))?)*", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex RxOrderBy = new Regex(@"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex RxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
         private static readonly string _tableAndWhere = @"[Ff][Rr][Oo][Mm][\s\S]+[Ww][Hh][Ee][Rr][Ee][\s\S]+";
         private static readonly string _selectColumn = @"(?<=[Ss][Ee][Ll][Ee][Cc][Tt])[\S\s]+?\s(?=[Ff][Rr][Oo][Mm])";
+
+
 
         /// <summary>
         /// 获取最后一个匹配的 Order By 结果。
@@ -48,7 +64,8 @@ namespace Dapper.Extension
         /// <returns>返回 Order By 结果。</returns>
         private static Match GetOrderByMatch(string commandText)
         {
-            var match = _orderByRegexSqlServer.Match(commandText);
+            //var match = _orderByRegexSqlServer.Match(commandText);
+            var match = RxOrderBy.Match(commandText);
             while (match.Success)
             {
                 if ((match.Index + match.Length) == commandText.Length) return match;
@@ -82,8 +99,15 @@ namespace Dapper.Extension
                     orderBy = "ORDER BY getdate()";
                 }
 
-                return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},* FROM ({0}) ____t1____) ____t2____ WHERE {1} BETWEEN {2} AND {3}",
-                    commandText
+                var m = RxColumns.Match(commandText);
+                if (!m.Success)
+                    throw new ArgumentException();
+
+                Group g = m.Groups[1];
+                var sqlSelectRemoved = commandText.Substring(g.Index);
+
+                return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},{0}) ____t1____ WHERE {1} BETWEEN {2} AND {3}",
+                    sqlSelectRemoved
                     , "RowNumber"
                     , start
                     , end
