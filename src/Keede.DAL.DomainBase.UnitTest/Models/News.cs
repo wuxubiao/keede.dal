@@ -15,12 +15,14 @@ namespace Keede.DAL.DDD.UnitTest.Models
         [ExplicitKey]
         public int GId { get; set; }
 
-        [ExplicitKey]
+        //[ExplicitKey]
         [Column("Title")]
         public string Title { get; set; }
 
         //[Column("Content")]
         public string Content { get; set; }
+
+        public Guid Test1 { get; set; }
 
         [IgnoreRead, IgnoreWrite]
         public string ContentTest { get; set; }

@@ -11,6 +11,8 @@ using Keede.DAL.DDD.Repositories;
 using Keede.DAL.DDD.UnitTest;
 using Keede.DAL.DDD.UnitTest.Models;
 using Keede.DAL.RWSplitting;
+using Keede.RepositoriesTests.Models;
+using Keede.RepositoriesTests.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Keede.RepositoriesTests
@@ -24,15 +26,20 @@ namespace Keede.RepositoriesTests
         public UnitTestRepository()
         {
             //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
-            string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
-            string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
-            ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
+
+            //string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+            //string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
+            //ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
             //TypeMapper.SetTypeMap(typeof(News));
             //TypeMapper.SetTypeMap(typeof(NewsCustom));
 
             //SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
+
+            string[] readConnctions = { "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+            string writeConnction = "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
+            ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
         }
 
         [TestMethod]
@@ -121,18 +128,19 @@ namespace Keede.RepositoriesTests
         [TestMethod]
         public void TestBatchAdd()
         {
+
             using (var repository = new NewsRepository())
             {
                 IList<News> list = new List<News>();
 
                 var news1 = new News();
-                news1.GId = 220;
+                news1.GId = 22011;
                 news1.Title = "title22120";
-
+                news1.Test1=new Guid();
                 list.Add(news1);
 
                 var news2 = new News();
-                news2.GId = 221;
+                news2.GId = 22111;
                 news2.Title = "title22121";
                 list.Add(news2);
 
@@ -157,6 +165,39 @@ namespace Keede.RepositoriesTests
                 //Assert.IsTrue(result1);
             }
 
+        }
+
+        [TestMethod]
+        public void TestBatchAdd2()
+        {
+            var couponNoEntityList = new List<CouponNoEntity>
+            {
+                new CouponNoEntity
+                {
+                    No = 1008209,
+                    CouponNo = "64ZTE4H",
+                    PromotionID = new Guid("0D6B14DD-2CFD-46F5-AF48-3D989F258430"),
+                    UseStartTime = DateTime.Parse("2017-01-23 00:00:00.000"),
+                    UseEndTime = DateTime.Parse("2017-01-24 23:59:59.997"),
+                    MemberID = Guid.NewGuid(),
+                    BuildTime = DateTime.Parse("2017-01-22 15:44:02.223"),
+                    IsUsed = false
+                },
+                new CouponNoEntity
+                {
+                    No = 1008210,
+                    CouponNo = "5K9HSJ",
+                    PromotionID = new Guid("0D6B14DD-2CFD-46F5-AF48-3D989F258430"),
+                    UseStartTime = DateTime.Parse("2017-01-23 00:00:00.000"),
+                    UseEndTime = DateTime.Parse("2017-01-24 23:59:59.997"),
+                    MemberID = Guid.NewGuid(),
+                    BuildTime = DateTime.Parse("2017-01-22 15:44:02.240"),
+                    IsUsed = false
+                }
+            };
+
+            var repository = new CouponNoRepository();
+            repository.BatchAdd(couponNoEntityList);
         }
 
         [TestMethod]

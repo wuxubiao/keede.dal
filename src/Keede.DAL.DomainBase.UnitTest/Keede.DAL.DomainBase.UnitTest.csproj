@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Extension\Mapping\TypeMapperTests.cs" />
     <Compile Include="Models\Box.cs" />
+    <Compile Include="Models\CouponNoEntity.cs" />
     <Compile Include="Models\NewCustom.cs" />
     <Compile Include="Models\NewsConstructor.cs" />
     <Compile Include="Models\NewsMultiId.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Repositories\BookRepository.cs" />
+    <Compile Include="Repositories\CouponNoRepository.cs" />
     <Compile Include="Repositories\IBookRepository.cs" />
     <Compile Include="Repositories\INewCustomRepository.cs" />
     <Compile Include="Repositories\INewsRepository.cs" />

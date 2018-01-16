@@ -37,7 +37,7 @@ namespace Keede.DAL.DDD.UnitTest
             {
                 CustomersEntity ce=new CustomersEntity();
                 ce.DD=new Guid();
-                unitOfWork.RegisterModified<News>(ct => ct.IDD == ce.DD, new { Title = "afterUpdateTitle1112" });
+                unitOfWork.RegisterModified<News>(ct => ct.Test1 == ce.DD, new { Title = "afterUpdateTitle1112" });
 
                 ////Expression<Func<News, bool>> modifyQueryExpression = ct => ct.GId == 10000 && ct.Title == "updateTitle";
                 ////unitOfWork.RegisterModified(modifyQueryExpression, new { Title = "afterUpdateTitle" });

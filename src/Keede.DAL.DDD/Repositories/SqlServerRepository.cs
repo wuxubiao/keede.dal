@@ -183,6 +183,12 @@ namespace Keede.DAL.DDD.Repositories
             bulkCopy.DestinationTableName = dt.TableName;
             bulkCopy.BatchSize = dt.Rows.Count;
 
+            foreach (var item in dt.Columns)
+            {
+                var col = (DataColumn) item;
+                bulkCopy.ColumnMappings.Add(col.ColumnName, col.ColumnName);
+            }
+
             try
             {
                 if (dt.Rows.Count != 0)
