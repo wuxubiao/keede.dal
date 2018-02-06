@@ -11,6 +11,18 @@ namespace Dapper.Extensions.Tests
     public class WhereExpressionTest
     {
         [TestMethod]
+        public void SimpleWhereTrueTest1()
+        {
+            //Expression<Func<CustomersEntity, bool>> queryExp1 = ct => 1==1 && ct.CustomerCity == "B-City";
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => true && ct.CustomerCity == "B-City" && ct.CustomerID==1;
+
+            var translate = new SqlTranslateFormater();
+            string sql = translate.Translate(queryExp1);
+
+            Assert.Equals(sql, "CustomerID < 50 AND CustomerCity = 'B-City'");
+        }
+
+        [TestMethod]
         public void SimpleWhereTest1()
         {
             Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID < 50 && ct.CustomerCity == "B-City";

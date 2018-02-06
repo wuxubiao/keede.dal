@@ -275,7 +275,7 @@ namespace Dapper.Extension
                 switch (Type.GetTypeCode(c.Value.GetType()))
                 {
                     case TypeCode.Boolean:
-                        sb.Append(((bool)c.Value) ? 1 : 0);
+                        sb.Append(((bool)c.Value) ? "1=1" : "0");
                         break;
                     case TypeCode.DateTime:
                         string dtfs = "'{0}'";
