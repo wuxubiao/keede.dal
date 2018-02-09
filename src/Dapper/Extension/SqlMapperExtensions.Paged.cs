@@ -55,7 +55,14 @@ namespace Dapper.Extension
         private static readonly string _tableAndWhere = @"[Ff][Rr][Oo][Mm][\s\S]+[Ww][Hh][Ee][Rr][Ee][\s\S]+";
         private static readonly string _selectColumn = @"(?<=[Ss][Ee][Ll][Ee][Cc][Tt])[\S\s]+?\s(?=[Ff][Rr][Oo][Mm])";
 
+        public static string GetSelectColumnReplaceToCount(string commandText)
+        {
+            string replacement = " count(1) ";
+            Regex rgx = new Regex(_selectColumn);
+            string result = rgx.Replace(commandText, replacement, 1);
 
+            return result;
+        }
 
         /// <summary>
         /// 获取最后一个匹配的 Order By 结果。

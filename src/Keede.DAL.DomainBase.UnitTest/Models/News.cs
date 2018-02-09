@@ -12,7 +12,7 @@ namespace Keede.DAL.DDD.UnitTest.Models
     public class News : IEntity
     {
         //[ExplicitKey, Column("GId")]
-        [ExplicitKey]
+        [Key]
         public int GId { get; set; }
 
         //[ExplicitKey]

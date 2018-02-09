@@ -31,15 +31,21 @@ namespace Keede.RepositoriesTests
             //string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
             //ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
-            TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
-            //TypeMapper.SetTypeMap(typeof(News));
-            //TypeMapper.SetTypeMap(typeof(NewsCustom));
+            //TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
+            ////TypeMapper.SetTypeMap(typeof(News));
+            ////TypeMapper.SetTypeMap(typeof(NewsCustom));
 
-            //SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
+            ////SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
 
-            string[] readConnctions = { "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
-            string writeConnction = "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
+            //string[] readConnctions = { "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+            //string writeConnction = "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
+            //ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
+            //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
+            string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+            string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
+
+            TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
         }
 
         [TestMethod]
@@ -134,14 +140,14 @@ namespace Keede.RepositoriesTests
                 IList<News> list = new List<News>();
 
                 var news1 = new News();
-                news1.GId = 22011;
-                news1.Title = "title22120";
+                news1.GId = 9998;
+                news1.Title = "title1" + DateTime.Now;
                 news1.Test1=new Guid();
                 list.Add(news1);
 
                 var news2 = new News();
-                news2.GId = 22111;
-                news2.Title = "title22121";
+                news2.GId = 9999;
+                news2.Title = "title2" +DateTime.Now;
                 list.Add(news2);
 
                 var result = repository.BatchAdd(list);

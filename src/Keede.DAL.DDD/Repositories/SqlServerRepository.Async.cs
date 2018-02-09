@@ -446,6 +446,8 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
+                sql = SqlMapperExtensions.GetSelectColumnReplaceToCount(sql);
+
                 result = await conn.ExecuteScalarAsync<int>(sql, parameterObject, DbTransaction);
             }
             catch (Exception e)

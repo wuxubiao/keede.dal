@@ -684,11 +684,6 @@ namespace Dapper.Extension
             DataTable dt = new DataTable();
             dt.TableName = GetTableName(type);
 
-            if (keyProperties.Count > 0)
-            {
-                dt.Columns.Add(new DataColumn(GetCustomColumnName(keyProperties[0]), keyProperties[0].PropertyType));
-            }
-
             foreach (var propertie in allPropertiesExceptKeyAndComputed)
             {
                 var column = new DataColumn(GetCustomColumnName(propertie), propertie.PropertyType);
@@ -711,6 +706,11 @@ namespace Dapper.Extension
                 var values = allPropertiesExceptKeyAndComputed.Select(propertyInfo => propertyInfo.GetValue(item, null)).ToArray();
                 dt.LoadDataRow(values, true);
             }
+
+            //if (keyProperties.Count > 0)
+            //{
+            //    dt.Columns.Add(new DataColumn(GetCustomColumnName(keyProperties[0]), keyProperties[0].PropertyType));
+            //}
 
             return dt;
         }
