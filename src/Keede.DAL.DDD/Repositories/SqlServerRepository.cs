@@ -52,7 +52,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public override bool Add(TEntity data)
+        public override bool Add(TEntity data, int? commandTimeout = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -60,7 +60,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.Insert(data, DbTransaction) > 0;
+                result = conn.Insert(data, DbTransaction, commandTimeout) > 0;
             }
             catch (SqlStatementException statementEx)
             {
@@ -207,7 +207,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public override bool Save(TEntity data)
+        public override bool Save(TEntity data, int? commandTimeout = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -215,7 +215,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.Update(data, DbTransaction);
+                result = conn.Update(data, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -235,14 +235,14 @@ namespace Keede.DAL.DDD.Repositories
             return result;
         }
 
-        public override int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data)
+        public override int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data, int? commandTimeout = null)
         {
             var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
             var result = 0;
 
             try
             {
-                 result=SqlMapperExtensions.Update(conn, data, whereExpression, "", null, DbTransaction);
+                 result=SqlMapperExtensions.Update(conn, data, whereExpression, "", null, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -262,14 +262,14 @@ namespace Keede.DAL.DDD.Repositories
             return result;
         }
 
-        public override int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression)
+        public override int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression, int? commandTimeout = null)
         {
             var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
             var result = 0;
 
             try
             {
-                result = conn.Delete(whereExpression, DbTransaction);
+                result = conn.Delete(whereExpression, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -294,7 +294,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public override bool Remove(TEntity data)
+        public override bool Remove(TEntity data, int? commandTimeout = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -302,7 +302,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.Delete(data, DbTransaction);
+                result = conn.Delete(data, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -330,7 +330,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        public override TEntity Get(string sql, object parameterObject = null, bool isReadDb = true)
+        public override TEntity Get(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -338,7 +338,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction);
+                result = conn.QueryFirstOrDefault<TEntity>(sql, parameterObject, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -367,7 +367,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        public override T Get<T>(string sql, object parameterObject = null, bool isReadDb = true)
+        public override T Get<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -375,7 +375,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction);
+                result = conn.QueryFirstOrDefault<T>(sql, parameterObject, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -401,9 +401,9 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override TEntity Get(object condition, bool isReadDb = true)
+        public override TEntity Get(object condition, bool isReadDb = true, int? commandTimeout = null)
         {
-            return GetList(condition, isReadDb).FirstOrDefault();
+            return GetList(condition, isReadDb, commandTimeout).FirstOrDefault();
         }
 
         /// <summary>
@@ -412,7 +412,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="id"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override TEntity GetById(dynamic id, bool isReadDb = true)
+        public override TEntity GetById(dynamic id, bool isReadDb = true, int? commandTimeout = null)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -420,7 +420,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction);
+                result = SqlMapperExtensions.Get<TEntity>(conn, id, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -445,7 +445,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public override TEntity GetAndUpdateLock(object condition)
+        public override TEntity GetAndUpdateLock(object condition, int? commandTimeout = null)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
             var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -454,7 +454,7 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-                result = conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, 3);
+                result = conn.GetAndUpdateLock<TEntity>(condition, table, "*", false, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -482,7 +482,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true)
+        public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -490,7 +490,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.Query<T>(sql, parameterObject, DbTransaction).ToList();
+                result = conn.Query<T>(sql, parameterObject, DbTransaction, true, commandTimeout).ToList();
             }
             catch (SqlStatementException statementEx)
             {
@@ -516,7 +516,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override IList<TEntity> GetList(object condition, bool isReadDb = true)
+        public override IList<TEntity> GetList(object condition, bool isReadDb = true, int? commandTimeout = null)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -525,7 +525,7 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 var tableName = SqlMapperExtensions.GetTableName(typeof(TEntity));
-                result = conn.QueryList<TEntity>(condition, tableName, "*", false, DbTransaction, 3).ToList();
+                result = conn.QueryList<TEntity>(condition, tableName, "*", false, DbTransaction, commandTimeout).ToList();
             }
             catch (SqlStatementException statementEx)
             {
@@ -549,14 +549,14 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <returns></returns>
-        public override IList<TEntity> GetAll(bool isReadDb = true)
+        public override IList<TEntity> GetAll(bool isReadDb = true, int? commandTimeout = null)
         {
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
             var result = default(IList<TEntity>);
 
             try
             {
-                result = conn.GetAll<TEntity>(DbTransaction).ToList();
+                result = conn.GetAll<TEntity>(DbTransaction, commandTimeout).ToList();
             }
             catch (SqlStatementException statementEx)
             {
@@ -584,7 +584,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true)
+        public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -594,7 +594,7 @@ namespace Keede.DAL.DDD.Repositories
             {
                 sql = SqlMapperExtensions.GetSelectColumnReplaceToCount(sql);
 
-                result = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction);
+                result = (int)conn.ExecuteScalar(sql, parameterObject, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -614,7 +614,7 @@ namespace Keede.DAL.DDD.Repositories
             return result;
         }
 
-        public override int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true)
+        public override int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null)
         {
             var translate = new SqlTranslateFormater();
             string whereSql = translate.Translate(whereExpression);
@@ -628,7 +628,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = (int)conn.ExecuteScalar(sql, null, DbTransaction);
+                result = (int)conn.ExecuteScalar(sql, null, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -656,7 +656,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
+        public override PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true, int? commandTimeout = null)
         {
             var translate = new SqlTranslateFormater();
             string whereSql = translate.Translate(whereExpression);
@@ -666,7 +666,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                conn.QueryPaged(ref result, null, DbTransaction);
+                conn.QueryPaged(ref result, null, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -700,14 +700,14 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        public override IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true)
+        public override IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true, int? commandTimeout = null)
         {
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
             var result = default(IList<T>);
 
             try
             {
-                result = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction);
+                result = conn.QueryPaged<T>(sql, pageIndex, pageSize, orderBy, parameterObjects, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -736,7 +736,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
+        public override PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true, int? commandTimeout = null)
         {
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -744,7 +744,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, 3);
+                result = conn.QueryPaged<TEntity>(condition, table, orderBy, pageIndex, pageSize, "*", false, DbTransaction, commandTimeout);
             }
             catch (SqlStatementException statementEx)
             {
@@ -770,9 +770,9 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="id"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override bool IsExistById(object id, bool isReadDb = true)
+        public override bool IsExistById(object id, bool isReadDb = true, int? commandTimeout = null)
         {
-            return GetById(id, isReadDb) != null;
+            return GetById(id, isReadDb, commandTimeout) != null;
         }
 
         /// <summary>
@@ -781,7 +781,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public override bool IsExist(object condition, bool isReadDb = true)
+        public override bool IsExist(object condition, bool isReadDb = true, int? commandTimeout = null)
         {
             var tableName = SqlMapperExtensions.GetTableName(typeof(TEntity));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -789,7 +789,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                result = conn.GetCount(condition, tableName, false, DbTransaction) > 0;
+                result = conn.GetCount(condition, tableName, false, DbTransaction, commandTimeout) > 0;
             }
             catch (SqlStatementException statementEx)
             {
@@ -817,7 +817,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        public override bool IsExist(string sql, object condition = null, bool isReadDb = true)
+        public override bool IsExist(string sql, object condition = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
             var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
@@ -825,7 +825,7 @@ namespace Keede.DAL.DDD.Repositories
 
             try
             {
-                var count=conn.ExecuteScalar(sql, condition, DbTransaction);
+                var count=conn.ExecuteScalar(sql, condition, DbTransaction, commandTimeout);
                 if (count == null)
                     return false;
                 result = (int)count > 0;

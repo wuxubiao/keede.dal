@@ -21,7 +21,7 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        bool Add(TEntity data);
+        bool Add(TEntity data, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -36,14 +36,14 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        bool Save(TEntity data);
+        bool Save(TEntity data, int? commandTimeout = null);
 
         /// <summary>
         /// Remove item from the repository by custom condition
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
-        bool Remove(TEntity condition);
+        bool Remove(TEntity condition, int? commandTimeout = null);
 
         /// <summary>
         /// Get single item from the repository by custom condition
@@ -52,7 +52,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <returns></returns>
         [Obsolete]
-        TEntity Get(string sql,object parameterObject = null, bool isReadDb = true);
+        TEntity Get(string sql,object parameterObject = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -63,7 +63,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        T Get<T>(string sql, object parameterObject = null, bool isReadDb = true);
+        T Get<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
@@ -71,14 +71,14 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="id"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        TEntity GetById(dynamic id, bool isReadDb = true);
+        TEntity GetById(dynamic id, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果要求附带UPDLOCK更新锁，就能防止脏读数据
         /// </summary>
         /// <param name="condition"></param>
         /// <returns></returns>
-        TEntity GetAndUpdateLock(object condition);
+        TEntity GetAndUpdateLock(object condition, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -88,7 +88,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        int GetCount(string sql, object parameterObject = null, bool isReadDb = true);
+        int GetCount(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -99,13 +99,13 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true);
+        IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// Get all items from the repository by custom condition
         /// </summary>
         /// <returns></returns>
-        IList<TEntity> GetAll(bool isReadDb = true);
+        IList<TEntity> GetAll(bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -113,7 +113,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        TEntity Get(object condition, bool isReadDb = true);
+        TEntity Get(object condition, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -121,7 +121,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        IList<TEntity> GetList(object condition, bool isReadDb = true);
+        IList<TEntity> GetList(object condition, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -132,7 +132,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true);
+        PagedList<TEntity> GetPagedList(Expression<Func<TEntity, bool>> whereExpression, string orderBy, int pageIndex, int pageSize, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -145,7 +145,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true);
+        IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -157,7 +157,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize,
-            bool isReadDb = true);
+            bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -165,21 +165,21 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="whereExpression"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data);
+        int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data, int? commandTimeout = null);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="whereExpression"></param>
         /// <returns></returns>
-        int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression);
+        int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression, int? commandTimeout = null);
 
-        bool IsExistById(object condition, bool isReadDb = true);
+        bool IsExistById(object condition, bool isReadDb = true, int? commandTimeout = null);
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        bool IsExist(object condition, bool isReadDb = true);
+        bool IsExist(object condition, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -189,7 +189,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <returns></returns>
         [Obsolete]
-        bool IsExist(string sql, object condition = null, bool isReadDb = true);
+        bool IsExist(string sql, object condition = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
         /// 
@@ -197,7 +197,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="whereExpression"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true);
+        int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null);
 
         int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters);
     }
