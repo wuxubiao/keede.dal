@@ -67,7 +67,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        Task<T> GetAsync<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        Task<T> GetAsync<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// 指定Id，获取一个实体对象；如果在事务内读取，会自动加上更新锁 WITH(UPDLOCK)
@@ -101,7 +101,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// Get all items from the repository by custom condition
@@ -130,7 +130,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        Task<IList<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
+        Task<IList<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true);
 
         /// <summary>
         /// 

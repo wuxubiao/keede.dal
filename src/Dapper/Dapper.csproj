@@ -54,6 +54,7 @@
     <Compile Include="Expression\SqlTranslateFormater.cs" />
     <Compile Include="Extension\Attribute\IgnoreReadAttribute.cs" />
     <Compile Include="Extension\Attribute\IgnoreWriteAttribute.cs" />
+    <Compile Include="Extension\Attribute\RWSplitDbNameAttribute.cs" />
     <Compile Include="Extension\Attribute\TypeMapperAttribute.cs" />
     <Compile Include="Extension\Exception\SqlStatementException.cs" />
     <Compile Include="Extension\Kede.SqlMapperExtensions.cs" />

@@ -15,6 +15,27 @@ namespace Dapper.Extension
     /// </summary>
     public static partial class SqlMapperExtensions
     {
+        private static readonly ConcurrentDictionary<RuntimeTypeHandle, string> TypeRWSplitDbName = new ConcurrentDictionary<RuntimeTypeHandle, string>();
+
+        public static string GetRWSplitDbName(Type type)
+        {
+            string name = "";
+            if (TypeRWSplitDbName.TryGetValue(type.TypeHandle, out name)) return name;
+
+
+                //NOTE: This as dynamic trick should be able to handle both our own Table-attribute as well as the one in EntityFramework 
+                var tableAttr = type
+#if COREFX
+                    .GetTypeInfo()
+#endif
+                    .GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "RWSplitDbNameAttribute") as dynamic;
+                if (tableAttr != null)
+                    name = tableAttr.Name;
+            if(name==null) name = "";
+            TypeRWSplitDbName[type.TypeHandle] = name;
+            return name;
+        }
+
         #region 改动方法
         /// <summary>
         /// ！@#有改动

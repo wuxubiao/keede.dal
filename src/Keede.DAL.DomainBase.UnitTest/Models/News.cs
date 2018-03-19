@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Keede.DAL.DDD.UnitTest.Models
 {
     [Table("News"), TypeMapper]
+    [RWSplitDbName("")]
     public class News : IEntity
     {
         //[ExplicitKey, Column("GId")]

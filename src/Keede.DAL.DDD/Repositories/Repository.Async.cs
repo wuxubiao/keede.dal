@@ -78,7 +78,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
-        public abstract Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        public abstract Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         //public abstract IList<TEntity> GetList(string where, object parameterObject = null);
 
@@ -90,7 +90,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract Task<T> GetAsync<T>(string sql, object parameterObject = null, bool isReadDb = true) where T : class;
+        public abstract Task<T> GetAsync<T>(string sql, object parameterObject = null, bool isReadDb = true);
 
         /// <summary>
         /// 
@@ -127,7 +127,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
-        public abstract Task<IList<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true) where T : class;
+        public abstract Task<IList<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true);
         #region IDisposable Members
 
         /// <summary>
