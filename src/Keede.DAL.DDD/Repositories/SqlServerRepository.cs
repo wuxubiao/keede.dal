@@ -25,9 +25,9 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="isReadDb"></param>
         /// <param name="dbName"></param>
         /// <returns></returns>
-        public IDbConnection OpenDbConnection(bool isReadDb = true, string dbName = "")
+        public IDbConnection OpenDbConnection(bool isReadDb = true)
         {
-            var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(dbName, isReadDb);
+            var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)), isReadDb);
             if (conn.State == ConnectionState.Broken || conn.State == ConnectionState.Closed) conn.Open();
             return conn;
         }
@@ -55,7 +55,7 @@ namespace Keede.DAL.DDD.Repositories
         public override bool Add(TEntity data, int? commandTimeout = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -90,7 +90,7 @@ namespace Keede.DAL.DDD.Repositories
         public override bool BatchAdd<T>(IList<T> list, string destinationTableName = null)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -129,7 +129,7 @@ namespace Keede.DAL.DDD.Repositories
         public override int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             int result;
 
             try
@@ -210,7 +210,7 @@ namespace Keede.DAL.DDD.Repositories
         public override bool Save(TEntity data, int? commandTimeout = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -237,7 +237,7 @@ namespace Keede.DAL.DDD.Repositories
 
         public override int SaveExpression(Expression<Func<TEntity, bool>> whereExpression, dynamic data, int? commandTimeout = null)
         {
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = 0;
 
             try
@@ -264,7 +264,7 @@ namespace Keede.DAL.DDD.Repositories
 
         public override int RemoveExpression(Expression<Func<TEntity, bool>> whereExpression, int? commandTimeout = null)
         {
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = 0;
 
             try
@@ -297,7 +297,7 @@ namespace Keede.DAL.DDD.Repositories
         public override bool Remove(TEntity data, int? commandTimeout = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -333,7 +333,7 @@ namespace Keede.DAL.DDD.Repositories
         public override TEntity Get(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(TEntity);
 
             try
@@ -370,7 +370,7 @@ namespace Keede.DAL.DDD.Repositories
         public override T Get<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(T);
 
             try
@@ -415,7 +415,7 @@ namespace Keede.DAL.DDD.Repositories
         public override TEntity GetById(dynamic id, bool isReadDb = true, int? commandTimeout = null)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(TEntity);
 
             try
@@ -448,7 +448,7 @@ namespace Keede.DAL.DDD.Repositories
         public override TEntity GetAndUpdateLock(object condition, int? commandTimeout = null)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = default(TEntity);
 
             try
@@ -485,7 +485,7 @@ namespace Keede.DAL.DDD.Repositories
         public override IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(IList<T>);
 
             try
@@ -519,7 +519,7 @@ namespace Keede.DAL.DDD.Repositories
         public override IList<TEntity> GetList(object condition, bool isReadDb = true, int? commandTimeout = null)
         {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(IList<TEntity>);
 
             try
@@ -551,7 +551,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override IList<TEntity> GetAll(bool isReadDb = true, int? commandTimeout = null)
         {
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(IList<TEntity>);
 
             try
@@ -587,7 +587,7 @@ namespace Keede.DAL.DDD.Repositories
         public override int GetCount(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = 0;
 
             try
@@ -623,7 +623,7 @@ namespace Keede.DAL.DDD.Repositories
             var tableName = SqlMapperExtensions.GetTableName(entityType);
             string sql = "select count(*) from "+ tableName+ " where " + whereSql;
 
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = 0;
 
             try
@@ -662,7 +662,7 @@ namespace Keede.DAL.DDD.Repositories
             string whereSql = translate.Translate(whereExpression);
 
             var result = new PagedList<TEntity>(pageIndex, pageSize, whereSql, orderBy);
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
 
             try
             {
@@ -702,7 +702,7 @@ namespace Keede.DAL.DDD.Repositories
         [Obsolete]
         public override IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true, int? commandTimeout = null)
         {
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(IList<T>);
 
             try
@@ -739,7 +739,7 @@ namespace Keede.DAL.DDD.Repositories
         public override PagedList<TEntity> GetPagedList(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true, int? commandTimeout = null)
         {
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = default(PagedList<TEntity>);
 
             try
@@ -784,7 +784,7 @@ namespace Keede.DAL.DDD.Repositories
         public override bool IsExist(object condition, bool isReadDb = true, int? commandTimeout = null)
         {
             var tableName = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = false;
 
             try
@@ -820,7 +820,7 @@ namespace Keede.DAL.DDD.Repositories
         public override bool IsExist(string sql, object condition = null, bool isReadDb = true, int? commandTimeout = null)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = false;
 
             try

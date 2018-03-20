@@ -24,7 +24,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> AddAsync(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -53,7 +53,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> BatchAddAsync<T>(IList<T> list, string destinationTableName = null)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -113,7 +113,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> SaveAsync(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -141,7 +141,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<bool> RemoveAsync(TEntity data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = false;
 
             try
@@ -169,7 +169,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<int> RemoveAsync(string whereSql, object parameterObject = null)
         {
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             var result = 0;
 
             try
@@ -199,7 +199,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<TEntity> GetAsync(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             TEntity result;
 
             try
@@ -230,7 +230,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<T> GetAsync<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             T result;
 
             try
@@ -260,7 +260,7 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             TEntity result;
 
             try
@@ -291,7 +291,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<TEntity> GetByIdAsync(dynamic id, bool isReadDb = true)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             TEntity result;
 
             try
@@ -320,7 +320,7 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
-            var conn = OpenDbConnection(false, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(false);
             TEntity result;
 
             try
@@ -351,7 +351,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<IList<T>> GetListAsync<T>(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             IList<T> result;
 
             try
@@ -382,7 +382,7 @@ namespace Keede.DAL.DDD.Repositories
         {
             if (condition == null)
                 throw new ArgumentNullException(nameof(condition));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             IList<TEntity> result;
 
             try
@@ -410,7 +410,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<IList<TEntity>> GetAllAsync(bool isReadDb = true)
         {
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             IList<TEntity> result;
 
             try
@@ -441,7 +441,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<int> GetCountAsync(string sql, object parameterObject = null, bool isReadDb = true)
         {
             if (string.IsNullOrWhiteSpace(sql)) throw new ArgumentNullException(nameof(sql));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             var result = 0;
 
             try
@@ -475,7 +475,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<PagedList<TEntity>> GetPagedListAsync(string whereSql, string orderBy, object parameterObjects, int pageIndex, int pageSize, bool isReadDb = true)
         {
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             PagedList<TEntity> result;
 
             try
@@ -510,7 +510,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         public override async Task<IList<T>> GetPagedListAsync<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true)
         {
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             IList<T> result;
 
             try
@@ -543,7 +543,7 @@ namespace Keede.DAL.DDD.Repositories
         public override async Task<PagedList<TEntity>> GetPagedListAsync(object condition, string orderBy, int pageIndex, int pageSize, bool isReadDb = true)
         {
             var table = SqlMapperExtensions.GetTableName(typeof(TEntity));
-            var conn = OpenDbConnection(isReadDb, SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)));
+            var conn = OpenDbConnection(isReadDb);
             PagedList<TEntity> result;
 
             try

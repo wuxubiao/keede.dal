@@ -100,17 +100,17 @@ namespace Keede.DAL.DDD.UnitTest
             NewsRepository repository = new NewsRepository();
 
             var news = new News();
-            news.GId = 998;
+            news.GId = 998111;
             news.Title = "UnitWrokTitle998";
 
             IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
             unitOfWork.RegisterAdded(news);
             //unitOfWork.RegisterRemoved(news);
 
-            var person = new Person();
-            person.Name = "name";
-            person.Id = new Guid("9E8D004F-21F6-432C-B1D5-DA5C01CA60ee");
-            unitOfWork.RegisterAdded(person);
+            //var person = new Person();
+            //person.Name = "name";
+            //person.Id = new Guid("9E8D004F-21F6-432C-B1D5-DA5C01CA60ee");
+            //unitOfWork.RegisterAdded(person);
 
             unitOfWork.Commit();
 

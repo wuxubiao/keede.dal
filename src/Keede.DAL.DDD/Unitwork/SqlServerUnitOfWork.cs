@@ -211,21 +211,21 @@ namespace Keede.DAL.DDD.Unitwork
                         {
                             var repository = GetRepostiroy(deletedData.Value, _openedTransaction);
                             var removeMethod = GetRemoveMethod(repository);
-                            removeMethod.Invoke(repository, new[] { deletedData.Value });
+                            removeMethod.Invoke(repository, new[] { deletedData.Value, null });
                         }
 
                         foreach (var newData in NewCollection)
                         {
                             var repository = GetRepostiroy(newData.Value, _openedTransaction);
                             var addMethod = GetAddMethod(repository);
-                            addMethod.Invoke(repository, new[] { newData.Value });
+                            addMethod.Invoke(repository, new[] { newData.Value, null });
                         }
 
                         foreach (var modifiedData in ModifiedCollection)
                         {
                             var repository = GetRepostiroy(modifiedData.Value, _openedTransaction);
                             var saveMethod = GetSaveMethod(repository);
-                            saveMethod.Invoke(repository, new[] { modifiedData.Value });
+                            saveMethod.Invoke(repository, new[] { modifiedData.Value, null });
                         }
 
                         foreach (var customOperate in CustomOperateCollection)
@@ -239,14 +239,15 @@ namespace Keede.DAL.DDD.Unitwork
                         {
                             var repository = GetRepostiroy(modifiedData.Value.EntityType, _openedTransaction);
                             var modifiedExpressionMethod = GetModifiedExpressionMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)modifiedExpressionMethod).Invoke(repository, new object[] { modifiedData.Value.WhereExpression, modifiedData.Value.Data });
+                            ((FastMethodUtility.FastInvokeHandler)modifiedExpressionMethod).Invoke(repository, new object[] { modifiedData.Value.WhereExpression,
+                                modifiedData.Value.Data, null });
                         }
 
                         foreach (var deletedData in ExpressionDeletedCollection)
                         {
                             var repository = GetRepostiroy(deletedData.Value.EntityType, _openedTransaction);
                             var removeExpressionMethod = GetRemoveExpressionMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)removeExpressionMethod).Invoke(repository, new object[] { deletedData.Value.WhereExpression });
+                            ((FastMethodUtility.FastInvokeHandler)removeExpressionMethod).Invoke(repository, new object[] { deletedData.Value.WhereExpression, null });
                         }
 
                         _openedTransaction.Commit();
@@ -280,7 +281,7 @@ namespace Keede.DAL.DDD.Unitwork
                         {
                             var repository = GetRepostiroy(deletedData.Value, trans);
                             var removeMethod = GetRemoveMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)removeMethod).Invoke(repository, new object[] { deletedData.Value });
+                            ((FastMethodUtility.FastInvokeHandler)removeMethod).Invoke(repository, new object[] { deletedData.Value, null });
                         }
 
                         foreach (var customOperate in CustomOperateCollection)
@@ -294,28 +295,29 @@ namespace Keede.DAL.DDD.Unitwork
                         {
                             var repository = GetRepostiroy(newData.Value, trans);
                             var addMethod = GetAddMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)addMethod).Invoke(repository, new object[] { newData.Value });
+                            ((FastMethodUtility.FastInvokeHandler)addMethod).Invoke(repository, new object[] { newData.Value, null });
                         }
 
                         foreach (var modifiedData in ModifiedCollection)
                         {
                             var repository = GetRepostiroy(modifiedData.Value, trans);
                             var saveMethod = GetSaveMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)saveMethod).Invoke(repository, new object[] { modifiedData.Value });
+                            ((FastMethodUtility.FastInvokeHandler)saveMethod).Invoke(repository, new object[] { modifiedData.Value, null });
                         }
                         
                         foreach (var modifiedData in ExpressionModifiedCollection)
                         {
                             var repository = GetRepostiroy(modifiedData.Value.EntityType, trans);
                             var modifiedExpressionMethod = GetModifiedExpressionMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)modifiedExpressionMethod).Invoke(repository, new object[] { modifiedData.Value.WhereExpression, modifiedData.Value.Data });
+                            ((FastMethodUtility.FastInvokeHandler)modifiedExpressionMethod).Invoke(repository, new object[] { modifiedData.Value.WhereExpression,
+                                modifiedData.Value.Data, null });
                         }
 
                         foreach (var deletedData in ExpressionDeletedCollection)
                         {
                             var repository = GetRepostiroy(deletedData.Value.EntityType, trans);
                             var removeExpressionMethod = GetRemoveExpressionMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)removeExpressionMethod).Invoke(repository, new object[] { deletedData.Value.WhereExpression });
+                            ((FastMethodUtility.FastInvokeHandler)removeExpressionMethod).Invoke(repository, new object[] { deletedData.Value.WhereExpression, null });
                         }
 
                         trans.Commit();
