@@ -14,12 +14,15 @@ namespace Dapper.Extensions.Tests
         public void SimpleWhereTrueTest1()
         {
             //Expression<Func<CustomersEntity, bool>> queryExp1 = ct => 1==1 && ct.CustomerCity == "B-City";
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => true && ct.CustomerCity == "B-City" && ct.CustomerID==1;
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct =>  true && ct.TestBool==true && false && ct.TestBool==false && ct.TestBool == true && ct.CustomerCity == "B-City" && ct.CustomerID==1;
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID < 50 AND CustomerCity = 'B-City'");
+            //Expression<Func<CustomersEntity, bool>> queryExp11 = ct => true;
+            //string sql11 = translate.Translate(queryExp11);
+
+            //Assert.Equals(sql, "CustomerID < 50 AND CustomerCity = 'B-City'");
         }
 
         [TestMethod]

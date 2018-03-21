@@ -35,7 +35,7 @@ namespace Dapper.Extension
             ordby = new StringBuilder();
 
             this.Visit(expr);
-            return sb.ToString();
+            return sb.ToString().Replace("= 1=1", "= 1").Replace("= 1=0", "= 0");
         }
 
         bool isleft = true;
@@ -275,7 +275,7 @@ namespace Dapper.Extension
                 switch (Type.GetTypeCode(c.Value.GetType()))
                 {
                     case TypeCode.Boolean:
-                        sb.Append(((bool)c.Value) ? "1=1" : "0");
+                        sb.Append((bool)c.Value ? "1=1" : "1=0");
                         break;
                     case TypeCode.DateTime:
                         string dtfs = "'{0}'";

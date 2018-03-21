@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,6 +29,7 @@ namespace Dapper.Extensions.Tests
         ///</summary>               
         public String CustomerCity { set; get; }
 
+        public bool TestBool { set; get; }
         ///<summary>
         ///
         ///</summary>               
