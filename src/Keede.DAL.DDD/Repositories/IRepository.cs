@@ -200,5 +200,10 @@ namespace Keede.DAL.DDD.Repositories
         int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null);
 
         int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters);
+
+        bool IsExist(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null);
+
+        IList<TEntity> GetList(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true,
+            int? commandTimeout = null);
     }
 }

@@ -545,6 +545,35 @@ namespace Keede.DAL.DDD.Repositories
             return result;
         }
 
+        //public override IList<TEntity> GetList(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null)
+        //{
+        //    string whereSql = new SqlTranslateFormater().Translate(whereExpression);
+
+        //    var conn = OpenDbConnection(isReadDb);
+        //    var result = default(IList<TEntity>);
+
+        //    try
+        //    {
+        //        result = conn.Query<T>(sql, parameterObject, DbTransaction, true, commandTimeout).ToList();
+        //    }
+        //    catch (SqlStatementException statementEx)
+        //    {
+        //        _logger.Error(statementEx);
+        //        throw;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.Error(e);
+        //        throw;
+        //    }
+        //    finally
+        //    {
+        //        CloseConnection(conn);
+        //    }
+
+        //    return result;
+        //}
+
         /// <summary>
         /// 
         /// </summary>
@@ -846,6 +875,45 @@ namespace Keede.DAL.DDD.Repositories
             }
 
             return result;
+        }
+
+        public override bool IsExist(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null)
+        {
+            var translate = new SqlTranslateFormater();
+            string whereSql = translate.Translate(whereExpression);
+
+            var entityType = whereExpression.Parameters[0].Type;
+            var tableName = SqlMapperExtensions.GetTableName(entityType);
+            string sql = "select count(*) from " + tableName + " where " + whereSql;
+
+            var conn = OpenDbConnection(isReadDb);
+            var result = false;
+
+            try
+            {
+                result = (int)conn.ExecuteScalar(sql, null, DbTransaction, commandTimeout)>0;
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
+
+            return result;
+        }
+
+        public override IList<TEntity> GetList(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

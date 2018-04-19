@@ -51,6 +51,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
+        [Obsolete]
         public abstract TEntity Get(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
@@ -73,6 +74,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="sql"></param>
         /// <param name="parameterObject"></param>
         /// <returns></returns>
+        [Obsolete]
         public abstract IList<T> GetList<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null);
 
         //public abstract IList<TEntity> GetList(string where, object parameterObject = null);
@@ -85,6 +87,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="parameterObject"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public abstract T Get<T>(string sql, object parameterObject = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
@@ -123,6 +126,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="pageSize"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public abstract IList<T> GetPagedList<T>(string sql, object parameterObjects, int pageIndex, int pageSize, string orderBy = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
@@ -205,6 +209,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="condition"></param>
         /// <param name="isReadDb"></param>
         /// <returns></returns>
+        [Obsolete]
         public abstract bool IsExist(string sql, object condition = null, bool isReadDb = true, int? commandTimeout = null);
 
         /// <summary>
@@ -216,5 +221,10 @@ namespace Keede.DAL.DDD.Repositories
         public abstract int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null);
 
         public abstract int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters);
+
+        public abstract bool IsExist(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null);
+
+        public abstract IList<TEntity> GetList(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true,
+            int? commandTimeout = null);
     }
 }

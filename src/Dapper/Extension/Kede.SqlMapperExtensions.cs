@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
@@ -987,6 +988,12 @@ namespace Dapper.Extension
             {
                 return new List<string>();
             }
+
+            if (obj is IDictionary<string, object>)
+            {
+                return (obj as IDictionary<string, object>).Keys.ToList();
+            }
+
             if (obj is DynamicParameters)
             {
                 return (obj as DynamicParameters).ParameterNames.ToList();
@@ -1096,6 +1103,18 @@ namespace Dapper.Extension
             var sql = string.Format("update [{0}] set {1}{2}", tableName, updateFields, whereSql);
 
             var parameters = new DynamicParameters(data);
+            if (obj is IDictionary<string, object>)
+            {
+                var dic = obj as IDictionary<string, object>;
+                var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+                foreach (var item in dic)
+                {
+                    expandoObject.Add("@" + item.Key, item.Value);
+                }
+
+                parameters.AddDynamicParams(expandoObject);
+            }
+
             //var expandoObject = new ExpandoObject() as IDictionary<string, object>;
 
             //parameters.AddDynamicParams(expandoObject);

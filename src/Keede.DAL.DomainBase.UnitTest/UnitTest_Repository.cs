@@ -64,32 +64,35 @@ namespace Keede.RepositoriesTests
         [TestMethod]
         public void TestRemoveExpression()
         {
-            Dictionary<string, Expression> _localExpressionDeletedCollection = new Dictionary<string, Expression>();
-
             var repository = new NewsRepository();
+            //Dictionary<string, Expression> _localExpressionDeletedCollection = new Dictionary<string, Expression>();
 
-            Expression<Func<News, bool>> queryExp2 = ct => ct.GId == 10000 && ct.Title == "removeTitle";
-            var tttt = queryExp2.Parameters[0].Type;
-            _localExpressionDeletedCollection.Add("s", queryExp2);
 
-            foreach (var modifiedData in _localExpressionDeletedCollection)
-            {
-                var e = modifiedData.Value;
+            //Expression<Func<News, bool>> queryExp2 = ct => ct.GId == 10000 && ct.Title == "removeTitle";
+            //var tttt = queryExp2.Parameters[0].Type;
+            //_localExpressionDeletedCollection.Add("s", queryExp2);
+
+            //foreach (var modifiedData in _localExpressionDeletedCollection)
+            //{
+            //    var e = modifiedData.Value;
                 
-                var type = typeof(News);
-                repository.RemoveExpression((Expression<Func<News, bool>>)e);
+            //    var type = typeof(News);
+            //    repository.RemoveExpression((Expression<Func<News, bool>>)e);
 
-            }
+            //}
 
-            Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 10000 && ct.Title == "updateTitle";
+            Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 220 && ct.Title == "afterUpdateTitle1111";
 
             var tt=queryExp1.Parameters[0].Type;
 
-            repository.SaveExpression(queryExp1, new { Title = "afterUpdateTitle" });
+            var dic=new Dictionary<string,object>();
+            dic.Add("Title", "afterUpdateTitle11111");
+            dic.Add("Content", "afterUpdateContent11111");
+            dic.Add("Test1", new Guid());
+            repository.SaveExpression(queryExp1, dic);
+            //repository.SaveExpression(queryExp1, new { Title = "afterUpdateTitle" });
 
-
-            repository.RemoveExpression(queryExp2);
-
+            //repository.RemoveExpression(queryExp2);
         }
 
         [TestMethod]
