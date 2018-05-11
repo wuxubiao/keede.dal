@@ -138,7 +138,7 @@ namespace Keede.DAL.DDD.Repositories
                     { CommandTimeout = int.MaxValue };
                 cmd.Parameters.AddRange(parameters);
 
-                var dt = conn.GetTableSchema(list);
+                var dt = conn.GetTableSchema(list,true);
                 if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
 
                 using (var adapter = new SqlDataAdapter { UpdateCommand = cmd })

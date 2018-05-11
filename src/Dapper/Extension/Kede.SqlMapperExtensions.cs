@@ -684,7 +684,7 @@ namespace Dapper.Extension
         /// <param name="connection"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static DataTable GetTableSchema<T>(this IDbConnection connection, IList<T> list)
+        public static DataTable GetTableSchema<T>(this IDbConnection connection, IList<T> list,bool isForUpdate = false)
         {
             var type = typeof(T);
 
@@ -700,7 +700,12 @@ namespace Dapper.Extension
             var allProperties = TypePropertiesCache(type);
             var keyProperties = KeyPropertiesCache(type);
             var computedProperties = ComputedPropertiesCache(type);
-            var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
+
+            List<PropertyInfo> allPropertiesExceptKeyAndComputed;
+            if (isForUpdate)
+                allPropertiesExceptKeyAndComputed = allProperties.Except(computedProperties).ToList();
+            else
+                allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
 
 
             DataTable dt = new DataTable();
