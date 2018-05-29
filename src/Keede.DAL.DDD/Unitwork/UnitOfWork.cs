@@ -57,6 +57,23 @@ namespace Keede.DAL.DDD.Unitwork
                 _localCustomOperateCollection.Dispose();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="issuccess"></param>
+        protected virtual void OnCommittedEvent(bool issuccess)
+        {
+            CommittedEvent?.Invoke(issuccess);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void OnRollBackEvent()
+        {
+            RollBackEvent?.Invoke();
+        }
         #endregion
 
         #region Protected Properties
@@ -83,8 +100,27 @@ namespace Keede.DAL.DDD.Unitwork
         protected IEnumerable<KeyValuePair<string, ExpressionData>> ExpressionModifiedCollection => _localExpressionModifiedCollection.Value;
 
         protected IEnumerable<KeyValuePair<string, ExpressionData>> ExpressionDeletedCollection => _localExpressionDeletedCollection.Value;
-
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="isSuccess"></param>
+        public delegate void CommittedDel(bool isSuccess);
+        /// <summary>
+        /// 
+        /// </summary>
+        public delegate void RollBackDel();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event CommittedDel CommittedEvent;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event RollBackDel RollBackEvent;
 
         /// <summary>
         /// 

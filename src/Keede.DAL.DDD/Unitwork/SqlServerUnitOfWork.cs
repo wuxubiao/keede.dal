@@ -20,15 +20,7 @@ namespace Keede.DAL.DDD.Unitwork
     /// </summary>
     public class SqlServerUnitOfWork : UnitOfWork
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="isSuccess"></param>
-        public delegate void CommittedDel(bool isSuccess);
-        /// <summary>
-        /// 
-        /// </summary>
-        public delegate void RollBackDel();
+
 
         private readonly string _dbConnectString;
         private IDbConnection _openedConnect;
@@ -51,15 +43,7 @@ namespace Keede.DAL.DDD.Unitwork
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _removeExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _saveExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public event CommittedDel CommittedEvent;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public event RollBackDel RollBackEvent;
 
         /// <summary>
         /// 
@@ -451,21 +435,6 @@ namespace Keede.DAL.DDD.Unitwork
             _removeExpressionMethodDic.AddOrUpdate(repositoryType.FullName, method, (key, existed) => method);
             return method;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="issuccess"></param>
-        protected virtual void OnCommittedEvent(bool issuccess)
-        {
-            CommittedEvent?.Invoke(issuccess);
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        protected virtual void OnRollBackEvent()
-        {
-            RollBackEvent?.Invoke();
-        }
     }
 }
