@@ -29,13 +29,13 @@ namespace Dapper.Extension
         /// <returns></returns>
         public static IList<T> QueryPaged<T>(this IDbConnection connection, string sql, int pageIndex, int pageSize, string orderBy, object paramterObjects = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            var commandText = ProcessCommandSqlServer(sql.Trim(),pageIndex,pageSize, orderBy);
+            var commandText = ProcessCommandSqlServer(sql.Trim(), pageIndex, pageSize, orderBy);
 
             IList<T> result;
 
             //try
             //{
-                result= connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
+            result = connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
             //}
             //catch (Exception e)
             //{
@@ -88,7 +88,7 @@ namespace Dapper.Extension
         /// <param name="pageSize">页的大小。</param>
         /// <param name="commandText">数据源查询命令。</param>
         /// <param name="orderBy"></param>
-        private static string ProcessCommandSqlServer(string commandText,int pageIndex, int pageSize, string orderBy)
+        private static string ProcessCommandSqlServer(string commandText, int pageIndex, int pageSize, string orderBy)
         {
             var start = pageSize * (pageIndex - 1) + 1;
             var end = pageIndex * pageSize;
@@ -105,30 +105,28 @@ namespace Dapper.Extension
                 {
                     orderBy = "ORDER BY getdate()";
                 }
-
-                var m = RxColumns.Match(commandText);
-                if (!m.Success)
-                    throw new ArgumentException();
-
-                Group g = m.Groups[1];
-                var sqlSelectRemoved = commandText.Substring(g.Index);
-
-                return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},{0}) ____t1____ WHERE {1} BETWEEN {2} AND {3}",
-                    sqlSelectRemoved
-                    , "RowNumber"
-                    , start
-                    , end
-                    , orderBy);
             }
             else
             {
-                var tableAndWhere = Regex.Match(commandText, _tableAndWhere).Value;
-                var selectColumn = Regex.Match(commandText, _selectColumn).Value;
-                return string.Format("WITH TEMP AS (SELECT ROW_NUMBER() over(order by {0}) as RowNumber,", orderBy)
-                                + selectColumn
-                                + tableAndWhere
-                                + string.Format(")SELECT * FROM TEMP WHERE RowNumber BETWEEN {0} AND {1}", start, end);
+                if (!orderBy.Trim().ToUpper().StartsWith("ORDER BY"))
+                {
+                    orderBy = "ORDER BY " + orderBy;
+                }
             }
+
+            var m = RxColumns.Match(commandText);
+            if (!m.Success)
+                throw new ArgumentException();
+
+            Group g = m.Groups[1];
+            var sqlSelectRemoved = commandText.Substring(g.Index);
+
+            return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER({4}) AS {1},{0}) ____t1____ WHERE {1} BETWEEN {2} AND {3}",
+                sqlSelectRemoved
+                , "RowNumber"
+                , start
+                , end
+                , orderBy);
         }
         #endregion 新增分页方法
     }
@@ -150,9 +148,9 @@ namespace Dapper.Extension
         {
             PageIndex = pageIndex;
             PageSize = pageSize;
-            if(!string.IsNullOrEmpty(whereSql))
+            if (!string.IsNullOrEmpty(whereSql))
                 WhereSql = whereSql.Trim().StartsWith("WHERE", StringComparison.CurrentCultureIgnoreCase) ? " " + whereSql + " " : " WHERE " + whereSql + " ";
-            OrderBy = orderBy.Trim().StartsWith("ORDER BY",StringComparison.CurrentCultureIgnoreCase)?" "+orderBy+" ":" ORDER BY "+orderBy+" ";
+            OrderBy = orderBy.Trim().StartsWith("ORDER BY", StringComparison.CurrentCultureIgnoreCase) ? " " + orderBy + " " : " ORDER BY " + orderBy + " ";
         }
 
         public PagedList(int pageIndex, int pageSize, long recordCount, IList<T> items)
