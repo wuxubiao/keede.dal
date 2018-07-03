@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Dapper.Extension
 {
@@ -22,7 +23,6 @@ namespace Dapper.Extension
         {
             string name = "";
             if (TypeRWSplitDbName.TryGetValue(type.TypeHandle, out name)) return name;
-
 
                 //NOTE: This as dynamic trick should be able to handle both our own Table-attribute as well as the one in EntityFramework 
                 var tableAttr = type
@@ -1125,6 +1125,16 @@ namespace Dapper.Extension
             //parameters.AddDynamicParams(expandoObject);
 
             return connection.Execute(sql, parameters, transaction, commandTimeout);
+        }
+
+        private static readonly string _selectColumn = @"(?<=[Ss][Ee][Ll][Ee][Cc][Tt])[\S\s]+?\s(?=[Ff][Rr][Oo][Mm])";
+        public static string GetSelectColumnReplaceToCount(string commandText)
+        {
+            string replacement = " count(1) ";
+            Regex rgx = new Regex(_selectColumn);
+            string result = rgx.Replace(commandText, replacement, 1);
+
+            return result;
         }
 
         #endregion 新增方法

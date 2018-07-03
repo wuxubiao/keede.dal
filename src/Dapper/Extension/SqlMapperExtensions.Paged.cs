@@ -31,17 +31,7 @@ namespace Dapper.Extension
         {
             var commandText = ProcessCommandSqlServer(sql.Trim(), pageIndex, pageSize, orderBy);
 
-            IList<T> result;
-
-            //try
-            //{
-            result = connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
-            //}
-            //catch (Exception e)
-            //{
-            //    throw new SqlStatementException(commandText, e);
-            //}
-
+            IList<T> result = connection.Query<T>(commandText, paramterObjects, transaction, true, commandTimeout).ToList();
             return result;
         }
 
@@ -52,17 +42,7 @@ namespace Dapper.Extension
         private static readonly Regex RxOrderBy = new Regex(@"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex RxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static readonly string _tableAndWhere = @"[Ff][Rr][Oo][Mm][\s\S]+[Ww][Hh][Ee][Rr][Ee][\s\S]+";
-        private static readonly string _selectColumn = @"(?<=[Ss][Ee][Ll][Ee][Cc][Tt])[\S\s]+?\s(?=[Ff][Rr][Oo][Mm])";
-
-        public static string GetSelectColumnReplaceToCount(string commandText)
-        {
-            string replacement = " count(1) ";
-            Regex rgx = new Regex(_selectColumn);
-            string result = rgx.Replace(commandText, replacement, 1);
-
-            return result;
-        }
+        //private static readonly string _tableAndWhere = @"[Ff][Rr][Oo][Mm][\s\S]+[Ww][Hh][Ee][Rr][Ee][\s\S]+";
 
         /// <summary>
         /// 获取最后一个匹配的 Order By 结果。
