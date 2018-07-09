@@ -11,5 +11,7 @@ namespace Keede.DAL.DDD.UnitTest
     public interface INewsRepository: IRepository<News>
     {
         bool TestAdd(int id);
+
+        void TestTestBatchAdd();
     }
 }

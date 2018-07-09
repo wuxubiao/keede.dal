@@ -210,6 +210,13 @@ namespace Keede.RepositoriesTests
         }
 
         [TestMethod]
+        public void TestBatchAdd3()
+        {
+            var repo=new NewsRepository();
+            repo.TestTestBatchAdd();
+        }
+
+        [TestMethod]
         public void TestBatchUpdate()
         {
             using (var repository = new NewsRepository())
@@ -218,7 +225,7 @@ namespace Keede.RepositoriesTests
 
                 var news1 = new News();
                 news1.Title = "title2111";
-                news1.GId = 10000;
+                news1.GId = 9998;
                 list.Add(news1);
 
                 //var news2 = new News();

@@ -28,8 +28,9 @@ namespace Keede.DAL.DDD.Repositories
         /// </summary>
         /// <param name="list"></param>
         /// <param name="destinationTableName"></param>
+        /// <param name="sqlBulkCopyOptions"></param>
         /// <returns></returns>
-        bool BatchAdd<T>(IList<T> list, string destinationTableName=null); 
+        bool BatchAdd<T>(IList<T> list, string destinationTableName=null, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default); 
 
         /// <summary>
         /// Save the modified item to the repository
@@ -199,7 +200,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <returns></returns>
         int GetCount(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null);
 
-        int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters);
+        int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, int? commandTimeout = null, params SqlParameter[] parameters);
 
         bool IsExist(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null);
 

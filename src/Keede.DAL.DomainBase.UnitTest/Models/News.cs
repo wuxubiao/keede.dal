@@ -12,8 +12,8 @@ namespace Keede.DAL.DDD.UnitTest.Models
     [RWSplitDbName("")]
     public class News : IEntity
     {
-        //[ExplicitKey, Column("GId")]
-        [Key]
+        [ExplicitKey]
+        //[Key]
         public int GId { get; set; }
 
         //[ExplicitKey]

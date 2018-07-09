@@ -23,12 +23,25 @@ namespace Keede.DAL.DDD.Repositories
         /// 
         /// </summary>
         /// <param name="isReadDb"></param>
-        /// <param name="dbName"></param>
+        /// <param name="beginTransaction"></param>
         /// <returns></returns>
-        public IDbConnection OpenDbConnection(bool isReadDb = true)
+        public IDbConnection OpenDbConnection(bool isReadDb = true, bool beginTransaction = false)
         {
+            if (isReadDb && beginTransaction)
+            {
+                var statementEx= new SqlStatementException("不能在只读数据库上开启事务");
+                _logger.Error(statementEx);
+                throw statementEx;
+            }
+
             var conn = DbTransaction != null ? DbTransaction.Connection : Databases.GetDbConnection(SqlMapperExtensions.GetRWSplitDbName(typeof(TEntity)), isReadDb);
             if (conn.State == ConnectionState.Broken || conn.State == ConnectionState.Closed) conn.Open();
+
+            if (DbTransaction == null && beginTransaction)
+            {
+                DbTransaction = conn.BeginTransaction();
+            }
+
             return conn;
         }
 
@@ -86,8 +99,9 @@ namespace Keede.DAL.DDD.Repositories
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <param name="destinationTableName"></param>
+        /// <param name="sqlBulkCopyOptions"></param>
         /// <returns></returns>
-        public override bool BatchAdd<T>(IList<T> list, string destinationTableName = null)
+        public override bool BatchAdd<T>(IList<T> list, string destinationTableName = null, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             var conn = OpenDbConnection(false);
@@ -97,7 +111,7 @@ namespace Keede.DAL.DDD.Repositories
             {
                 var dt = conn.GetTableSchema(list);
                 if (!string.IsNullOrEmpty(destinationTableName)) dt.TableName = destinationTableName;
-                result = BulkToDb(conn, dt, DbTransaction);
+                result = BulkToDb(conn, dt, DbTransaction, sqlBulkCopyOptions);
             }
             catch (SqlStatementException statementEx)
             {
@@ -124,9 +138,10 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="list"></param>
         /// <param name="updateCommandText"></param>
         /// <param name="destinationTableName"></param>
+        /// <param name="commandTimeout"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public override int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, params SqlParameter[] parameters)
+        public override int BatchUpdate<T>(IList<T> list, string updateCommandText, string destinationTableName = null, int? commandTimeout = null, params SqlParameter[] parameters)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             var conn = OpenDbConnection(false);
@@ -135,7 +150,7 @@ namespace Keede.DAL.DDD.Repositories
             try
             {
                 var cmd = new SqlCommand(updateCommandText, (SqlConnection)conn, (SqlTransaction)DbTransaction)
-                    { CommandTimeout = int.MaxValue };
+                    { CommandTimeout = commandTimeout ?? 15 };
                 cmd.Parameters.AddRange(parameters);
 
                 var dt = conn.GetTableSchema(list,true);
@@ -177,10 +192,10 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="dt"></param>
         /// <param name="dbTransaction"></param>
         /// <returns></returns>
-        private static bool BulkToDb(IDbConnection conn, DataTable dt, IDbTransaction dbTransaction)
+        private static bool BulkToDb(IDbConnection conn, DataTable dt, IDbTransaction dbTransaction, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default)
         {
             SqlConnection sqlConn = conn as SqlConnection;
-            SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn, SqlBulkCopyOptions.Default, (SqlTransaction)dbTransaction);
+            SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn, sqlBulkCopyOptions, (SqlTransaction)dbTransaction);
             bulkCopy.DestinationTableName = dt.TableName;
             bulkCopy.BatchSize = dt.Rows.Count;
 
