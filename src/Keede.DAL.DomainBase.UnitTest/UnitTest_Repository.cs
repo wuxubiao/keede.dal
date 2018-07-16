@@ -363,6 +363,20 @@ namespace Keede.RepositoriesTests
         }
 
         [TestMethod]
+        public void TestGetListExpression()
+        {
+            using (var repository = new NewsRepository())
+            {
+                Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 220 && ct.Title == "afterUpdateTitle1111";
+
+                var list2 = repository.GetList(queryExp1);
+
+                Assert.IsTrue(list2.Count > 0);
+
+            }
+        }
+
+        [TestMethod]
         public void TestGetPagedList()
         {
             using (var repository = new NewsRepository())

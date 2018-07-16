@@ -560,34 +560,35 @@ namespace Keede.DAL.DDD.Repositories
             return result;
         }
 
-        //public override IList<TEntity> GetList(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null)
-        //{
-        //    string whereSql = new SqlTranslateFormater().Translate(whereExpression);
+        public override IList<TEntity> GetList(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null)
+        {
+            string whereSql = " where " + new SqlTranslateFormater().Translate(whereExpression);
+            var conn = OpenDbConnection(isReadDb);
+            var result = default(IList<TEntity>);
 
-        //    var conn = OpenDbConnection(isReadDb);
-        //    var result = default(IList<TEntity>);
+            try
+            {
+                var tableName = SqlMapperExtensions.GetTableName(typeof(TEntity));
+                var sql = $"SELECT * FROM [{tableName}] "+ whereSql; 
+                result = conn.Query<TEntity>(sql, null, DbTransaction, true, commandTimeout: commandTimeout).ToList();
+            }
+            catch (SqlStatementException statementEx)
+            {
+                _logger.Error(statementEx);
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+            finally
+            {
+                CloseConnection(conn);
+            }
 
-        //    try
-        //    {
-        //        result = conn.Query<T>(sql, parameterObject, DbTransaction, true, commandTimeout).ToList();
-        //    }
-        //    catch (SqlStatementException statementEx)
-        //    {
-        //        _logger.Error(statementEx);
-        //        throw;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        _logger.Error(e);
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        CloseConnection(conn);
-        //    }
-
-        //    return result;
-        //}
+            return result;
+        }
 
         /// <summary>
         /// 
@@ -924,11 +925,6 @@ namespace Keede.DAL.DDD.Repositories
             }
 
             return result;
-        }
-
-        public override IList<TEntity> GetList(Expression<Func<TEntity, bool>> whereExpression, bool isReadDb = true, int? commandTimeout = null)
-        {
-            throw new NotImplementedException();
         }
     }
 }
