@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Keede.RepositoriesTests</RootNamespace>
     <AssemblyName>Keede.RepositoriesTests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -112,7 +112,7 @@
       <Name>Keede.DAL.Helper</Name>
     </ProjectReference>
     <ProjectReference Include="..\Keede.DAL.RWSplitting\Keede.DAL.RWSplitting.csproj">
-      <Project>{ffdeb36e-a2c6-4fb4-a88e-0bdd49d83699}</Project>
+      <Project>{f842e429-158f-4c9b-8c98-f7839a39190b}</Project>
       <Name>Keede.DAL.RWSplitting</Name>
     </ProjectReference>
   </ItemGroup>
