@@ -25,11 +25,7 @@ namespace Dapper.Extension
             if (TypeRWSplitDbName.TryGetValue(type.TypeHandle, out name)) return name;
 
                 //NOTE: This as dynamic trick should be able to handle both our own Table-attribute as well as the one in EntityFramework 
-                var tableAttr = type
-#if COREFX
-                    .GetTypeInfo()
-#endif
-                    .GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "RWSplitDbNameAttribute") as dynamic;
+                var tableAttr = type.GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "RWSplitDbNameAttribute") as dynamic;
                 if (tableAttr != null)
                     name = tableAttr.Name;
             if(name==null) name = "";

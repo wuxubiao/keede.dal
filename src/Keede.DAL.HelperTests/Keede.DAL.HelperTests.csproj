@@ -66,7 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapper\Dapper.csproj">
-      <Project>{c872a7d5-567a-4320-b805-fc32db20b8e1}</Project>
+      <Project>{ad51a929-b464-4675-b892-f69ddff50a88}</Project>
       <Name>Dapper</Name>
     </ProjectReference>
     <ProjectReference Include="..\Keede.DAL.Helper\Keede.DAL.Helper.csproj">

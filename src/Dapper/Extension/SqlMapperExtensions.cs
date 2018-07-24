@@ -6,8 +6,10 @@ using System.Reflection;
 using System.Text;
 using System.Collections.Concurrent;
 using System.Reflection.Emit;
+
 using Dapper;
-#if COREFX
+
+#if NETSTANDARD1_3
 using DataException = System.InvalidOperationException;
 #else
 using System.Threading;
@@ -165,7 +167,7 @@ namespace Dapper.Extension
             {
                 //NOTE: This as dynamic trick should be able to handle both our own Table-attribute as well as the one in EntityFramework 
                 var tableAttr = type
-#if COREFX
+#if NETSTANDARD1_3
                     .GetTypeInfo()
 #endif
                     .GetCustomAttributes(false).SingleOrDefault(attr => attr.GetType().Name == "TableAttribute") as dynamic;
@@ -173,7 +175,7 @@ namespace Dapper.Extension
                     name = tableAttr.Name;
                 else
                 {
-                    name = type.Name + "s";
+                    name = type.Name;
                     if (type.IsInterface() && name.StartsWith("I"))
                         name = name.Substring(1);
                 }
@@ -230,7 +232,7 @@ namespace Dapper.Extension
 
             private static AssemblyBuilder GetAsmBuilder(string name)
             {
-#if COREFX
+#if NETSTANDARD1_3 || NETSTANDARD2_0
                 return AssemblyBuilder.DefineDynamicAssembly(new AssemblyName { Name = name }, AssemblyBuilderAccess.Run);
 #else
                 return Thread.GetDomain().DefineDynamicAssembly(new AssemblyName { Name = name }, AssemblyBuilderAccess.Run);
@@ -241,8 +243,7 @@ namespace Dapper.Extension
             {
                 Type typeOfT = typeof(T);
 
-                Type k;
-                if (TypeCache.TryGetValue(typeOfT, out k))
+                if (TypeCache.TryGetValue(typeOfT, out Type k))
                 {
                     return (T)Activator.CreateInstance(k);
                 }
@@ -266,7 +267,7 @@ namespace Dapper.Extension
                     CreateProperty<T>(typeBuilder, property.Name, property.PropertyType, setIsDirtyMethod, isId);
                 }
 
-#if COREFX
+#if NETSTANDARD1_3 || NETSTANDARD2_0
                 var generatedType = typeBuilder.CreateTypeInfo().AsType();
 #else
                 var generatedType = typeBuilder.CreateType();

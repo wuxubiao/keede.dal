@@ -287,11 +287,7 @@ namespace Dapper.Extension
                         sb.Append("'");
                         break;
                     case TypeCode.Object:
-#if COREFX
-                        if (c.Type.GetTypeInfo().GetInterface("IEnumerable", false) != null)
-#else
                         if (c.Type.GetInterface("IEnumerable", false) != null)
-#endif
                         {
                             List<object> list = new List<object>();
                             foreach (var item in (IEnumerable)c.Value)
@@ -419,11 +415,8 @@ namespace Dapper.Extension
                     sb.Append(" In ");
                     this.Visit(node.Arguments[0]);
                 }
-#if COREFX
-            if (methodInfo.DeclaringType.GetTypeInfo().GetInterface("IEnumerable", false) != null)
-#else
+
             if (methodInfo.DeclaringType?.GetInterface("IEnumerable", false) != null && methodInfo.DeclaringType != typeof(string))
-#endif
             {
                 this.Visit(node.Arguments[0]);
                 sb.Append(" In ");

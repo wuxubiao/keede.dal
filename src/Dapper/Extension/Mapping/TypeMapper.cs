@@ -78,14 +78,10 @@ namespace Dapper.Extension
         private static string GetDescriptionFromAttribute(MemberInfo member)
         {
             if (member == null) return null;
-#if COREFX
-            var data = member.CustomAttributes.FirstOrDefault(x => x.AttributeType == typeof(ColumnAttribute));
-            return (string)data?.ConstructorArguments.Single().Value;
-#else
+
             var attrib = (ColumnAttribute)Attribute.GetCustomAttribute(member, typeof(ColumnAttribute), false);
             if (attrib == null) return member.Name;
             return attrib?.Name;
-#endif
         }
     }
 }
