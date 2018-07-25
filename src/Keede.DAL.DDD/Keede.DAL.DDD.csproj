@@ -1,96 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{73C19C15-5933-489A-AE5D-275425709354}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Keede.DAL.DDD</RootNamespace>
-    <AssemblyName>Keede.DAL.DDD</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net.Ext.Json, Version=1.2.15.4228, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.Ext.Json.1.2.15.14586\lib\net45-full\log4net.Ext.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Utility\Configuration.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Aggregate\AggregateRoot.cs" />
-    <Compile Include="Aggregate\Entity.cs" />
-    <Compile Include="Aggregate\IAggregateRoot.cs" />
-    <Compile Include="Utility\EntityAttributeUtil.cs" />
-    <Compile Include="Aggregate\IEntity.cs" />
-    <Compile Include="Repositories\IRepository.cs" />
-    <Compile Include="Repositories\IRepositoryWithTransaction.cs" />
-    <Compile Include="Repositories\Repository.Async.cs" />
-    <Compile Include="Repositories\Repository.cs" />
-    <Compile Include="Repositories\RepositoryWithTransaction.cs" />
-    <Compile Include="Repositories\SqlServerRepository.Async.cs" />
-    <Compile Include="Repositories\SqlServerRepository.cs" />
-    <Compile Include="Unitwork\CustomOperate.cs" />
-    <Compile Include="Unitwork\DisposableObject.cs" />
-    <Compile Include="Unitwork\ExpressionData.cs" />
-    <Compile Include="Unitwork\IUnitOfWork.cs" />
-    <Compile Include="Unitwork\SqlServerUnitOfWork.cs" />
-    <Compile Include="Unitwork\UnitOfWork.cs" />
-    <Compile Include="Aggregate\ValueObject.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utility\AttributeUtility.cs" />
-    <Compile Include="Utility\FastMethodUtility.cs" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net.Ext.Json" Version="2.0.8.3" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Dapper\Dapper.csproj">
-      <Project>{ad51a929-b464-4675-b892-f69ddff50a88}</Project>
-      <Name>Dapper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Keede.DAL.RWSplitting\Keede.DAL.RWSplitting.csproj">
-      <Project>{f842e429-158f-4c9b-8c98-f7839a39190b}</Project>
-      <Name>Keede.DAL.RWSplitting</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Dapper\Dapper.csproj" />
+    <ProjectReference Include="..\Keede.DAL.RWSplitting\Keede.DAL.RWSplitting.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Repositories\IRepository.Async.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="log4net.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="log4net.Ext.Json.LICENSE.txt" />
-    <Content Include="log4net.Ext.Json.README.txt" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

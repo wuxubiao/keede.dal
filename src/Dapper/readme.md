@@ -9,5 +9,6 @@ catch (Exception e)
 }
 涉及的方法有ExecuteImpl、QueryMultipleImpl、QueryImpl、QueryRowImpl、MultiMapImpl(两个同名)、ExecuteCommand、ExecuteScalarImpl、ExecuteReaderImpl，一共9个方法
 自定义异常SqlStatementException依赖Newtonsoft.Json
-
 ======================================
+2018/07/24 吴旭标
+在官方版本1.50.2进行升级，支持.net standard2.0

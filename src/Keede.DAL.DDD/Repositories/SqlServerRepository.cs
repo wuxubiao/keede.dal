@@ -17,7 +17,7 @@ namespace Keede.DAL.DDD.Repositories
     public partial class SqlServerRepository<TEntity> : RepositoryWithTransaction<TEntity>
         where TEntity : class, IEntity
     {
-        private static readonly log4net.ILog _logger = log4net.LogManager.GetLogger("SqlServerRepository");
+        private static readonly log4net.ILog _logger = log4net.LogManager.GetLogger(typeof(TEntity));
 
         /// <summary>
         /// 

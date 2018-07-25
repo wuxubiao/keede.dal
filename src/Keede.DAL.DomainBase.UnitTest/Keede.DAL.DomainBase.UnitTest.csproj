@@ -99,6 +99,10 @@
     <Content Include="Test_Master.sql" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dapper\Dapper.csproj">
+      <Project>{ad51a929-b464-4675-b892-f69ddff50a88}</Project>
+      <Name>Dapper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Keede.DAL.DDD\Keede.DAL.DDD.csproj">
       <Project>{73c19c15-5933-489a-ae5d-275425709354}</Project>
       <Name>Keede.DAL.DDD</Name>

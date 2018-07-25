@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Management.Instrumentation;
 using System.Reflection;
 using System.Threading;
 using Keede.DAL.DDD.Repositories;
@@ -12,6 +11,10 @@ using Keede.DAL.Utility;
 using Keede.DAL.RWSplitting;
 using System.Linq.Expressions;
 using Dapper.Extension;
+
+#if NET462 || NET47 || NET471 || NET472
+using System.Management.Instrumentation;
+#endif
 
 namespace Keede.DAL.DDD.Unitwork
 {
@@ -355,7 +358,11 @@ namespace Keede.DAL.DDD.Unitwork
                     return constructor;
                 }
             }
+#if NETSTANDARD1_3 || NETSTANDARD2_0
+            throw new Exception($"未找到实现{entityType.FullName}的仓储，确定该仓储的程序集名称包含\"Keede\"！");
+#else
             throw new InstanceNotFoundException($"未找到实现{entityType.FullName}的仓储，确定该仓储的程序集名称包含\"Keede\"！");
+#endif
         }
 
         private FastMethodUtility.FastInvokeHandler GetAddMethod(dynamic repository)
