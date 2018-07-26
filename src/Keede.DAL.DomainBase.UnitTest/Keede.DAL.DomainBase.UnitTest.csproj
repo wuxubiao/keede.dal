@@ -107,10 +107,6 @@
       <Project>{73c19c15-5933-489a-ae5d-275425709354}</Project>
       <Name>Keede.DAL.DDD</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Keede.DAL.Helper\Keede.DAL.Helper.csproj">
-      <Project>{362009f2-3f5f-44c3-ae34-8abeb35c2df4}</Project>
-      <Name>Keede.DAL.Helper</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Keede.DAL.RWSplitting\Keede.DAL.RWSplitting.csproj">
       <Project>{f842e429-158f-4c9b-8c98-f7839a39190b}</Project>
       <Name>Keede.DAL.RWSplitting</Name>
