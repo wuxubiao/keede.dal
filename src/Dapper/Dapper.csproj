@@ -8,6 +8,7 @@
     <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
     <Version>1.50.2</Version>
     <PackageReleaseNotes>在官方版本1.50.2进行升级，支持.net standard2.0</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
     <Reference Include="System" />
