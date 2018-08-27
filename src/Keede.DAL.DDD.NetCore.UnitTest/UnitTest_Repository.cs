@@ -13,8 +13,8 @@ namespace Keede.DAL.DDD.UnitTest
     {
         public UnitTestRepository()
         {
-            string[] readConnctions = { "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;;min pool size=20;max pool size=1000;" };
-            string writeConnction = "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;;min pool size=20;max pool size=1000;";
+            string[] readConnctions = { "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;min pool size=20;max pool size=1000;" };
+            string writeConnction = "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest");

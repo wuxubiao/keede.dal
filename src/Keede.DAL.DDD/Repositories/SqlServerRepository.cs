@@ -101,7 +101,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="destinationTableName"></param>
         /// <param name="sqlBulkCopyOptions"></param>
         /// <returns></returns>
-        public override bool BatchAdd<T>(IList<T> list, string destinationTableName = null, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default)
+        public override bool BatchAdd<T>(IList<T> list, string destinationTableName = null, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default, int? commandTimeout = null)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             var conn = OpenDbConnection(false);
@@ -192,10 +192,11 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="dt"></param>
         /// <param name="dbTransaction"></param>
         /// <returns></returns>
-        private static bool BulkToDb(IDbConnection conn, DataTable dt, IDbTransaction dbTransaction, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default)
+        private static bool BulkToDb(IDbConnection conn, DataTable dt, IDbTransaction dbTransaction, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default, int? commandTimeout = null)
         {
             SqlConnection sqlConn = conn as SqlConnection;
             SqlBulkCopy bulkCopy = new SqlBulkCopy(sqlConn, sqlBulkCopyOptions, (SqlTransaction)dbTransaction);
+            bulkCopy.BulkCopyTimeout = commandTimeout ?? 15;
             bulkCopy.DestinationTableName = dt.TableName;
             bulkCopy.BatchSize = dt.Rows.Count;
 

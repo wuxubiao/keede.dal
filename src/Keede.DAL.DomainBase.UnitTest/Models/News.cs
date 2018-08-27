@@ -12,18 +12,19 @@ namespace Keede.DAL.DDD.UnitTest.Models
     [RWSplitDbName("")]
     public class News : IEntity
     {
-        [ExplicitKey]
-        //[Key]
-        public int GId { get; set; }
+//        [ExplicitKey]
+        [Key]
+        public int Id { get; set; }
 
         //[ExplicitKey]
-        [Column("Title")]
+//        [Column("Title")]
         public string Title { get; set; }
 
         //[Column("Content")]
         public string Content { get; set; }
 
-        public Guid Test1 { get; set; }
+//        public Guid Test1 { get; set; }
+        public int Num { get; set; }
 
         [IgnoreRead, IgnoreWrite]
         public string ContentTest { get; set; }

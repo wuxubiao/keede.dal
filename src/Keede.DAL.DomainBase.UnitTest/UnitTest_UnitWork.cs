@@ -37,7 +37,7 @@ namespace Keede.DAL.DDD.UnitTest
             {
                 CustomersEntity ce=new CustomersEntity();
                 ce.DD=new Guid();
-                unitOfWork.RegisterModified<News>(ct => ct.Test1 == ce.DD, new { Title = "afterUpdateTitle1112" });
+//                unitOfWork.RegisterModified<News>(ct => ct.Test1 == ce.DD, new { Title = "afterUpdateTitle1112" });
 
                 ////Expression<Func<News, bool>> modifyQueryExpression = ct => ct.GId == 10000 && ct.Title == "updateTitle";
                 ////unitOfWork.RegisterModified(modifyQueryExpression, new { Title = "afterUpdateTitle" });
@@ -87,7 +87,7 @@ namespace Keede.DAL.DDD.UnitTest
         public void TestCustomRepository()
         {
             //ICustomRepository custom = new CustomRepository();
-            var news = new News{ GId=14,Title="title"+DateTime.Now};
+            var news = new News{ Id=14,Title="title"+DateTime.Now};
 
             IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
             unitOfWork.RegisterAdded(news);
@@ -100,7 +100,7 @@ namespace Keede.DAL.DDD.UnitTest
             NewsRepository repository = new NewsRepository();
 
             var news = new News();
-            news.GId = 998111;
+            news.Id = 998111;
             news.Title = "UnitWrokTitle998";
 
             IUnitOfWork unitOfWork = new SqlServerUnitOfWork();
@@ -166,12 +166,12 @@ namespace Keede.DAL.DDD.UnitTest
                 var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
-                news1.GId = 6;
+                news1.Id = 6;
                 news1.Title = "UnitWrokTitle6";
                 unitOfWork.RegisterAdded(news1);
 
                 var news2 = new News();
-                news2.GId = 7;
+                news2.Id = 7;
                 news2.Title = "UnitWrokTitle7";
                 unitOfWork.RegisterAdded(news2);
 
@@ -209,11 +209,11 @@ namespace Keede.DAL.DDD.UnitTest
                 var repository = new NewsRepository().SetDbTransaction(unitOfWork.DbTransaction);
 
                 var news1 = new News();
-                news1.GId = 6;
+                news1.Id = 6;
                 unitOfWork.RegisterRemoved(news1);
 
                 var news2 = new News();
-                news2.GId = 7;
+                news2.Id = 7;
                 unitOfWork.RegisterRemoved(news2);
 
                 var result = unitOfWork.Commit();
@@ -270,11 +270,11 @@ namespace Keede.DAL.DDD.UnitTest
             var id2= EntityAttributeUtil.GetId(box1);
 
             var new1=new News();
-            new1.GId = 1;
+            new1.Id = 1;
             new1.Title = "1";
 
             var new2=new News();
-            new2.GId = 1;
+            new2.Id = 1;
             new2.Title = "1";
             var id3 = EntityAttributeUtil.GetId(new1);
             var id4 = EntityAttributeUtil.GetId(new2);

@@ -41,8 +41,8 @@ namespace Keede.RepositoriesTests
             //string writeConnction = "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
             //ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
             //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
-            string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
-            string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
+            string[] readConnctions = { "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;;min pool size=20;max pool size=1000;" };
+            string writeConnction = "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
@@ -81,7 +81,7 @@ namespace Keede.RepositoriesTests
 
             //}
 
-            Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 220 && ct.Title == "afterUpdateTitle1111";
+            Expression<Func<News, bool>> queryExp1 = ct => ct.Id == 220 && ct.Title == "afterUpdateTitle1111";
 
             var tt=queryExp1.Parameters[0].Type;
 
@@ -114,12 +114,12 @@ namespace Keede.RepositoriesTests
             using (var repository = new NewsRepository())
             {
                 var news1 = new News();
-                news1.GId = 10;
+                news1.Id = 10;
                 news1.Title = "title10";
                 news1.Content = DateTime.Now.ToString();
                 var result = repository.Add(news1);
 
-                news1.GId = 11;
+                news1.Id = 11;
                 news1.Title = "title11";
                 news1.Content = DateTime.Now.ToString();
                 var result2 = repository.Add(news1);
@@ -143,14 +143,16 @@ namespace Keede.RepositoriesTests
                 IList<News> list = new List<News>();
 
                 var news1 = new News();
-                news1.GId = 9998;
+                news1.Id = 9998;
                 news1.Title = "title1" + DateTime.Now;
-                news1.Test1=new Guid();
+                news1.Content = DateTime.Now.ToString();
+//                news1.Test1=new Guid();
                 list.Add(news1);
 
                 var news2 = new News();
-                news2.GId = 9999;
+                news2.Id = 9999;
                 news2.Title = "title2" +DateTime.Now;
+                news2.Content = DateTime.Now.ToString();
                 list.Add(news2);
 
                 var result = repository.BatchAdd(list);
@@ -172,6 +174,33 @@ namespace Keede.RepositoriesTests
 
                 Assert.IsTrue(result);
                 //Assert.IsTrue(result1);
+            }
+
+        }
+
+        [TestMethod]
+        public void TestBatchAddForNullAble()
+        {
+
+            using (var repository = new NewsRepository())
+            {
+                IList<News> list = new List<News>();
+
+                var news1 = new News();
+                news1.Title = null;
+//                news1.Test1 = new Guid();
+                news1.Content = DateTime.Now.ToString();
+                list.Add(news1);
+
+                var news2 = new News();
+                news2.Title = "title2" + DateTime.Now;
+                news2.Content = DateTime.Now.ToString();
+                list.Add(news2);
+
+                var result = repository.BatchAdd(list);
+
+
+                Assert.IsTrue(result);
             }
 
         }
@@ -225,7 +254,7 @@ namespace Keede.RepositoriesTests
 
                 var news1 = new News();
                 news1.Title = "title2111";
-                news1.GId = 9998;
+                news1.Id = 9998;
                 list.Add(news1);
 
                 //var news2 = new News();
@@ -279,7 +308,7 @@ namespace Keede.RepositoriesTests
             {
                 var news1 = new News();
 
-                news1.GId = 10;
+                news1.Id = 10;
                 news1.Title = "title";
                 news1.Content = "Content"+DateTime.Now;
                 var result = repository.Save(news1);
@@ -303,7 +332,7 @@ namespace Keede.RepositoriesTests
             using (var repository = new NewsRepository())
             {
                 var news1 = new News();
-                news1.GId = 10;
+                news1.Id = 10;
                 news1.Title = "title10";
                 var result = repository.Remove(news1);
 
@@ -322,7 +351,7 @@ namespace Keede.RepositoriesTests
             using (var repository = new NewsRepository())
             {
                 var news11 = new News();
-                news11.GId = 2;
+                news11.Id = 2;
                 news11.Title = "321";
                 var new5 = repository.Get(news11);
 
@@ -367,7 +396,7 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
-                Expression<Func<News, bool>> queryExp1 = ct => ct.GId == 220 && ct.Title == "afterUpdateTitle1111";
+                Expression<Func<News, bool>> queryExp1 = ct => ct.Id == 220 && ct.Title == "afterUpdateTitle1111";
 
                 var list2 = repository.GetList(queryExp1);
 
@@ -435,7 +464,7 @@ namespace Keede.RepositoriesTests
 
             IRepository<News> repository = new NewsRepository();
             News news = new News();
-            news.GId = 11;
+            news.Id = 11;
 
             Assert.IsTrue(repository.Add(news));
         }

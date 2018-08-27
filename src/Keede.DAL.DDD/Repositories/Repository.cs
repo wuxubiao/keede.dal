@@ -30,7 +30,7 @@ namespace Keede.DAL.DDD.Repositories
         /// <param name="destinationTableName"></param>
         /// <param name="sqlBulkCopyOptions"></param>
         /// <returns></returns>
-        public abstract bool BatchAdd<T>(IList<T> list, string destinationTableName=null, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default);
+        public abstract bool BatchAdd<T>(IList<T> list, string destinationTableName=null, SqlBulkCopyOptions sqlBulkCopyOptions = SqlBulkCopyOptions.Default, int? commandTimeout = null);
 
         /// <summary>
         /// 

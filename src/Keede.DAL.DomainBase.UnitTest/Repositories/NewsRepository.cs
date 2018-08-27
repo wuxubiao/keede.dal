@@ -48,13 +48,13 @@ namespace Keede.DAL.DDD.UnitTest
 
                 IList<News> list = new List<News>();
                 var news1 = new News();
-                news1.GId = 9998;
+                news1.Id = 9998;
                 news1.Title = "title1" + DateTime.Now;
-                news1.Test1 = new Guid();
+//                news1.Test1 = new Guid();
                 list.Add(news1);
 
                 var news2 = new News();
-                news2.GId = 9999;
+                news2.Id = 9999;
                 news2.Title = "title2" + DateTime.Now;
                 list.Add(news2);
                 var result = BatchAdd(list);
