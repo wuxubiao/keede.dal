@@ -25,11 +25,9 @@ namespace Keede.RepositoriesTests
     {
         public UnitTestRepository()
         {
-            //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
-
-            //string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
-            //string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
-            //ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
+//            string[] readConnctions = { "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
+//            string writeConnction = "server=192.168.117.189;database=Group.WMS;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
+//            ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             //TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
             ////TypeMapper.SetTypeMap(typeof(News));
@@ -37,10 +35,7 @@ namespace Keede.RepositoriesTests
 
             ////SqlMapper.SetTypeMap(typeof(News), new ColumnAttributeTypeMapper<News>());
 
-            //string[] readConnctions = { "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;" };
-            //string writeConnction = "server=192.168.117.126;database=Promotion;user id=test;password=t#@!$%;min pool size=20;max pool size=1000;";
-            //ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
-            //string[] readConnctions = { "Data Source=192.168.117.155;Initial Catalog=Test_Slaver1;User Id = sa;Password = !QAZ2wsx;" };
+//
             string[] readConnctions = { "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;;min pool size=20;max pool size=1000;" };
             string writeConnction = "server=192.168.117.155;database=DAL;user id=sa;password=!QAZ2wsx;;min pool size=20;max pool size=1000;";
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
@@ -68,7 +63,7 @@ namespace Keede.RepositoriesTests
             //Dictionary<string, Expression> _localExpressionDeletedCollection = new Dictionary<string, Expression>();
 
 
-            //Expression<Func<News, bool>> queryExp2 = ct => ct.GId == 10000 && ct.Title == "removeTitle";
+            //Expression<Func<News, bool>> queryExp2 = ct => ct.Id == 10000 && ct.Title == "removeTitle";
             //var tttt = queryExp2.Parameters[0].Type;
             //_localExpressionDeletedCollection.Add("s", queryExp2);
 
@@ -254,7 +249,7 @@ namespace Keede.RepositoriesTests
 
                 var news1 = new News();
                 news1.Title = "title2111";
-                news1.Id = 9998;
+                news1.Id = 1;
                 list.Add(news1);
 
                 //var news2 = new News();
@@ -263,11 +258,14 @@ namespace Keede.RepositoriesTests
 
                 var parameters = new[]
                 {
-                    new SqlParameter("@Gid", SqlDbType.Int, 4, "Gid"),
+                    new SqlParameter("@Id", SqlDbType.Int, 4, "Id"),
                     new SqlParameter("@Title", SqlDbType.NVarChar, 50, "Title"),
                 };
 
-                var result = repository.BatchUpdate(list,"update news set title=@Title where Gid=@Gid", parameters:parameters);
+                var result = repository.BatchUpdate(list,"update news set title=@Title where Id=@Id", parameters:parameters);
+
+                var result2 = repository.BatchUpdate(list, "update news set title=@Title where Id=@Id", parameters: parameters);
+
 
                 //IList<NewsCustom> list2 = new List<NewsCustom>();
 
@@ -295,8 +293,8 @@ namespace Keede.RepositoriesTests
         {
             using (var repository = new NewsRepository())
             {
-                var result1=repository.IsExist(new {GId = 100001, Title = "title2111" });
-                var result2 = repository.IsExist("select top 1 1 from news where Gid=@Gid", new { GId = 100001});
+                var result1=repository.IsExist(new {Id = 100001, Title = "title2111" });
+                var result2 = repository.IsExist("select top 1 1 from news where Id=@Id", new { Id = 100001});
 
             }
         }
@@ -356,13 +354,13 @@ namespace Keede.RepositoriesTests
                 var new5 = repository.Get(news11);
 
 
-                var new4 = repository.Get(new {Gid = 2,Title="321"});
+                var new4 = repository.Get(new {Id = 2,Title="321"});
 
                 var dynParms1 = new DynamicParameters();
                 dynParms1.Add("@id", 2);
-                var news2 = repository.Get("select * from news where Gid=@id", dynParms1);
+                var news2 = repository.Get("select * from news where Id=@id", dynParms1);
 
-                var news1 = repository.Get<News>("select * from news where Gid=@id", dynParms1);
+                var news1 = repository.Get<News>("select * from news where Id=@id", dynParms1);
 
                 var news3 = repository.GetById(2);
 
@@ -383,8 +381,8 @@ namespace Keede.RepositoriesTests
             {
                 var dynParms2 = new DynamicParameters();
                 dynParms2.Add("@num", 5);
-                var list2 = repository.GetList<News>("select * from news where Gid>@num", dynParms2);
-                var list3 = repository.GetList<News>("select * from news where Gid>5");
+                var list2 = repository.GetList<News>("select * from news where Id>@num", dynParms2);
+                var list3 = repository.GetList<News>("select * from news where Id>5");
 
                 Assert.IsTrue(list2.Count > 0);
                 Assert.IsTrue(list3.Count > 0);
@@ -411,7 +409,7 @@ namespace Keede.RepositoriesTests
             using (var repository = new NewsRepository())
             {
 
-                var sql = "select * from News where Gid>2 order by Gid desc ";
+                var sql = "select * from News where Id>2 order by Id desc ";
                 var list6 = repository.GetPagedList<News>(sql, null, 1, 2);
 
                 Assert.IsTrue(list6.Count > 0);

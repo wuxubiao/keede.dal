@@ -147,10 +147,11 @@ namespace Keede.DAL.DDD.Repositories
             var conn = OpenDbConnection(false);
             int result;
 
+            var cmd = new SqlCommand(updateCommandText, (SqlConnection)conn, (SqlTransaction)DbTransaction)
+                { CommandTimeout = commandTimeout ?? 15 };
+
             try
             {
-                var cmd = new SqlCommand(updateCommandText, (SqlConnection)conn, (SqlTransaction)DbTransaction)
-                    { CommandTimeout = commandTimeout ?? 15 };
                 cmd.Parameters.AddRange(parameters);
 
                 var dt = conn.GetTableSchema(list,true);
@@ -179,6 +180,8 @@ namespace Keede.DAL.DDD.Repositories
             }
             finally
             {
+                cmd.Parameters.Clear();
+                cmd.Dispose();
                 CloseConnection(conn);
             }
 
