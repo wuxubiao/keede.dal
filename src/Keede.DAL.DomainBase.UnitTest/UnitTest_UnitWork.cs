@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Keede.DAL.DDD.Unitwork;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,7 +11,9 @@ using Keede.DAL.DDD.UnitTest.Models;
 using Dapper;
 using Dapper.Extension;
 using System.Linq.Expressions;
+using System.Reflection;
 using Dapper.Extensions.Tests;
+using Keede.DAL.DDD.Repositories;
 
 namespace Keede.DAL.DDD.UnitTest
 {
@@ -29,6 +32,42 @@ namespace Keede.DAL.DDD.UnitTest
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
         }
+
+        //        [TestMethod]
+        //        public void TestReg()
+        //        {
+        //            var typess = AppDomain.CurrentDomain.GetAssemblies()
+        //                .SelectMany(a => a.GetTypes().Where(d=>d.IsClass && !d.IsAbstract).Where(t =>t.GetInterfaces().Any(d=>d.IsGenericType && d.GetGenericTypeDefinition()==typeof(IRepository<>))));
+        //
+        //            foreach (var type in typess)
+        //            {
+        //                var interfaceType = type.GetInterfaces().FirstOrDefault(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IRepository<>));
+        //                var entityType = interfaceType.GenericTypeArguments.Where(i=>!i.IsGenericParameter).FirstOrDefault();
+        //
+        //                Type generic = typeof(SqlServerRepository<>);
+        //                Type[] typeArgs = { entityType };
+        //                Type realType = generic.MakeGenericType(typeArgs);
+        //                ConstructorInfo constructor;
+        //
+        //
+        //            }
+        //
+        //
+        //            if (_constructorDic.TryGetValue(realType.FullName, out constructor))
+        //                return constructor;
+        //            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(ent => !ent.GlobalAssemblyCache && ent.FullName.ToLower().Contains("keede")))
+        //            {
+        //                foreach (var type in assembly.GetTypes().Where(type => realType.IsAssignableFrom(type)))//assembly.GetTypes().Where(ent => ent.IsClass).Where(ent => ent.BaseType == realType || (ent.BaseType != null && ent.BaseType.BaseType == realType)))
+        //                {
+        //                    constructor = type.GetConstructor(new Type[0]);
+        //                    _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);
+        //                    return constructor;
+        //                }
+        //            }
+        //
+        //
+        //
+        //        }
 
         [TestMethod]
         public void TestExpression()

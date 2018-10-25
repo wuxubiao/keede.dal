@@ -24,7 +24,7 @@ namespace Keede.DAL.DDD.UnitTest.Models
         public string Content { get; set; }
 
 //        public Guid Test1 { get; set; }
-        public int Num { get; set; }
+//        public int Num { get; set; }
 
         [IgnoreRead, IgnoreWrite]
         public string ContentTest { get; set; }

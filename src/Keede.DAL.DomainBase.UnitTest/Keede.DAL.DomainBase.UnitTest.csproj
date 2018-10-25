@@ -76,6 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Repositories\BaseRepository.cs" />
     <Compile Include="Repositories\BookRepository.cs" />
     <Compile Include="Repositories\CouponNoRepository.cs" />
     <Compile Include="Repositories\IBookRepository.cs" />

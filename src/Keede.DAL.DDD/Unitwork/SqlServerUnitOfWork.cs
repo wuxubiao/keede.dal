@@ -23,8 +23,6 @@ namespace Keede.DAL.DDD.Unitwork
     /// </summary>
     public class SqlServerUnitOfWork : UnitOfWork
     {
-
-
         private readonly string _dbConnectString;
         private IDbConnection _openedConnect;
         private IDbTransaction _openedTransaction;
@@ -38,6 +36,7 @@ namespace Keede.DAL.DDD.Unitwork
         /// 临时缓存，记录当前工作单元上下文中用到的仓储
         /// </summary>
         private readonly Dictionary<string, dynamic> _repositoriesDic = new Dictionary<string, dynamic>();
+
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _addMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _saveMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _removeMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
@@ -46,7 +45,38 @@ namespace Keede.DAL.DDD.Unitwork
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _removeExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _saveExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
 
-
+//        static SqlServerUnitOfWork()
+//        {
+//            var typess = AppDomain.CurrentDomain.GetAssemblies()
+//                .SelectMany(a => a.GetTypes().Where(d => d.IsClass && !d.IsAbstract).Where(t => t.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IRepository<>))));
+//
+//            foreach (var type in typess)
+//            {
+//                var interfaceType = type.GetInterfaces().FirstOrDefault(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IRepository<>));
+//                var entityType = interfaceType.GenericTypeArguments.Where(i => !i.IsGenericParameter).FirstOrDefault();
+//
+//                Type generic = typeof(SqlServerRepository<>);
+//                Type[] typeArgs = { entityType };
+//                Type realType = generic.MakeGenericType(typeArgs);
+//                ConstructorInfo constructor;
+//
+//
+//            }
+//
+//
+//            if (_constructorDic.TryGetValue(realType.FullName, out constructor))
+//                return constructor;
+//            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(ent => !ent.GlobalAssemblyCache && ent.FullName.ToLower().Contains("keede")))
+//            {
+//                foreach (var type in assembly.GetTypes().Where(type => realType.IsAssignableFrom(type)))//assembly.GetTypes().Where(ent => ent.IsClass).Where(ent => ent.BaseType == realType || (ent.BaseType != null && ent.BaseType.BaseType == realType)))
+//                {
+//                    constructor = type.GetConstructor(new Type[0]);
+//                    _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);
+//                    return constructor;
+//                }
+//            }
+//
+//        }
 
         /// <summary>
         /// 
