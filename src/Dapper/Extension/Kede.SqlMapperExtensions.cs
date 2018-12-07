@@ -116,11 +116,11 @@ namespace Dapper.Extension
                 string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
                 if (isUpdateLock)
                 {
-                    sql = $"select {columns} from {name} WITH (UPDLOCK) where {GetCustomColumnName(key)} = @id";
+                    sql = $"select {columns} from [{name}] WITH (UPDLOCK) where {GetCustomColumnName(key)} = @id";
                 }
                 else
                 {
-                    sql = $"select {columns} from {name} where {GetCustomColumnName(key)} = @id";
+                    sql = $"select {columns} from [{name}] where {GetCustomColumnName(key)} = @id";
                 }
                 GetQueries[type.TypeHandle] = sql;
             }
@@ -182,7 +182,7 @@ namespace Dapper.Extension
             //{
             //    throw new SqlStatementException(sql, e);
             //}
-            var countSql = $"SELECT COUNT(0) FROM {table} {pagedList.WhereSql} ";
+            var countSql = $"SELECT COUNT(0) FROM [{table}] {pagedList.WhereSql} ";
             var total = connection.QueryFirstOrDefault<int>(countSql, paramterObjects, transaction);
             pagedList.FillQueryData(total, datas);
         }
@@ -211,7 +211,7 @@ namespace Dapper.Extension
                 var canReadProperties = TypePropertiesCanReadCache(type);
                 if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
                 string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
-                sql = $"SELECT {columns} FROM " + name;
+                sql = $"SELECT {columns} FROM [{name}]";
                 GetQueries[cacheType.TypeHandle] = sql;
             }
 
@@ -278,7 +278,7 @@ namespace Dapper.Extension
             var name = GetTableName(type);
 
             var sb = new StringBuilder();
-            sb.AppendFormat("update {0} set ", name);
+            sb.AppendFormat("update [{0}] set ", name);
 
             var allProperties = TypePropertiesCache(type);
             keyProperties.AddRange(explicitKeyProperties);
@@ -349,7 +349,7 @@ namespace Dapper.Extension
             keyProperties.AddRange(explicitKeyProperties);
 
             var sb = new StringBuilder();
-            sb.AppendFormat("delete from {0} where ", name);
+            sb.AppendFormat("delete from [{0}] where ", name);
 
             var adapter = GetFormatter(connection);
 
@@ -443,7 +443,7 @@ namespace Dapper.Extension
                 {
                     whereSql = " WHERE " + whereSql;
                 }
-                sql = $"SELECT {columns} FROM " + name + whereSql + orderBy;
+                sql = $"SELECT {columns} FROM [{name}]" + whereSql + orderBy;
                 GetQueries[cacheType.TypeHandle] = sql;
             }
 
@@ -483,7 +483,7 @@ namespace Dapper.Extension
             whereSql = whereSql.StartsWith("WHERE", StringComparison.CurrentCultureIgnoreCase) ? " " + whereSql + " " : " WHERE " + whereSql + " ";
             var type = typeof(T);
             var name = GetTableName(type);
-            var statement = $"delete from {name}" + whereSql;
+            var statement = $"delete from [{name}]" + whereSql;
 
             return connection.Execute(statement, parameterObject, transaction, commandTimeout);
         }
@@ -565,7 +565,7 @@ namespace Dapper.Extension
             else                        //非自增列和列表
             {
                 //insert list of entities
-                var cmd = $"insert into {name} ({sbColumnList}) values ({sbParameterList})";
+                var cmd = $"insert into [{name}] ({sbColumnList}) values ({sbParameterList})";
                 returnVal = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
             }
             if (wasClosed) connection.Close();
@@ -588,7 +588,7 @@ namespace Dapper.Extension
             var name = GetTableName(type);
             var canReadProperties = TypePropertiesCanReadCache(type);
             if (canReadProperties.Count == 0) throw new ArgumentException("Entity must have at least one property for Select");
-            string sql = $"update {name} set {GetCustomColumnName(key)}=@id where {GetCustomColumnName(key)} = @id";
+            string sql = $"update [{name}] set {GetCustomColumnName(key)}=@id where {GetCustomColumnName(key)} = @id";
             var dynParms = new DynamicParameters();
             dynParms.Add("@id", id);
             return connection.Execute(sql, dynParms, transaction, commandTimeout) > 0;
@@ -630,7 +630,7 @@ namespace Dapper.Extension
             var name = GetTableName(type);
 
             var sb = new StringBuilder();
-            sb.AppendFormat("update {0} set ", name);
+            sb.AppendFormat("update [{0}] set ", name);
 
             keyProperties.AddRange(explicitKeyProperties);
 
@@ -829,7 +829,7 @@ namespace Dapper.Extension
                 var separator = isOr ? " OR " : " AND ";
                 whereFields = " WHERE " + string.Join(separator, properties.Select(p => HandleKeyword(p) + " = @" + p));
             }
-            var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER (ORDER BY {1}) AS RowNumber, {0} FROM {2}{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, whereFields, (pageIndex - 1) * pageSize + 1, pageIndex * pageSize);
+            var sql = string.Format("SELECT {0} FROM (SELECT ROW_NUMBER() OVER (ORDER BY {1}) AS RowNumber, {0} FROM [{2}]{3}) AS Total WHERE RowNumber >= {4} AND RowNumber <= {5}", columns, orderBy, table, whereFields, (pageIndex - 1) * pageSize + 1, pageIndex * pageSize);
             List<T> datas;
             int total = 0;
 
@@ -1081,7 +1081,7 @@ namespace Dapper.Extension
 
             var type = typeof(T);
             var name = GetTableName(type);
-            var statement = $"delete from {name}" + whereSql;
+            var statement = $"delete from [{name}]" + whereSql;
 
             var deleted = connection.Execute(statement, null, transaction, commandTimeout);
             return deleted;

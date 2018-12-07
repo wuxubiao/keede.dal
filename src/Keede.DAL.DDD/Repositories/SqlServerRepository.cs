@@ -670,7 +670,7 @@ namespace Keede.DAL.DDD.Repositories
 
             var entityType = whereExpression.Parameters[0].Type;
             var tableName = SqlMapperExtensions.GetTableName(entityType);
-            string sql = "select count(*) from "+ tableName+ " where " + whereSql;
+            string sql = $"select count(*) from [{tableName}] where {whereSql}";
 
             var conn = OpenDbConnection(isReadDb);
             var result = 0;
@@ -904,7 +904,7 @@ namespace Keede.DAL.DDD.Repositories
 
             var entityType = whereExpression.Parameters[0].Type;
             var tableName = SqlMapperExtensions.GetTableName(entityType);
-            string sql = "select count(*) from " + tableName + " where " + whereSql;
+            string sql = $"select count(*) from [{tableName}] where " + whereSql;
 
             var conn = OpenDbConnection(isReadDb);
             var result = false;

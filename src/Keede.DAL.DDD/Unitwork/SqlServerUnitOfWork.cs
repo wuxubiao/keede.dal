@@ -45,6 +45,7 @@ namespace Keede.DAL.DDD.Unitwork
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _removeExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _saveExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
 
+        //todo:
 //        static SqlServerUnitOfWork()
 //        {
 //            var typess = AppDomain.CurrentDomain.GetAssemblies()
@@ -388,6 +389,9 @@ namespace Keede.DAL.DDD.Unitwork
                     return constructor;
                 }
             }
+
+            //todo：生成没有实现仓储实例
+
 #if NETSTANDARD1_3 || NETSTANDARD2_0
             throw new Exception($"未找到实现{entityType.FullName}的仓储，确定该仓储的程序集名称包含\"Keede\"！");
 #else

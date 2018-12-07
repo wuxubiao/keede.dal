@@ -1,7 +1,9 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -11,6 +13,7 @@ using Keede.DAL.DDD.Repositories;
 using Keede.DAL.DDD.UnitTest;
 using Keede.DAL.DDD.UnitTest.Models;
 using Keede.DAL.RWSplitting;
+using Keede.DAL.Utility;
 using Keede.RepositoriesTests.Models;
 using Keede.RepositoriesTests.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -41,6 +44,43 @@ namespace Keede.RepositoriesTests
             ConnectionContainer.AddDbConnections("DB01", writeConnction, readConnctions, EnumStrategyType.Loop);
 
             TypeMapper.Initialize("Keede.DAL.DDD.UnitTest.Models");
+        }
+
+        [TestMethod]
+        public void TestBase()
+        {
+//            var boxRepository = new SqlServerRepository<Box>();
+//            var box=new Box{BoxId = Guid.NewGuid()};
+//            boxRepository.Add(box);
+//
+            var newsRepository = new SqlServerRepository<News>();
+            var news = new News { Id = 11121,Title = "title",Content = "c"};
+            newsRepository.Add(news);
+
+//            var type1 = typeof(News);
+            var type1 = news.GetType();
+
+
+            Type generic = typeof(SqlServerRepository<>);
+            Type[] typeArgs = { type1 };
+            Type realType = generic.MakeGenericType(typeArgs);
+            var constructor = realType.GetConstructor(new Type[0]);
+            var instance = constructor.Invoke(null);
+            var repository = Convert.ChangeType(instance, constructor.DeclaringType);
+
+            var addMethod = GetAddMethod(repository);
+            addMethod.Invoke(repository, new[] { news, null });
+        }
+
+        private FastMethodUtility.FastInvokeHandler GetAddMethod(dynamic repository)
+        {
+            Type repositoryType = repository.GetType();
+            FastMethodUtility.FastInvokeHandler method;
+
+            MethodInfo addMethod = repositoryType.GetMethod("Add", BindingFlags.Public | BindingFlags.Instance);
+            method = FastMethodUtility.GetMethodInvoker(addMethod);
+
+            return method;
         }
 
         [TestMethod]
@@ -102,6 +142,8 @@ namespace Keede.RepositoriesTests
             sqlstr += date;
 
         }
+
+
 
         [TestMethod]
         public void TestAdd()
@@ -521,6 +563,21 @@ namespace Keede.RepositoriesTests
                 Assert.IsNotNull(person2);
             }
         }
+
+        [TestMethod]
+        public void TestLLL()
+        {
+            var id1 = Guid.Parse("9E8D004F-21F6-432C-B1D5-DA5C01CA60DE");
+            var id2 = Guid.Parse("848D4D32-6962-404D-BDFC-E61F2094D76C");
+            using (var repository = new PersonRepository())
+            {
+                var list = new List<Guid>();
+                list.Add(id1);
+                list.Add(id2);
+                repository.Test(list);
+            }
+        }
+
 
         private TestContext testContextInstance;
 

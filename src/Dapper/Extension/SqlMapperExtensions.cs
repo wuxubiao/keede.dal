@@ -197,7 +197,7 @@ namespace Dapper.Extension
         {
             var type = typeof(T);
             var name = GetTableName(type);
-            var statement = $"delete from {name}";
+            var statement = $"delete from [{name}]";
             var deleted = connection.Execute(statement, null, transaction, commandTimeout);
             return deleted > 0;
         }

@@ -14,7 +14,7 @@ namespace Dapper.Extensions.Tests
         public void SimpleWhereTrueTest1()
         {
             //Expression<Func<CustomersEntity, bool>> queryExp1 = ct => 1==1 && ct.CustomerCity == "B-City";
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct =>  true && ct.TestBool==true && false && ct.TestBool==false && ct.TestBool == true && ct.CustomerCity == "B-City" && ct.CustomerID==1;
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct =>  true && ct.TestBool && false && ct.TestBool==false && ct.TestBool == true && ct.CustomerCity == "B-City" && ct.CustomerID==1;
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
@@ -159,7 +159,7 @@ namespace Dapper.Extensions.Tests
         [TestMethod]
         public void LikeTest()
         {
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerName.Contains("X");
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerName.Contains("X") && ct.TestBool==true && ct.CustomerCity.StartsWith("y");
             Expression<Func<CustomersEntity, bool>> queryExp2 = ct => ct.CustomerName.StartsWith("X");
             Expression<Func<CustomersEntity, bool>> queryExp3 = ct => ct.CustomerName.EndsWith("X");
             var translate = new SqlTranslateFormater();
