@@ -91,17 +91,15 @@
     <Compile Include="UnitTest_UnitWork.cs" />
     <Compile Include="UnitTest_WMS.cs" />
     <Compile Include="ValueObject\Book.cs" />
-    <Compile Include="WhereExpression\Entitys.cs" />
-    <Compile Include="WhereExpression\WhereBuilder.cs" />
+    <Compile Include="WhereExpression\CustomersEntity.cs" />
+    <Compile Include="WhereExpression\TestValue.cs" />
     <Compile Include="WhereExpression\WhereBuilderTest.cs" />
-    <Compile Include="WhereExpression\WhereExpressionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Test_Master.sql" />
-    <Content Include="WhereExpression\TextFile1.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapper\Dapper.csproj">

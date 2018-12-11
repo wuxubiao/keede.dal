@@ -7,22 +7,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Dapper.Extension;
 
-namespace Keede.RepositoriesTests.WhereExpression
+namespace Dapper.Extension
 {
-    public class WhereBuilder
+    public class SqlTranslateFormater
     {
-//        private readonly IProvider _provider;
-//        private TableDefinition _tableDef;
-//
-//        public WhereBuilder(IProvider provider)
-//        {
-//            _provider = provider;
-//        }
-
         public string Translate<T>(Expression<Func<T, bool>> expression)
         {
-//            _tableDef = _provider.GetTableDefinitionFor<T>();
             return Recurse(expression.Body, true);
         }
 
@@ -87,16 +79,24 @@ namespace Keede.RepositoriesTests.WhereExpression
 
             if (TryGetValue(member, out var getter))
             {
-                //                    return ValueToString(GetValue(member), isUnary, quote);
                 return ValueToString(getter(), isUnary, quote);
             }
             else if (member.Member is PropertyInfo)
             {
                 var property = (PropertyInfo)member.Member;
+                var colName = SqlMapperExtensions.GetCustomColumnName(property);
 
-                //var colName = _tableDef.GetColumnNameFor(property.Name);
+                if (isUnary && member.Type == typeof(bool))
+                {
+                    return "([" + colName + "] = 1)";
+                }
+                return "[" + colName + "]";
+            }
+            else if (member.Member is FieldInfo)
+            {
+                var property = (FieldInfo)member.Member;
+                var colName = SqlMapperExtensions.GetCustomColumnName(property);
 
-                var colName = property.Name;
                 if (isUnary && member.Type == typeof(bool))
                 {
                     return "([" + colName + "] = 1)";
@@ -176,7 +176,7 @@ namespace Keede.RepositoriesTests.WhereExpression
             throw new Exception("Unsupported method call: " + methodCall.Method.Name);
         }
 
-        public string ValueToString(object value, bool isUnary, bool quote)
+        private string ValueToString(object value, bool isUnary, bool quote)
         {
             if (value is bool)
             {
@@ -198,7 +198,6 @@ namespace Keede.RepositoriesTests.WhereExpression
             {
                 return $"'{{{value}}}'";
             }
-            //            return _provider.ValueToString(value, quote);
             return value.ToString();
         }
 
@@ -280,22 +279,5 @@ namespace Keede.RepositoriesTests.WhereExpression
             }
             throw new Exception($"Unsupported node type: {nodeType}");
         }
-
-
-        //                if (member.Member is PropertyInfo)
-        //                {
-        //                    var property = (PropertyInfo)member.Member;
-        ////                    var colName = _tableDef.GetColumnNameFor(property.Name);
-        //                    var colName = property.Name;
-        //                    if (isUnary && member.Type == typeof(bool))
-        //                    {
-        //                        return "([" + colName + "] = 1)";
-        //                    }
-        //                    return "[" + colName + "]";
-        //                }
-        //                if (member.Member is FieldInfo)
-        //                {
-        //                    return ValueToString(GetValue(member), isUnary, quote);
-        //                }
     }
 }

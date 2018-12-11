@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper.Extension;
 
 namespace Dapper.Extensions.Tests
 {
     public class CustomersEntity
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Key;
+
         ///<summary>
         ///
         ///</summary>               
@@ -17,23 +23,30 @@ namespace Dapper.Extensions.Tests
         ///<summary>
         ///
         ///</summary>               
-        public String CustomerNumber { set; get; }
+        public string CustomerNumber { set; get; }
 
         ///<summary>
         ///
         ///</summary>               
-        public String CustomerName { set; get; }
+        public string CustomerName { set; get; }
 
         ///<summary>
         ///
         ///</summary>               
-        public String CustomerCity { set; get; }
+        public string CustomerCity { set; get; }
 
-        public bool TestBool { set; get; }
+        public bool TestBool;
+
+        public DateTime CreateDateTime { get; set; }
+
+        [Column("Alias__X")]
+        public string Alias { get; set; }
+
         ///<summary>
         ///
         ///</summary>               
         public Nullable<Boolean> IsActive { set; get; }
+
 
     }
 }

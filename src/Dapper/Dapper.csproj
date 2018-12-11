@@ -33,6 +33,7 @@
   <!--   <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" /> -->
   <!-- </ItemGroup> -->
   <ItemGroup>
+    <Compile Remove="Expression\SqlTranslateFormater.cs" />
     <Compile Remove="Extension\Kede.SqlMapperExtensions.Async.cs" />
     <Compile Remove="Extension\SqlMapperExtensions.Async.cs" />
     <Compile Remove="Extension\SqlMapperExtensions.Paged.Async.cs" />

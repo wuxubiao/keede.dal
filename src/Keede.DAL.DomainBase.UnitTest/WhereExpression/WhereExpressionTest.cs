@@ -11,10 +11,21 @@ namespace Dapper.Extensions.Tests
     public class WhereExpressionTest
     {
         [TestMethod]
+        public void KeyTest()
+        {
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.Key ==1;
+
+            var translate = new SqlTranslateFormater();
+            string sql = translate.Translate(queryExp1);
+
+            Assert.AreEqual(sql, "[Key] = 1");
+        }
+
+        [TestMethod]
         public void SimpleWhereTrueTest1()
         {
             //Expression<Func<CustomersEntity, bool>> queryExp1 = ct => 1==1 && ct.CustomerCity == "B-City";
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct =>  true && ct.TestBool && false && ct.TestBool==false && ct.TestBool == true && ct.CustomerCity == "B-City" && ct.CustomerID==1;
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => true && ct.TestBool == false && ct.TestBool == true && ct.CustomerCity == "B-City" && ct.CustomerID == 1;
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
@@ -22,7 +33,7 @@ namespace Dapper.Extensions.Tests
             //Expression<Func<CustomersEntity, bool>> queryExp11 = ct => true;
             //string sql11 = translate.Translate(queryExp11);
 
-            //Assert.Equals(sql, "CustomerID < 50 AND CustomerCity = 'B-City'");
+            //Assert.AreEqual(sql, "CustomerID < 50 AND CustomerCity = 'B-City'");
         }
 
         [TestMethod]
@@ -33,7 +44,7 @@ namespace Dapper.Extensions.Tests
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID < 50 AND CustomerCity = 'B-City'");
+            Assert.AreEqual(sql, "CustomerID < 50 AND CustomerCity = 'B-City'");
 
         }
 
@@ -46,7 +57,7 @@ namespace Dapper.Extensions.Tests
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID = 1 AND (CustomerCity = 'B-City' OR CustomerNumber = '0000')");
+            Assert.AreEqual(sql, "CustomerID = 1 AND (CustomerCity = 'B-City' OR CustomerNumber = '0000')");
 
         }
 
@@ -58,7 +69,7 @@ namespace Dapper.Extensions.Tests
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is Not NULL");
+            Assert.AreEqual(sql, "CustomerID <= 50 AND CustomerCity is Not NULL");
 
         }
 
@@ -71,7 +82,7 @@ namespace Dapper.Extensions.Tests
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+            Assert.AreEqual(sql, "CustomerID <= 50 AND CustomerCity is NULL");
 
         }
 
@@ -88,7 +99,7 @@ namespace Dapper.Extensions.Tests
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+            Assert.AreEqual(sql, "CustomerID <= 50 AND CustomerCity is NULL");
         }
 
 
@@ -100,12 +111,12 @@ namespace Dapper.Extensions.Tests
 
         private void TestValueTypeParam(int id)
         {
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID <= id ;
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerID <= id;
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+            Assert.AreEqual(sql, "CustomerID <= 50 AND CustomerCity is NULL");
         }
 
         [TestMethod]
@@ -121,7 +132,7 @@ namespace Dapper.Extensions.Tests
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+            Assert.AreEqual(sql, "CustomerID <= 50 AND CustomerCity is NULL");
         }
 
         [TestMethod]
@@ -137,7 +148,7 @@ namespace Dapper.Extensions.Tests
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID <= 50 AND CustomerCity is NULL");
+            Assert.AreEqual(sql, "CustomerID <= 50 AND CustomerCity is NULL");
         }
 
         [TestMethod]
@@ -146,20 +157,22 @@ namespace Dapper.Extensions.Tests
             //IEnumerable<int> ids = new List<int>() { 40, 50 };//通过测试
             //int[] ids = new[] {40, 50};//通过测试
             List<int> ids = new List<int>() { 40, 50 };//通过测试
+            List<int> ids2 = new List<int>() { 40, 50 };//通过测试
 
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ids.Contains(ct.CustomerID) && (SQLMethod.IsNull(ct.CustomerCity));
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => !ids.Contains(ct.CustomerID) && (SQLMethod.IsNull(ct.CustomerCity));
+//            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.TestBool ==true && !ids.Contains(ct.CustomerID);// && ct.CustomerCity.StartsWith("y") && (SQLMethod.IsNull(ct.CustomerCity));
 
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
 
-            Assert.Equals(sql, "CustomerID In (40,50) AND CustomerCity is NULL");
+            Assert.AreEqual(sql, "CustomerID In (40,50) AND CustomerCity is NULL");
 
         }
 
         [TestMethod]
         public void LikeTest()
         {
-            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.CustomerName.Contains("X") && ct.TestBool==true && ct.CustomerCity.StartsWith("y");
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.TestBool == true && ct.CustomerName.Contains("X") && ct.CustomerCity.StartsWith("y");
             Expression<Func<CustomersEntity, bool>> queryExp2 = ct => ct.CustomerName.StartsWith("X");
             Expression<Func<CustomersEntity, bool>> queryExp3 = ct => ct.CustomerName.EndsWith("X");
             var translate = new SqlTranslateFormater();
@@ -169,12 +182,7 @@ namespace Dapper.Extensions.Tests
         }
     }
 
-    public class TestValue
-    {
-        public int Id { set; get; }
-        public Guid DD { set; get; }
 
-    }
 
 
 }

@@ -13,7 +13,7 @@ namespace Dapper.Extension
     /// Maker:张磊
     /// 解析整个Linq成SQL语句的入口
     /// </summary>
-    public class SqlTranslateFormater : ExpressionVisitor
+    public class SqlTranslateFormaterOld : ExpressionVisitor
     {
         /// <summary>
         /// 
@@ -61,25 +61,31 @@ namespace Dapper.Extension
                     break;
                 case ExpressionType.GreaterThan:
                     sb.Append(" > ");
+                    isleft = false;
                     break;
                 case ExpressionType.LessThan:
                     sb.Append(" < ");
+                    isleft = false;
                     break;
                 case ExpressionType.Equal:
                     sb.Append(" = ");
+                    isleft = false;
                     break;
                 case ExpressionType.LessThanOrEqual:
                     sb.Append(" <= ");
+                    isleft = false;
                     break;
                 case ExpressionType.GreaterThanOrEqual:
                     sb.Append(" >= ");
+                    isleft = false;
                     break;
                 case ExpressionType.NotEqual:
                     sb.Append(" <> ");
+                    isleft = false;
                     break;
             }
 
-            isleft = false;
+//            isleft = false;
 
             this.VisitBinaryWithParent(b, b.Right);
 
@@ -140,7 +146,7 @@ namespace Dapper.Extension
                     return;
             }
 
-            if (bnode != null && bnode.Right is BinaryExpression)
+            if (bnode != null && (bnode.Right is BinaryExpression  || bnode.Right is MethodCallExpression))
                 this.VisitBinaryWithParent(node, bnode.Right);
             else
             {
@@ -163,7 +169,7 @@ namespace Dapper.Extension
             {
                 var memberEx = node as MemberExpression;
                 GetParentMemberName(memberEx.Expression);
-                sb.Append(memberEx.Member.Name);
+                sb.Append(HandleKeyword(memberEx.Member.Name));
                 sb.Append(".");
             }
         }
@@ -232,7 +238,7 @@ namespace Dapper.Extension
                 //    sb.Append(".");
                 //}
 
-                sb.Append(fieldName);
+                sb.Append(HandleKeyword(fieldName));
                 return node;
             }
             else
@@ -371,7 +377,7 @@ namespace Dapper.Extension
                         sb.Append(" is NULL");
                         break;
                     case "IsNotNull":
-                        sb.Append(" is NOT NULL");
+                        sb.Append(" is Not NULL");
                         break;
                     default:
                         string methodName = methodInfo.Name.ToLower();
@@ -505,5 +511,17 @@ namespace Dapper.Extension
             return node;
         }
 
+        private static string HandleKeyword(string p)
+        {
+            switch (p)
+            {
+                case "Key":
+                    return "[Key]";
+                case "Description":
+                    return "[Description]";
+                default:
+                    return p;
+            }
+        }
     }
 }

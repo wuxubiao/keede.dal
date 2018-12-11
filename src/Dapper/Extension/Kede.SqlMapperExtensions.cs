@@ -116,11 +116,11 @@ namespace Dapper.Extension
                 string columns = $"[{string.Join("],[", canReadProperties.Select(p => GetCustomColumnName(p)).ToArray())}]";
                 if (isUpdateLock)
                 {
-                    sql = $"select {columns} from [{name}] WITH (UPDLOCK) where {GetCustomColumnName(key)} = @id";
+                    sql = $"select {columns} from [{name}] WITH (UPDLOCK) where [{GetCustomColumnName(key)}] = @id";
                 }
                 else
                 {
-                    sql = $"select {columns} from [{name}] where {GetCustomColumnName(key)} = @id";
+                    sql = $"select {columns} from [{name}] where [{GetCustomColumnName(key)}] = @id";
                 }
                 GetQueries[type.TypeHandle] = sql;
             }
@@ -382,7 +382,18 @@ namespace Dapper.Extension
         /// </summary>
         /// <param name="property"></param>
         /// <returns></returns>
-        private static string GetCustomColumnName(PropertyInfo property)
+        public static string GetCustomColumnName(PropertyInfo property)
+        {
+            string result = property.Name;
+            var attributes = property.GetCustomAttributes(true).Where(p => p is ColumnAttribute).FirstOrDefault();
+            if (attributes != null)
+            {
+                result = (attributes as ColumnAttribute).Name;
+            }
+            return result;
+        }
+
+        public static string GetCustomColumnName(FieldInfo property)
         {
             string result = property.Name;
             var attributes = property.GetCustomAttributes(true).Where(p => p is ColumnAttribute).FirstOrDefault();
