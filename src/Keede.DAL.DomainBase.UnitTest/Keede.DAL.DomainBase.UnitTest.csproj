@@ -68,7 +68,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Extension\Mapping\TypeMapperTests.cs" />
     <Compile Include="Models\Box.cs" />
     <Compile Include="Models\CouponNoEntity.cs" />
     <Compile Include="Models\NewCustom.cs" />

@@ -49,10 +49,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entitys.cs" />
+    <Compile Include="Extension\Mapping\TypeMapperTests.cs" />
     <Compile Include="Extension\SqlMapperExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WhereExpressionTest.cs" />
+    <Compile Include="WhereExpression\CustomersEntity.cs" />
+    <Compile Include="WhereExpression\TestValue.cs" />
+    <Compile Include="WhereExpression\WhereBuilderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
