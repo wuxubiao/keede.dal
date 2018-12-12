@@ -24,7 +24,15 @@ namespace Dapper.Extension
             {
                 var unary = (UnaryExpression)expression;
                 var right = Recurse(unary.Operand, true);
-                return "(" + NodeTypeToString(unary.NodeType, right == "NULL") + " " + right + ")";
+
+                if (unary.NodeType == ExpressionType.Convert)
+                {
+                    return right;
+                }
+                else
+                {
+                    return "(" + NodeTypeToString(unary.NodeType, right == "NULL") + " " + right + ")";
+                }
             }
 
             if (expression is BinaryExpression)
@@ -190,7 +198,7 @@ namespace Dapper.Extension
             {
                 return "NULL";
             }
-            else if (value is string && quote)
+            else if ((value is string ||value is DateTime) && quote)
             {
                 return $"'{value}'";
             }
@@ -276,6 +284,8 @@ namespace Dapper.Extension
                     return "OR";
                 case ExpressionType.Subtract:
                     return "-";
+                case ExpressionType.Convert:
+                    return "";
             }
             throw new Exception($"Unsupported node type: {nodeType}");
         }

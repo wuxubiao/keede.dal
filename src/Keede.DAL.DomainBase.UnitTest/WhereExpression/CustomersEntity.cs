@@ -37,10 +37,14 @@ namespace Dapper.Extensions.Tests
 
         public bool TestBool;
 
-        public DateTime CreateDateTime { get; set; }
+        public DateTime CreateDateTime;
 
         [Column("Alias__X")]
         public string Alias { get; set; }
+
+        public int? NullableInt { get; set; }
+
+        public DateTime? NullableDate { get; set; }
 
         ///<summary>
         ///

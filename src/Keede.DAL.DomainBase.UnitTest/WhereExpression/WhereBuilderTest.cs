@@ -143,7 +143,6 @@ namespace Keede.RepositoriesTests.WhereExpression
             string sql = translate.Translate(queryExp1);
 
             Assert.AreEqual(sql, "(([CustomerID] < 50) AND ([CustomerCity] = 'B-City'))");
-
         }
 
         [TestMethod]
@@ -210,6 +209,18 @@ namespace Keede.RepositoriesTests.WhereExpression
             string sql = translate.Translate(queryExp1);
 
             Assert.AreEqual(sql, "([CreateDateTime] = GETDATE())");
+        }
+
+        [TestMethod]
+        public void DateTimeTest()
+        {
+            var date = DateTime.Parse("2018/12/11 0:00:00");
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct =>ct.TestBool && (ct.CreateDateTime >date.Date || ct.CreateDateTime < date);
+
+            var translate = new SqlTranslateFormater();
+            string sql = translate.Translate(queryExp1);
+
+            Assert.AreEqual(sql, "(([TestBool] = 1) AND (([CreateDateTime] > '2018/12/11 0:00:00') OR ([CreateDateTime] < '2018/12/11 0:00:00')))");
         }
 
         [TestMethod]
@@ -304,21 +315,26 @@ namespace Keede.RepositoriesTests.WhereExpression
             List<int> ids = new List<int>() { 40, 50 };//通过测试
             IEnumerable<int> ids2 = new List<int>() { 40, 50 };//通过测试
             int[] ids3 = new[] { 40, 50 };//通过测试
+            List<Guid> ids4 =new List<Guid>();
+            ids4.Add(new Guid());
 
             Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ids.Contains(ct.CustomerID);// && (SQLMethod.IsNull(ct.CustomerCity));
             Expression<Func<CustomersEntity, bool>> queryExp2 = ct => ids2.Contains(ct.CustomerID) || !ids3.Contains(ct.CustomerID);
             Expression<Func<CustomersEntity, bool>> queryExp3 = ct => ids.Contains(ct.CustomerID) && ids2.Contains(ct.Key) || !ids3.Contains(ct.CustomerID);
             Expression<Func<CustomersEntity, bool>> queryExp4 = ct => ct.TestBool == true && !ids.Contains(ct.CustomerID) && ct.CustomerCity.StartsWith("y");
+            Expression<Func<CustomersEntity, bool>> queryExp5 = ct => ct.TestBool == true && !ids4.Contains(ct.DD) && ct.CustomerCity.StartsWith("y");
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
             string sql2 = translate.Translate(queryExp2);
             string sql3 = translate.Translate(queryExp3);
             string sql4 = translate.Translate(queryExp4);
-
+            string sql5 = translate.Translate(queryExp5);
+            
             Assert.AreEqual(sql, "([CustomerID] IN (40, 50))");
             Assert.AreEqual(sql2, "(([CustomerID] IN (40, 50)) OR (NOT ([CustomerID] IN (40, 50))))");
             Assert.AreEqual(sql3, "((([CustomerID] IN (40, 50)) AND ([Key] IN (40, 50))) OR (NOT ([CustomerID] IN (40, 50))))");
             Assert.AreEqual(sql4, "((([TestBool] = 1) AND (NOT ([CustomerID] IN (40, 50)))) AND ([CustomerCity] LIKE \'y%\'))");
+            Assert.AreEqual(sql5, "((([TestBool] = 1) AND (NOT ([DD] IN ('{00000000-0000-0000-0000-000000000000}')))) AND ([CustomerCity] LIKE 'y%'))");
         }
 
         [TestMethod]
@@ -329,6 +345,17 @@ namespace Keede.RepositoriesTests.WhereExpression
             var translate = new SqlTranslateFormater();
             string sql = translate.Translate(queryExp1);
             Assert.AreEqual(sql, "([Alias__X] = 'Abc')");
+        }
+
+        [TestMethod]
+        public void NullAbleTest()
+        {
+            var date = DateTime.Parse("2018-01-01");
+            Expression<Func<CustomersEntity, bool>> queryExp1 = ct => ct.NullableInt >10 && ct.NullableDate <date;
+
+            var translate = new SqlTranslateFormater();
+            string sql = translate.Translate(queryExp1);
+            Assert.AreEqual(sql, "(([NullableInt] > 10) AND ([NullableDate] < '2018/1/1 0:00:00'))");
         }
     }
 }

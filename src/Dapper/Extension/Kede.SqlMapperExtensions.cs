@@ -741,11 +741,6 @@ namespace Dapper.Extension
                 dt.LoadDataRow(values, true);
             }
 
-            //if (keyProperties.Count > 0)
-            //{
-            //    dt.Columns.Add(new DataColumn(GetCustomColumnName(keyProperties[0]), keyProperties[0].PropertyType));
-            //}
-
             return dt;
         }
 
