@@ -40,6 +40,10 @@ namespace Keede.DAL.DDD.Unitwork
             _localNewCollection.Value.Clear();
             _localModifiedCollection.Value.Clear();
             _localDeletedCollection.Value.Clear();
+            _localCustomOperateCollection.Value.Clear();
+
+            _localExpressionModifiedCollection.Value.Clear();
+            _localExpressionDeletedCollection.Value.Clear();
         }
 
         /// <summary>
@@ -51,10 +55,13 @@ namespace Keede.DAL.DDD.Unitwork
             if (disposing)
             {
                 _localCommitted.Dispose();
-                _localDeletedCollection.Dispose();
-                _localModifiedCollection.Dispose();
                 _localNewCollection.Dispose();
+                _localModifiedCollection.Dispose();
+                _localDeletedCollection.Dispose();
                 _localCustomOperateCollection.Dispose();
+
+                _localExpressionModifiedCollection.Dispose();
+                _localExpressionDeletedCollection.Dispose();
             }
         }
 

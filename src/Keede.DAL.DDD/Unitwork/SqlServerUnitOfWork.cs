@@ -5,16 +5,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 using Keede.DAL.DDD.Repositories;
 using Keede.DAL.Utility;
 using Keede.DAL.RWSplitting;
-using System.Linq.Expressions;
-using Dapper.Extension;
-
-#if NET462 || NET47 || NET471 || NET472
-using System.Management.Instrumentation;
-#endif
 
 namespace Keede.DAL.DDD.Unitwork
 {
@@ -45,39 +40,30 @@ namespace Keede.DAL.DDD.Unitwork
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _removeExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
         private static readonly ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler> _saveExpressionMethodDic = new ConcurrentDictionary<string, FastMethodUtility.FastInvokeHandler>();
 
-        //todo:
-//        static SqlServerUnitOfWork()
-//        {
-//            var typess = AppDomain.CurrentDomain.GetAssemblies()
-//                .SelectMany(a => a.GetTypes().Where(d => d.IsClass && !d.IsAbstract).Where(t => t.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IRepository<>))));
-//
-//            foreach (var type in typess)
-//            {
-//                var interfaceType = type.GetInterfaces().FirstOrDefault(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IRepository<>));
-//                var entityType = interfaceType.GenericTypeArguments.Where(i => !i.IsGenericParameter).FirstOrDefault();
-//
-//                Type generic = typeof(SqlServerRepository<>);
-//                Type[] typeArgs = { entityType };
-//                Type realType = generic.MakeGenericType(typeArgs);
-//                ConstructorInfo constructor;
-//
-//
-//            }
-//
-//
-//            if (_constructorDic.TryGetValue(realType.FullName, out constructor))
-//                return constructor;
-//            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(ent => !ent.GlobalAssemblyCache && ent.FullName.ToLower().Contains("keede")))
-//            {
-//                foreach (var type in assembly.GetTypes().Where(type => realType.IsAssignableFrom(type)))//assembly.GetTypes().Where(ent => ent.IsClass).Where(ent => ent.BaseType == realType || (ent.BaseType != null && ent.BaseType.BaseType == realType)))
-//                {
-//                    constructor = type.GetConstructor(new Type[0]);
-//                    _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);
-//                    return constructor;
-//                }
-//            }
-//
-//        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entityAssembly"></param>
+        /// <param name="repositoryAssembly"></param>
+        public static void InitRepository(Assembly entityAssembly, Assembly repositoryAssembly)
+        {
+              var entityTypes = entityAssembly.GetTypes().Where(d => d.IsClass && !d.IsAbstract)
+                .Where(t => t.GetInterfaces().Any(d => d.Name == "IEntity"));
+
+            var repositoryTypess= repositoryAssembly.GetTypes().Where(d => d.IsClass && !d.IsAbstract)
+                .Where(t => t.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IRepository<>)));
+
+            foreach (var entityType in entityTypes)
+            {
+                Type realType = MakeRealType(entityType);
+
+                foreach (var type in repositoryTypess.Where(type => realType.IsAssignableFrom(type)))
+                {
+                    var constructor = type.GetConstructor(new Type[0]);
+                    _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);
+                }
+            }
+        }
 
         /// <summary>
         /// 
@@ -155,6 +141,10 @@ namespace Keede.DAL.DDD.Unitwork
             catch
             {
                 // ignored
+            }
+            finally
+            {
+                ClearRegistrations();
             }
         }
 
@@ -278,6 +268,10 @@ namespace Keede.DAL.DDD.Unitwork
                         Committed = false;
                         throw ex;
                     }
+                    finally
+                    {
+                        ClearRegistrations();
+                    }
                 }
             }
         }
@@ -299,43 +293,52 @@ namespace Keede.DAL.DDD.Unitwork
                         {
                             var repository = GetRepostiroy(deletedData.Value, trans);
                             var removeMethod = GetRemoveMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)removeMethod).Invoke(repository, new object[] { deletedData.Value, null });
+                            ((FastMethodUtility.FastInvokeHandler) removeMethod).Invoke(repository,
+                                new object[] {deletedData.Value, null});
                         }
 
                         foreach (var customOperate in CustomOperateCollection)
                         {
                             var repository = GetRepostiroy(customOperate.Value.RepositoryItemType, trans);
                             var method = GetCustomMethod(repository, customOperate.Value.OperateName);
-                            ((FastMethodUtility.FastInvokeHandler)method).Invoke(repository, new object[] { customOperate.Value.Data });
+                            ((FastMethodUtility.FastInvokeHandler) method).Invoke(repository,
+                                new object[] {customOperate.Value.Data});
                         }
 
                         foreach (var newData in NewCollection)
                         {
                             var repository = GetRepostiroy(newData.Value, trans);
                             var addMethod = GetAddMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)addMethod).Invoke(repository, new object[] { newData.Value, null });
+                            ((FastMethodUtility.FastInvokeHandler) addMethod).Invoke(repository,
+                                new object[] {newData.Value, null});
                         }
 
                         foreach (var modifiedData in ModifiedCollection)
                         {
                             var repository = GetRepostiroy(modifiedData.Value, trans);
                             var saveMethod = GetSaveMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)saveMethod).Invoke(repository, new object[] { modifiedData.Value, null });
+                            ((FastMethodUtility.FastInvokeHandler) saveMethod).Invoke(repository,
+                                new object[] {modifiedData.Value, null});
                         }
-                        
+
                         foreach (var modifiedData in ExpressionModifiedCollection)
                         {
                             var repository = GetRepostiroy(modifiedData.Value.EntityType, trans);
                             var modifiedExpressionMethod = GetModifiedExpressionMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)modifiedExpressionMethod).Invoke(repository, new object[] { modifiedData.Value.WhereExpression,
-                                modifiedData.Value.Data, null });
+                            ((FastMethodUtility.FastInvokeHandler) modifiedExpressionMethod).Invoke(repository,
+                                new object[]
+                                {
+                                    modifiedData.Value.WhereExpression,
+                                    modifiedData.Value.Data, null
+                                });
                         }
 
                         foreach (var deletedData in ExpressionDeletedCollection)
                         {
                             var repository = GetRepostiroy(deletedData.Value.EntityType, trans);
                             var removeExpressionMethod = GetRemoveExpressionMethod(repository);
-                            ((FastMethodUtility.FastInvokeHandler)removeExpressionMethod).Invoke(repository, new object[] { deletedData.Value.WhereExpression, null });
+                            ((FastMethodUtility.FastInvokeHandler) removeExpressionMethod).Invoke(repository,
+                                new object[] {deletedData.Value.WhereExpression, null});
                         }
 
                         trans.Commit();
@@ -347,6 +350,10 @@ namespace Keede.DAL.DDD.Unitwork
                         trans.Rollback();
                         Committed = false;
                         throw;
+                    }
+                    finally
+                    {
+                        ClearRegistrations();
                     }
                 }
             }
@@ -374,29 +381,37 @@ namespace Keede.DAL.DDD.Unitwork
 
         private ConstructorInfo GetRepostiroyConstructorInfo(Type entityType)
         {
+            Type realType = MakeRealType(entityType);
+            if (_constructorDic.TryGetValue(realType.FullName, out ConstructorInfo constructor))
+            {
+                return constructor;
+            }
+
+            //找不到实体对应的实现类，则返回默认实现类
+            return GetDefaultRepostiroyConstructorInfo(entityType);
+        }
+
+        /// <summary>
+        /// 默认实现类构造函数元数据
+        /// </summary>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        private ConstructorInfo GetDefaultRepostiroyConstructorInfo(Type entityType)
+        {
+            Type realType = MakeRealType(entityType);
+            var constructor = realType.GetConstructor(new Type[0]);
+            _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);
+
+            return constructor;
+        }
+
+        private static Type MakeRealType(Type entityType)
+        {
             Type generic = typeof(SqlServerRepository<>);
             Type[] typeArgs = { entityType };
             Type realType = generic.MakeGenericType(typeArgs);
-            ConstructorInfo constructor;
-            if (_constructorDic.TryGetValue(realType.FullName, out constructor))
-                return constructor;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(ent => !ent.GlobalAssemblyCache && ent.FullName.ToLower().Contains("keede")))
-            {
-                foreach (var type in assembly.GetTypes().Where(type => realType.IsAssignableFrom(type)))//assembly.GetTypes().Where(ent => ent.IsClass).Where(ent => ent.BaseType == realType || (ent.BaseType != null && ent.BaseType.BaseType == realType)))
-                {
-                    constructor = type.GetConstructor(new Type[0]);
-                    _constructorDic.AddOrUpdate(realType.FullName, constructor, (key, existed) => constructor);
-                    return constructor;
-                }
-            }
 
-            //todo：生成没有实现仓储实例
-
-#if NETSTANDARD1_3 || NETSTANDARD2_0
-            throw new Exception($"未找到实现{entityType.FullName}的仓储，确定该仓储的程序集名称包含\"Keede\"！");
-#else
-            throw new InstanceNotFoundException($"未找到实现{entityType.FullName}的仓储，确定该仓储的程序集名称包含\"Keede\"！");
-#endif
+            return realType;
         }
 
         private FastMethodUtility.FastInvokeHandler GetAddMethod(dynamic repository)

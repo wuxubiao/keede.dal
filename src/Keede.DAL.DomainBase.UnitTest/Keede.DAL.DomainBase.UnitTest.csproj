@@ -57,6 +57,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <Choose>
@@ -96,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Compile Include="UnitOfWork.Test.New.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Test_Master.sql" />
@@ -105,6 +107,10 @@
       <Project>{ad51a929-b464-4675-b892-f69ddff50a88}</Project>
       <Name>Dapper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Entitys.Test\Entitys.Test.csproj">
+      <Project>{2a526c4f-eddd-4c07-b213-2379f32f7932}</Project>
+      <Name>Entitys.Test</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Keede.DAL.DDD\Keede.DAL.DDD.csproj">
       <Project>{73c19c15-5933-489a-ae5d-275425709354}</Project>
       <Name>Keede.DAL.DDD</Name>
@@ -112,6 +118,10 @@
     <ProjectReference Include="..\Keede.DAL.RWSplitting\Keede.DAL.RWSplitting.csproj">
       <Project>{f842e429-158f-4c9b-8c98-f7839a39190b}</Project>
       <Name>Keede.DAL.RWSplitting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Repository.Test\Repository.Test.csproj">
+      <Project>{c57191d8-a3d4-43c2-9dec-a946c25f3ac2}</Project>
+      <Name>Repository.Test</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
