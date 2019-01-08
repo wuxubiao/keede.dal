@@ -54,7 +54,7 @@ namespace Keede.DAL.RWSplitting
             {
                 if (_lists.Count == 0) throw new Exception("数据库配置没有初始化，需在应用启动调用ConnectionContainer.AddDbConnections进行初始化");
 
-                throw new Exception("数据库不存在，请检查配置");
+                throw new Exception($"dbName:{dbName}数据库不存在，请检查ConnectionContainer.AddDbConnections配置");
             }
 
             return isReadDb ? wapper.ReadConnction : wapper.WriteConnction;

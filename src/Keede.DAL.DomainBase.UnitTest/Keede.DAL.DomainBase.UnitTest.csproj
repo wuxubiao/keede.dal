@@ -89,7 +89,6 @@
     <Compile Include="Repositories\PersonRepository.cs" />
     <Compile Include="UnitTest_Repository.cs" />
     <Compile Include="UnitTest_UnitWork.cs" />
-    <Compile Include="UnitTest_WMS.cs" />
     <Compile Include="ValueObject\Book.cs" />
     <Compile Include="WhereExpression\CustomersEntity.cs" />
     <Compile Include="WhereExpression\TestValue.cs" />
