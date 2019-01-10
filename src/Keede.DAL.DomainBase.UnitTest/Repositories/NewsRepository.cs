@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using System.Data.Common;
+using Dapper.Extension;
 using Keede.DAL.RWSplitting;
 using Keede.RepositoriesTests.Repositories;
 
@@ -60,6 +61,19 @@ namespace Keede.DAL.DDD.UnitTest
                 var result = BatchAdd(list);
 
                 DbTransaction.Commit();
+            }
+        }
+
+        public void TestInsert()
+        {
+            using (var conn = OpenDbConnection(false, true))
+            {
+                var news1 = new News();
+                news1.Id = 9998;
+                news1.Title = "title1" + DateTime.Now;
+                //                news1.Test1 = new Guid();
+
+                conn.Insert(news1, "new");
             }
         }
     }

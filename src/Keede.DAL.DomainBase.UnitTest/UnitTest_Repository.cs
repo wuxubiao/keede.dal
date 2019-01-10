@@ -47,6 +47,13 @@ namespace Keede.RepositoriesTests
         }
 
         [TestMethod]
+        public void TestInsert()
+        {
+            var newsRepository = new NewsRepository();
+            newsRepository.TestInsert();
+        }
+
+        [TestMethod]
         public void TestBase()
         {
 //            var boxRepository = new SqlServerRepository<Box>();

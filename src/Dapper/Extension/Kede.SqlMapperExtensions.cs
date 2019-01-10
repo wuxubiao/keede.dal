@@ -865,11 +865,10 @@ namespace Dapper.Extension
             var obj = data as object;
             var properties = GetPropertyAndFieldName(obj);
             var fieldNames = properties.Values.ToList();
-            var columns = string.Join(",", fieldNames);
+
+            var columns = string.Join(",", fieldNames.Select(p => $"[{p}]"));
             var values = string.Join(",", fieldNames.Select(p => "@" + p));
             var sql = string.Format("insert into [{0}] ({1}) values ({2}) select cast(scope_identity() as bigint)", table, columns, values);
-
-            //return connection.Execute(sql, obj, transaction, commandTimeout);
 
             var parameters = new DynamicParameters(data);
             var expandoObject = new ExpandoObject() as IDictionary<string, object>;
