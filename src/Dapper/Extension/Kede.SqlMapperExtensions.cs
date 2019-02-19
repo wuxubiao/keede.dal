@@ -21,8 +21,7 @@ namespace Dapper.Extension
 
         public static string GetRWSplitDbName(Type type)
         {
-            string name = "";
-            if (_typeRwSplitDbName.TryGetValue(type.TypeHandle, out name)) return name;
+            if (_typeRwSplitDbName.TryGetValue(type.TypeHandle, out string name)) return name;
 
             var tableAttr = type.GetCustomAttributes(true).Where(p => p is RWSplitDbNameAttribute).FirstOrDefault();
             if (tableAttr != null)

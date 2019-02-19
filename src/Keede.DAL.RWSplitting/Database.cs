@@ -14,7 +14,7 @@ namespace Keede.DAL.RWSplitting
 
         public static IDbConnection GetDbConnection(string dbName, bool isReadDb = true)
         {
-            return CreateConnction(dbName.ToLower(), isReadDb);
+            return CreateConnction(dbName?.ToLower(), isReadDb);
         }
         
         private static IDbConnection CreateConnction(string dbName = null, bool isReadDb = true)
@@ -32,7 +32,7 @@ namespace Keede.DAL.RWSplitting
 
         public static SqlConnection GetSqlConnection(string dbName, bool isReadDb = true)
         {
-            return CreateSqlConnection(dbName.ToLower(), isReadDb);
+            return CreateSqlConnection(dbName?.ToLower(), isReadDb);
         }
 
         private static SqlConnection CreateSqlConnection(string dbName = null, bool isReadDb = true)
@@ -50,7 +50,7 @@ namespace Keede.DAL.RWSplitting
 
         public static string GetDbConnectionStr(string dbName, bool isReadDb = true)
         {
-            return CreateConnctionStr(dbName.ToLower(), isReadDb);
+            return CreateConnctionStr(dbName?.ToLower(), isReadDb);
         }
 
         private static string CreateConnctionStr(string dbName = null, bool isReadDb = true)
